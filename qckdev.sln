@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28010.2036
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "qckdev", "qckdev\qckdev.csproj", "{CA91C1A7-7BBD-4105-BF4E-50F74C013D51}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "qckdevTest", "qckdevTest\qckdevTest.csproj", "{B6063C02-EA2A-41A1-85A3-8C059D24F978}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{CA91C1A7-7BBD-4105-BF4E-50F74C013D51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA91C1A7-7BBD-4105-BF4E-50F74C013D51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA91C1A7-7BBD-4105-BF4E-50F74C013D51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA91C1A7-7BBD-4105-BF4E-50F74C013D51}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6063C02-EA2A-41A1-85A3-8C059D24F978}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6063C02-EA2A-41A1-85A3-8C059D24F978}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6063C02-EA2A-41A1-85A3-8C059D24F978}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6063C02-EA2A-41A1-85A3-8C059D24F978}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4F38FF2F-E4CF-4807-AB95-D0AD86A275BF}
+	EndGlobalSection
+EndGlobal
