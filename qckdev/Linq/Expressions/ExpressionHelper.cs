@@ -15,7 +15,11 @@ namespace qckdev.Linq.Expressions
     public static class ExpressionHelper
     {
 
+#if PORTABLE
+        private static readonly MethodInfo convertMethod = typeof(Convert).GetRuntimeMethod(nameof(Convert.ChangeType), new Type[] { typeof(object), typeof(Type) });
+#else
         private static readonly MethodInfo convertMethod = typeof(Convert).GetMethod(nameof(Convert.ChangeType), new Type[] { typeof(object), typeof(Type) });
+#endif
 
         /// <summary>
         /// Creates a <see cref="ConstantExpression"/> with nullable support.

@@ -1,4 +1,7 @@
-﻿using System;
+﻿#if PORTABLE // EXCLUDE.
+#else
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -12,7 +15,7 @@ namespace qckdev
     public class AppDomainWrapper : IDisposable
     {
 
-        #region ctor
+#region ctor
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AppDomainWrapper"/> class.
@@ -23,10 +26,10 @@ namespace qckdev
             this.AppDomain = appDomain;
         }
 
-        #endregion
+#endregion
 
 
-        #region properties
+#region properties
 
         /// <summary>
         /// Gets a value indicating whether the <see cref="AppDomain"/> has been unloaded.
@@ -38,10 +41,10 @@ namespace qckdev
         /// </summary>
         public AppDomain AppDomain { get; private set; }
 
-        #endregion
+#endregion
 
 
-        #region IDisposable Support
+#region IDisposable Support
 
         private bool disposedValue = false; // To detect redundant calls
 
@@ -78,7 +81,9 @@ namespace qckdev
             GC.SuppressFinalize(this); // The finalizer is overridden.
         }
 
-        #endregion
+#endregion
 
     }
 }
+
+#endif

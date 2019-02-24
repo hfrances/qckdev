@@ -28,7 +28,7 @@ namespace qckdev.Linq.Expressions
         public ExpressionBuilder()
         {
             this.ItemType = typeof(T);
-            this.Properties = ReflectionHelper.CacheProperties(ItemType);
+            this.Properties = ItemType.GetCachedProperties();
             this.ParameterExpression = Expression.Parameter(this.ItemType, "item");
 
             expressionAction = new Dictionary<ExpressionNodeType, Func<ExpressionNode, Expression>>()
@@ -294,7 +294,7 @@ namespace qckdev.Linq.Expressions
                     if (content.StartsWith("[") && content.EndsWith("]"))
                         content = content.Substring(1, content.Length - 2);
 
-                    pi = ItemType.GetProperty(content);
+                    pi = ItemType.GetCachedProperties()[content];
                     rdo = Expression.Property(this.ParameterExpression, pi);
                     break;
 

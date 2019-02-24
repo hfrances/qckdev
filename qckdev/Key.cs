@@ -17,7 +17,7 @@ namespace qckdev
 
         #region fields
 
-        readonly ArrayList InnerList;
+        readonly object[] InnerList;
         int? hashcode;
 
         #endregion
@@ -41,7 +41,7 @@ namespace qckdev
         public Key(object[] keys, bool ignoreCase)
         {
             IgnoreCase = ignoreCase;
-            InnerList = new ArrayList(keys);
+            InnerList = keys;
         }
 
         #endregion
@@ -100,9 +100,9 @@ namespace qckdev
             {
                 rdo = false;
             }
-            else if (this.InnerList.Count == other.InnerList.Count)
+            else if (this.InnerList.Length == other.InnerList.Length)
             {
-                int length = this.InnerList.Count;
+                int length = this.InnerList.Length;
                 for (int i = 0; i < length && rdo; i++)
                 {
                     var val1 = this.InnerList[i];
@@ -136,14 +136,14 @@ namespace qckdev
         /// <returns>true if the instances are equal; otherwise false.</returns>
         /// <remarks>
         /// If <paramref name="item1"/> and <paramref name="item2"/> are <see cref="String"/>, 
-        /// it uses <see cref="String.Compare(string, string, bool)"/> with <see cref="Key.IgnoreCase"/> parameter.
+        /// it uses <see cref="string.Compare(string, string, StringComparison)"/> with <see cref="Key.IgnoreCase"/> parameter.
         /// </remarks>
         protected virtual bool ItemEquals(object item1, object item2)
         {
             bool rdo;
 
             if (item1 is string && item2 is string)
-                rdo = (string.Compare((string)item1, (string)item2, this.IgnoreCase) == 0);
+                rdo = (string.Compare((string)item1, (string)item2, (IgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal)) == 0);
             else
                 rdo = object.Equals(item1, item2);
             return rdo;

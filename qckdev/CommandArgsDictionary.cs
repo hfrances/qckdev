@@ -1,8 +1,6 @@
-﻿using Microsoft.VisualBasic;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using System.Diagnostics;
 using System.Runtime.Serialization;
 
@@ -54,7 +52,7 @@ namespace qckdev
             if (args == null)
                 throw new ArgumentNullException("args");
             else if (ignoreCase)
-                lst = new CommandArgsDictionary(StringComparer.InvariantCultureIgnoreCase);
+                lst = new CommandArgsDictionary(StringComparer.OrdinalIgnoreCase);
             else
                 lst = new CommandArgsDictionary();
 

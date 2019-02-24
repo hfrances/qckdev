@@ -1,9 +1,12 @@
-﻿using System;
+﻿#if PORTABLE // EXCLUDE.
+#else
+
+using System;
 using System.ComponentModel;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace qckdev.Reflection
+namespace qckdev.ComponentModel
 {
 
     sealed class PropertyDescriptorCache
@@ -37,3 +40,5 @@ namespace qckdev.Reflection
     }
 
 }
+
+#endif

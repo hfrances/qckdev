@@ -31,7 +31,7 @@ namespace qckdev.Reflection
 
             if (!InnerList.TryGetValue(type, out properties))
             {
-                properties = type.GetProperties()
+                properties = type.GetPropertiesFull()
                     .ToDictionary(x => x.Name, y => y);
                 InnerList.Add(type, properties);
             }

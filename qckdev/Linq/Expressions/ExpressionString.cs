@@ -28,6 +28,7 @@ namespace qckdev.Linq.Expressions
             return tree;
         }
 
+        /*
         /// <summary>
         /// Serializes the specified <see cref="ExpressionTree"/> and writes the XML document to a file.
         /// </summary>
@@ -82,7 +83,7 @@ namespace qckdev.Linq.Expressions
             }
             return rdo;
         }
-
+        */
     }
 
 }

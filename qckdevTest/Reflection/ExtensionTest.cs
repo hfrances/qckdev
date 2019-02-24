@@ -20,9 +20,9 @@ namespace qckdevTest.Reflection
         [DataRow(typeof(TestInterfaceBase), "Property1, Property2, Property3, Property4")]
         [DataRow(typeof(TestInterface), "Property1, Property2, Property3, Property4, Property5")]
         [TestMethod]
-        public void GetProperties2(Type type, string propertyNames)
+        public void GetPropertiesFull(Type type, string propertyNames)
         {
-            var propertyList = type.GetProperties2();
+            var propertyList = type.GetPropertiesFull();
             var propertyKeysArr = propertyList.Select(x => x.Name).ToArray();
             var propertyNameArr = propertyNames.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
                                                .Select(x => x.Trim())

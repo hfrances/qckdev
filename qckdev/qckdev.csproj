@@ -1,11 +1,29 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <!--<TargetFramework>netstandard2.0</TargetFramework>-->
+    <TargetFrameworks>netstandard2.0;portable-net451+win81+wpa81</TargetFrameworks> <!-- portable-net45+sl50+win8+wpa81-->
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DocumentationFile>C:\Users\hfrances\source\repos\qckdev\qckdev\qckdev.xml</DocumentationFile>
   </PropertyGroup>
 
+  <PropertyGroup Condition="'$(TargetFramework)'=='portable-net451+win81+wpa81'">
+    <DefineConstants>$(DefineConstants);STANDARD</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)'=='portable-net451+win81+wpa81'">
+    <!--<TargetFrameworkIdentifier>.NETPortable</TargetFrameworkIdentifier>-->
+    <!--<TargetFrameworkVersion>v4.0</TargetFrameworkVersion>-->
+    <!--<TargetFrameworkProfile>Profile47</TargetFrameworkProfile>-->
+    <!--<DefineConstants>$(DefineConstants);PROFILE47</DefineConstants>-->
+    <DefineConstants>$(DefineConstants);PORTABLE</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MSBuild.Sdk.Extras" Version="1.0.5" PrivateAssets="all" />
+  </ItemGroup>
+
+  <Import Project="$(MSBuildSDKExtrasTargets)" Condition="Exists('$(MSBuildSDKExtrasTargets)')" />
 </Project>
