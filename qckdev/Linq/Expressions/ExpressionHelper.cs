@@ -52,11 +52,12 @@ namespace qckdev.Linq.Expressions
         /// <summary>
         /// Creates a <see cref="MethodCallExpression"/> that returns an object of the specified type and whose value is equivalent to the specified object.
         /// </summary>
-        /// <param name="expression">An <see cref="Expression"/> that implements the <see cref="IConvertible"/> interface</param>
+        /// <param name="expression">An <see cref="Expression"/> that implements the System.IConvertible interface</param>
         /// <param name="conversionType">The type of object to return.</param>
         /// <returns></returns>
         public static MethodCallExpression ChangeType(this Expression expression, Type conversionType)
         {
+            Convert.ChangeType(null, conversionType);
             return Expression.Call(convertMethod, expression, Expression.Constant(conversionType));
         }
 

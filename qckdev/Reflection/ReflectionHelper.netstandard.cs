@@ -113,7 +113,9 @@ namespace qckdev.Reflection
             return c;
         }
 
-
+        /// <summary>
+        /// Returns a <see cref="MethodBase"/> object representing the method that called to the executing method.
+        /// </summary>
         [MethodImpl(MethodImplOptions.NoInlining)]
         public static MethodBase GetCallingMethod()
         {

@@ -1,0 +1,14 @@
+{
+  "ServerUri": "https://sonarcloud.io/",
+  "Organization": {
+    "Key": "hfrances-github",
+    "Name": "hfrances"
+  },
+  "ProjectKey": "qckdev",
+  "Profiles": {
+    "CSharp": {
+      "ProfileKey": "AV8HSwklKRUdRrN4j6SF",
+      "ProfileTimestamp": "2019-01-14T10:58:53+01:00"
+    }
+  }
+}

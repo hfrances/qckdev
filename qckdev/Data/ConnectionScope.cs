@@ -9,7 +9,7 @@ using System.Text;
 namespace qckdev.Data
 {
 
-    class ConnectionScope : IDisposable
+    sealed class ConnectionScope : IDisposable
     {
 
         #region ctor

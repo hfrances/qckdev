@@ -15,9 +15,6 @@ namespace qckdev.Reflection
     public static partial class ReflectionExtensions
     {
 
-        readonly static Type stringType = typeof(string);
-
-
         /// <summary>
         /// When overridden in a derived class, searches for the properties of the current <see cref="Type"/>, using the specified binding constraints. 
         /// Includes all levels for interfaces.

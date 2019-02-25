@@ -13,13 +13,20 @@ namespace qckdev
     /// <remarks>
     /// Format: "/Param1:Value /Param2 /Param3:Value".
     /// </remarks>
-    public class CommandArgsDictionary : Dictionary<string, string>
+    [Serializable]
+    public sealed class CommandArgsDictionary : Dictionary<string, string>
     {
 
         private CommandArgsDictionary() { }
 
         private CommandArgsDictionary(IEqualityComparer<string> comparer)
             : base(comparer) { }
+
+#if PORTABLE // EXCLUDE.
+#else
+        private CommandArgsDictionary(SerializationInfo info, StreamingContext context)
+            :base(info, context) { }
+#endif
 
         /// <summary>
         /// Returns a <see cref="CommandArgsDictionary"/> with the information splitted. In uppercase.

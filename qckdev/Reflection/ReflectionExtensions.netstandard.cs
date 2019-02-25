@@ -25,6 +25,7 @@ namespace qckdev.Reflection
             return (type.IsPrimitive || type.IsValueType || type == stringType);
         }
 
+        // TODO: Quitar
         /// <summary>
         /// Creates an instance of the type designated by the specified generic type parameter.
         /// </summary>
@@ -35,11 +36,13 @@ namespace qckdev.Reflection
         /// that takes no parameters (the default constructor) is invoked.
         /// </param>
         /// <returns>A reference to the newly created object.</returns>
+        [Obsolete("Already exists in .NET Framework.")]
         public static object CreateInstance(this Type objectType, params object[] parameters)
         {
             return ReflectionHelper.CreateInstance(objectType, parameters);
         }
 
+        // TODO: Quitar
         /// <summary>
         /// Searches for a public/non-public instance constructor whose parameters match the types in the specified <paramref name="objectType"/>.
         /// </summary>
@@ -53,21 +56,26 @@ namespace qckdev.Reflection
         /// A <see cref="ConstructorInfo"/> object representing the public instance constructor
         /// whose parameters match the types in the parameter type array, if found; otherwise, null.
         /// </returns>
+        [Obsolete("Already exists in .NET Framework.")]
         public static ConstructorInfo GetConstructor(this Type objectType, params object[] parameters)
         {
             return ReflectionHelper.GetConstructor(objectType, parameters);
         }
 
+        // TODO: Quitar
+        [Obsolete("Already exists in .NET Framework.")]
         public static MethodInfo GetMethod(this Type type, string methodName, params object[] parameters)
         {
             return GetMethod(type, methodName, Type.GetTypeArray(parameters));
         }
 
+        // TODO: Quitar
+        [Obsolete("Already exists in .NET Framework.")]
         public static MethodInfo GetMethod(this Type type, string methodName, params Type[] parameters)
         {
             MethodInfo m = null;
             int i = 0;
-
+            
             MethodInfo[] carr = null;
             carr = type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
                              .Where(x => x.Name == methodName)

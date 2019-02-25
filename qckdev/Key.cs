@@ -92,11 +92,11 @@ namespace qckdev
         /// </summary>
         /// <param name="other">The <see cref="Key"/> to compare with the current <see cref="Key"/>.</param>
         /// <returns>true if the specified <see cref="Key"/> is equal to the current <see cref="Key"/>; otherwise, false.</returns>
-        public bool Equals(Key other)
+        public virtual bool Equals(Key other)
         {
             bool rdo = true;
 
-            if ((object)other == null)
+            if (other is null)
             {
                 rdo = false;
             }
@@ -125,7 +125,7 @@ namespace qckdev
         /// <returns>true if the specified <see cref="Object"/> is equal to the current <see cref="Key"/>; otherwise, false.</returns>
         public override bool Equals(object obj)
         {
-            return this.Equals((Key)obj);
+            return this.Equals(obj as Key);
         }
 
         /// <summary>
@@ -178,9 +178,9 @@ namespace qckdev
         {
             bool rdo;
 
-            if ((object)x == null && (object)y == null)
+            if (x is null && y is null)
                 rdo = true;
-            else if ((object)x == null)
+            else if (x is null)
                 rdo = false;
             else
                 rdo = x.Equals(y);
@@ -241,8 +241,8 @@ namespace qckdev
         {
             bool rdo;
 
-            if ((object)val1 == null)
-                rdo = ((object)val2 == null);
+            if (val1 is null)
+                rdo = (val2 is null);
             else
                 rdo = val1.Equals(val2);
             return rdo;

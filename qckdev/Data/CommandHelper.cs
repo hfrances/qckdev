@@ -15,7 +15,7 @@ namespace qckdev.Data
         /// <remarks>
         /// <seealso href="https://stackoverflow.com/questions/7952142/how-to-resolve-system-type-to-system-data-dbtype"/>
         /// </remarks>
-        internal static Dictionary<Type, DbType> TypeMap = new Dictionary<Type, DbType>()
+        readonly static Dictionary<Type, DbType> TypeMap = new Dictionary<Type, DbType>()
         {
             {typeof(byte), DbType.Byte},
             {typeof(sbyte), DbType.SByte},
@@ -150,16 +150,27 @@ namespace qckdev.Data
                     table.Load(reader, loadOption);
                 }
             }
-            catch (Exception)
-            {
-                throw;
-            }
             finally
             {
                 table.EndLoadData();
             }
         }
 
+        /// <summary>
+        /// Converts a <see cref="Type"/> to an equivalent <see cref="DbType"/> value.
+        /// </summary>
+        /// <param name="type">The <see cref="Type"/> to convert.</param>
+        /// <returns>
+        /// A <see cref="DbType"/> value that is equivalent to the specified <paramref name="type"/> 
+        /// or <see cref="DbType.Object"/> if no equivalent is found.
+        /// </returns>
+        /// <remarks>
+        /// <seealso href="https://stackoverflow.com/questions/7952142/how-to-resolve-system-type-to-system-data-dbtype"/>
+        /// </remarks>
+        public static DbType GetDbType(Type type)
+        {
+            return (TypeMap.TryGetValue(type, null) ?? DbType.Object);
+        }
 
         public static IDbDataParameter CreateParameterWithValue<TValue>(IDbCommand command, string parameterName, TValue value)
         {
@@ -171,7 +182,7 @@ namespace qckdev.Data
             var p = command.CreateParameter();
 
             p.ParameterName = parameterName;
-            p.DbType = (TypeMap.TryGetValue(typeof(TValue), null) ?? DbType.Object);
+            p.DbType = GetDbType(typeof(TValue));
             p.Value = ((object)value ?? DBNull.Value);
             p.Direction = direction;
             return p;
