@@ -13,6 +13,8 @@ namespace qckdev.Reflection
     public static partial class ReflectionExtensions
     {
 
+        readonly static Type stringType = typeof(string);
+
         /// <summary>
         /// Returns a value indicating whether the <see cref="Type"/> is one of the primitive types, a value type or the <see cref="string"/> type.
         /// </summary>
