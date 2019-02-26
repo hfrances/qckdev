@@ -114,15 +114,14 @@ namespace qckdev.Data
         public static IDataReader ExecuteReaderAuto(IDbCommand command, CommandBehavior behavior)
         {
             IDataReader rdo;
+            ConnectionState connectionState;
 
-            using (var scope = new ConnectionScope(command.Connection))
+            ConnectionHelper.OpenWithCheck(command.Connection, out connectionState);
+            if (connectionState == ConnectionState.Closed && (behavior & CommandBehavior.CloseConnection) != CommandBehavior.CloseConnection)
             {
-                if (scope.InitialState == ConnectionState.Closed && (behavior & CommandBehavior.CloseConnection) != CommandBehavior.CloseConnection)
-                {
-                    behavior = behavior | CommandBehavior.CloseConnection; // Si la conexión estaba originalmente cerrada, cerrarla otra vez tras terminar el DataReader.
-                }
-                rdo = command.ExecuteReader(behavior);
+                behavior = behavior | CommandBehavior.CloseConnection; // Si la conexión estaba originalmente cerrada, cerrarla otra vez tras terminar el DataReader.
             }
+            rdo = command.ExecuteReader(behavior);
             return rdo;
         }
 

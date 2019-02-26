@@ -129,6 +129,20 @@ namespace qckdev.Linq
                     m => m.y.DefaultIfEmpty(),
                     (m, y) => resultSelector(m.x, y));
 
+        /// <summary>
+        /// Performs the specified action on each element of the <see cref="System.Collections.Generic.IEnumerable{T}"/>.
+        /// </summary>
+        /// <param name="enumerable">Elements where apply the action.</param>
+        /// <param name="action">The <see cref="System.Action{T}"/> delegate to perform on each element of the <see cref="System.Collections.Generic.IEnumerable{T}"/>.</param>
+        /// <exception cref="System.ArgumentNullException">action is null.</exception>
+        /// <exception cref="System.InvalidOperationException">An element in the collection has been modified.</exception>
+        public static void ForEach<T>(this IEnumerable<T> enumerable, Action<T> action)
+        {
+            foreach (var item in enumerable)
+            {
+                action.Invoke(item);
+            }
+        }
 
     }
 }

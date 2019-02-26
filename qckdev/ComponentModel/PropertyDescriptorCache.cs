@@ -31,7 +31,7 @@ namespace qckdev.ComponentModel
 
             if (!InnerList.TryGetValue(type, out properties))
             {
-                properties = TypeDescriptor.GetProperties(type); // TODO: verificar si en las interfaces devuelve los elementos de otras interfaces.
+                properties = TypeDescriptorHelper.GetPropertiesFull(type);
                 InnerList.Add(type, properties);
             }
             return properties;

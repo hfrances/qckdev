@@ -132,6 +132,90 @@ namespace qckdevTest
                 rdo = dictionary.ContainsKey(new Key(new object[] { GetStringKey(i), i }, ignoreCase: true));
         }
 
+        /// <summary>
+        /// Probar que es capaz de comparar con objetos null.
+        /// </summary>
+        [TestMethod]
+        public void TestMethod006a()
+        {
+            var key1 = new Key(new object[] { "hola", 10, true });
+            var key2 = (Key)null;
+
+            Assert.AreNotEqual(key1, key2);
+        }
+
+        /// <summary>
+        /// Probar que es capaz de comparar con objetos null.
+        /// </summary>
+        [TestMethod]
+        public void TestMethod006b()
+        {
+            var key1 = (Key)null;
+            var key2 = new Key(new object[] { "hola", 10, true });
+
+            Assert.AreNotEqual(key1, key2);
+        }
+
+        /// <summary>
+        /// Probar que es capaz de comparar con objetos null.
+        /// </summary>
+        [TestMethod]
+        public void TestMethod006c()
+        {
+            var key1 = (Key)null;
+            var key2 = (Key)null;
+
+            Assert.AreEqual(key1, key2);
+        }
+
+        /// <summary>
+        /// Probar que es capaz de comparar cuando los objetos tienen distinto tamaño.
+        /// </summary>
+        [TestMethod]
+        public void TestMethod006d()
+        {
+            var key1 = new Key(new object[] { "hola", 10, true });
+            var key2 = new Key(new object[] { "hola", 10, true, false });
+
+            Assert.AreNotEqual(key1, key2);
+        }
+
+        /// <summary>
+        /// Probar el operador "=".
+        /// </summary>
+        [TestMethod]
+        public void TestMethod007a()
+        {
+            var key1 = new Key(new object[] { "hola", 10, true });
+            var key2 = new Key(new object[] { "hola", 10, true });
+
+            Assert.IsTrue(key1 == key2);
+        }
+
+        /// <summary>
+        /// Probar el operador "!=".
+        /// </summary>
+        [TestMethod]
+        public void TestMethod007b()
+        {
+            var key1 = new Key(new object[] { "hola", 10, true });
+            var key2 = new Key(new object[] { "adios", 10, true });
+
+            Assert.IsTrue(key1 != key2);
+        }
+
+        /// <summary>
+        /// Probar el operador "==" con nulos.
+        /// </summary>
+        [TestMethod]
+        public void TestMethod007c()
+        {
+            var key1 = new Key(new object[] { "hola", 10, true });
+            var key2 = (Key)null;
+
+            Assert.IsTrue(key1 != key2);
+        }
+
 
         #region helpers
 

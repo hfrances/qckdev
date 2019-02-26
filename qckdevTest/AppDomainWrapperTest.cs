@@ -14,26 +14,41 @@ namespace qckdevTest
     {
 
         [TestMethod]
-        public void AppDomainWrapper_InstanceAndUnwrap()
+        [DataRow(typeof(System.Data.SqlClient.SqlConnection), DisplayName = "Check with Class.")]
+        [DataRow(typeof(System.Drawing.SizeF), DisplayName = "Check with Structure.")]
+        public void AppDomainWrapper_InstanceAndUnwrap(Type type)
         {
-            bool rdo;
+            object rdo;
             var appDomain = AppDomain.CreateDomain("TestDomain");
-            var boolType = typeof(bool);
-            var assemblyName = boolType.Assembly.FullName;
-            var boolTypeName = boolType.FullName;
 
             using (var wrpDomain = new AppDomainWrapper(appDomain))
             {
-                rdo = (bool)wrpDomain.AppDomain.CreateInstanceAndUnwrap(assemblyName, boolTypeName);
-                rdo = true;
+                rdo = wrpDomain.AppDomain.CreateInstanceAndUnwrap(type.Assembly.FullName, type.FullName);
+                Assert.IsInstanceOfType(rdo, type);
+                rdo.ToString();
             }
+        }
 
-            Assert.IsTrue(rdo);
+        [TestMethod]
+        [DataRow(typeof(System.Data.SqlClient.SqlConnection), DisplayName = "Check with Class.")]
+        //[DataRow(typeof(System.Drawing.SizeF), DisplayName = "Check with Structure.")] // Not fails for structure.
+        [ExpectedException(typeof(AppDomainUnloadedException))]
+        public void AppDomainWrapper_Dispose_Object(Type type)
+        {
+            object rdo;
+            var appDomain = AppDomain.CreateDomain("TestDomain");
+
+            using (var wrpDomain = new AppDomainWrapper(appDomain))
+            {
+                rdo = wrpDomain.AppDomain.CreateInstanceAndUnwrap(type.Assembly.FullName, type.FullName);
+            }
+            rdo.ToString(); // Should raise AppDomainUnloadedException
+            Assert.Fail("AppDomainUnloadedException was expected.");
         }
 
         [TestMethod]
         [ExpectedException(typeof(AppDomainUnloadedException))]
-        public void AppDomainWrapper_Dispose()
+        public void AppDomainWrapper_Dispose_GetData()
         {
             var appDomain = AppDomain.CreateDomain("TestDomain");
 

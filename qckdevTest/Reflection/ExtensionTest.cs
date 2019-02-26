@@ -15,10 +15,10 @@ namespace qckdevTest.Reflection
         /// </summary>
         /// <param name="type">Validating type.</param>
         /// <param name="propertyNames">Property list (example: "Property1, Property2").</param>
-        [DataRow(typeof(TestClassBase), "Property1, Property2, Property3")]
-        [DataRow(typeof(TestClass), "Property1, Property2, Property3, Property5")]
-        [DataRow(typeof(TestInterfaceBase), "Property1, Property2, Property3, Property4")]
-        [DataRow(typeof(TestInterface), "Property1, Property2, Property3, Property4, Property5")]
+        [DataRow(typeof(TestObjects.TestClassBase), "Property1, Property2, Property3")]
+        [DataRow(typeof(TestObjects.TestClass), "Property1, Property2, Property3, Property5")]
+        [DataRow(typeof(TestObjects.ITestInterfaceBase), "Property1, Property2, Property3, Property4")]
+        [DataRow(typeof(TestObjects.ITestInterface), "Property1, Property2, Property3, Property4, Property5")]
         [TestMethod]
         public void GetPropertiesFull(Type type, string propertyNames)
         {
@@ -40,42 +40,6 @@ namespace qckdevTest.Reflection
                 Assert.Fail("Expected:<{0}>. Actual:<{1}>. ", string.Join(", ", propertyNameArr), string.Join(", ", propertyKeysArr));
             }
         }
-
-
-        #region helpers
-
-        private class TestClassBase
-        {
-            public string Property1 { get; }
-            public int Property2 { get; set; }
-            public bool Property3 { set => Property4 = value; }
-            private bool Property4 { get; set; }
-
-        }
-
-        private class TestClass : TestClassBase
-        {
-            public string Property5 { get; }
-
-        }
-
-        private interface TestInterfaceBase
-        {
-            string Property1 { get; }
-            int Property2 { get; set; }
-            bool Property3 { set; }
-            bool Property4 { get; set; }
-
-        }
-
-        private interface TestInterface : TestInterfaceBase
-        {
-            string Property5 { get; }
-
-        }
-
-        #endregion
-
 
     }
 }

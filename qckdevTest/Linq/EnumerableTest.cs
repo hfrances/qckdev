@@ -62,7 +62,7 @@ namespace qckdevTest.Linq
         [TestMethod]
         [DataRow(true, DisplayName = "IgnoreCase = true")]
         [DataRow(false, DisplayName = "IgnoreCase = false")]
-        public void LeftJoin_IgnoreCase(bool value)
+        public void LeftJoin02_IgnoreCase(bool value)
         {
             var parent = new[] {
                 new { Id = "A" },

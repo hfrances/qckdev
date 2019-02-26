@@ -14,13 +14,137 @@ namespace qckdevTest.Data
     {
 
         const string CONNSTRING = @"Data Source=(localdb)\MSSQLLocalDB;Initial Catalog=master;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False";
-        const string DBNullCONST = "1B544BD7-608D-438F-B6DC-F3A1B538A898";
+
+        #region command auto
+
+        [TestMethod]
+        [DataRow(false)]
+        [DataRow(true)]
+        public void ExecuteNonQueryAutoTest(bool openBeforeStart)
+        {
+
+            using (var conn = new System.Data.SqlClient.SqlConnection(CONNSTRING))
+            {
+                if (openBeforeStart)
+                    conn.Open();
+
+                using (var comm = conn.CreateCommand())
+                {
+                    int rdo;
+
+                    comm.CommandText = "sp_who2";
+                    comm.CommandType = System.Data.CommandType.StoredProcedure;
+                    rdo = comm.ExecuteNonQueryAuto();
+                    Assert.AreNotEqual(0, rdo);
+                }
+
+                if (openBeforeStart)
+                    Assert.AreEqual(System.Data.ConnectionState.Open, conn.State);
+                else
+                    Assert.AreEqual(System.Data.ConnectionState.Closed, conn.State);
+            }
+        }
+
+        [TestMethod]
+        [DataRow(false, "hola mundo", "hola mundo")]
+        [DataRow(false, "", "")]
+        [DataRow(false, Assert2.DBNullCONST, null)]
+        [DataRow(true, Assert2.DBNullCONST, null)]
+        public void ExecuteScalarAutoTest(bool openBeforeStart, object expected, string value)
+        {
+
+            using (var conn = new System.Data.SqlClient.SqlConnection(CONNSTRING))
+            {
+                if (openBeforeStart)
+                    conn.Open();
+
+                using (var comm = conn.CreateCommand())
+                {
+                    object rdo;
+
+                    comm.CommandText = $"SELECT @param";
+                    comm.Parameters.AddWithValue("@param", (object)value ?? DBNull.Value);
+                    rdo = comm.ExecuteScalarAuto();
+                    Assert2.AreEqualDBNull(expected, rdo);
+                }
+
+                if (openBeforeStart)
+                    Assert.AreEqual(System.Data.ConnectionState.Open, conn.State);
+                else
+                    Assert.AreEqual(System.Data.ConnectionState.Closed, conn.State);
+            }
+        }
+
+        [TestMethod]
+        [DataRow(false, "hola mundo", "hola mundo")]
+        [DataRow(false, "", "")]
+        [DataRow(false, null, null)]
+        [DataRow(true, null, null)]
+        public void ExecuteScalarAutoTTest(bool openBeforeStart, object expected, string value)
+        {
+
+            using (var conn = new System.Data.SqlClient.SqlConnection(CONNSTRING))
+            {
+                if (openBeforeStart)
+                    conn.Open();
+
+                using (var comm = conn.CreateCommand())
+                {
+                    string rdo;
+
+                    comm.CommandText = $"SELECT @param";
+                    comm.Parameters.AddWithValue("@param", (object)value ?? DBNull.Value);
+                    rdo = comm.ExecuteScalarAuto<string>();
+                    Assert2.AreEqualDBNull(expected, rdo);
+                }
+
+                if (openBeforeStart)
+                    Assert.AreEqual(System.Data.ConnectionState.Open, conn.State);
+                else
+                    Assert.AreEqual(System.Data.ConnectionState.Closed, conn.State);
+            }
+        }
+
+        [TestMethod]
+        [DataRow(false)]
+        [DataRow(true)]
+        public void ExecuteReaderAutoTest(bool openBeforeStart)
+        {
+
+            using (var conn = new System.Data.SqlClient.SqlConnection(CONNSTRING))
+            {
+                if (openBeforeStart)
+                    conn.Open();
+
+                using (var comm = conn.CreateCommand())
+                {
+                    comm.CommandText = $"SELECT * FROM syslanguages";
+                    using (var reader = comm.ExecuteReaderAuto())
+                    {
+                        while (reader.Read())
+                        {
+                            reader.ToString();
+                        }
+                    }
+                }
+
+                if (openBeforeStart)
+                    Assert.AreEqual(System.Data.ConnectionState.Open, conn.State);
+                else
+                    Assert.AreEqual(System.Data.ConnectionState.Closed, conn.State);
+            }
+        }
+
+        #endregion
+
+
+        #region create parameter
 
         [TestMethod]
         [DataRow(true, "hello world", "hello world")]
         [DataRow(false, "hello world", "hello world")]
         [DataRow(true, null, null)]
-        [DataRow(false, null, DBNullCONST)]
+        [DataRow(false, null, Assert2.DBNullCONST)]
         public void CreateParameterWithValueTest_String(bool castResult, string parameterValue, object expectedResult)
         {
             CreateParameterWithValueTest<string>(castResult, parameterValue, expectedResult);
@@ -42,7 +166,7 @@ namespace qckdevTest.Data
         [DataRow(true, 0, 0)]
         [DataRow(false, 0, 0)]
         [DataRow(true, null, null)]
-        [DataRow(false, null, DBNullCONST)]
+        [DataRow(false, null, Assert2.DBNullCONST)]
         public void CreateParameterWithValueTest_IntegerNullable(bool castResult, int? parameterValue, object expectedResult)
         {
             CreateParameterWithValueTest<int?>(castResult, parameterValue, expectedResult);
@@ -67,14 +191,13 @@ namespace qckdevTest.Data
                         else
                             rdo = comm.ExecuteScalarAuto();
                     }
-
-                    if (object.Equals(expectedResult, DBNullCONST))
-                        Assert.AreEqual(DBNull.Value, rdo);
-                    else
-                        Assert.AreEqual(parameterValue, rdo);
+                    Assert2.AreEqualDBNull(expectedResult, rdo);
                 }
             }
         }
+
+
+        #endregion
 
     }
 }

@@ -53,6 +53,26 @@ namespace qckdev
         }
 
         /// <summary>
+        /// Determines whether a specified value matches any value in a a list.
+        /// </summary>
+        /// <param name="this">Value to validate.</param>
+        /// <param name="ignoreCase">Ignores case sensitive.</param>
+        /// <param name="values">List of values to compare.</param>
+        /// <returns>Returns true if one of list values matches with the specified value.</returns>
+        public static bool In(this string @this, bool ignoreCase, params string[] values)
+        {
+            bool found = false;
+            int index = 0;
+
+            while (index < values.Length && !found)
+            {
+                found = string.Equals(@this, values[index], (ignoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal));
+                index += 1;
+            }
+            return found;
+        }
+
+        /// <summary>
         /// Clears the contents of the string builder.
         /// </summary>
         /// <param name="value">
