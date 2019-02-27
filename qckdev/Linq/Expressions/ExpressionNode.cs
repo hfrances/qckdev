@@ -74,6 +74,14 @@ namespace qckdev.Linq.Expressions
             }
         }
 
+        /// <summary>
+        /// Gets the final value of the <see cref="ExpressionNode"/> converted during the process or null if it must takes <see cref="Text"/> value.
+        /// </summary>
+        public string NewText
+        {
+            get; set;
+        }
+
         #endregion
 
 
@@ -82,7 +90,7 @@ namespace qckdev.Linq.Expressions
         /// <summary>
         /// Retuns if the element has child nodes. This class is for Serialization.
         /// </summary>
-        public bool ShouldSerializeNodes() 
+        public bool ShouldSerializeNodes()
             => (Nodes.Count > 0);
 
         /// <summary>
@@ -94,7 +102,7 @@ namespace qckdev.Linq.Expressions
         public override string ToString()
         {
             var @operator = (this.Operator == ExpressionOperatorType.None ? (ExpressionOperatorType?)null : this.Operator);
-            return string.Format("Expr {0} {1}:    {2}", this.Type, @operator, this.Text);
+            return string.Format("Expr {0} {1}:    {2}", this.Type, @operator, this.NewText ?? this.Text);
         }
 
         #endregion
@@ -169,7 +177,7 @@ namespace qckdev.Linq.Expressions
     /// </summary>
     public sealed class ExpressionNodeCollection : Collection<ExpressionNode>
     {
-        
+
         internal ExpressionNodeCollection(ExpressionNode owner)
         {
             this.Owner = owner;

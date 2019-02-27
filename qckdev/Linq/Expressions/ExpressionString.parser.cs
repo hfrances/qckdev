@@ -99,33 +99,59 @@ namespace qckdev.Linq.Expressions
         {
             var tree = ExpressionTree.Create(value);
             var root = tree.Root;
+            var lastCharType = CharType.None;
             int i;
 
             for (i = 0; i < value.Length; i++)
             {
-                var c = value[i];
-
-                if (delimiterCloser.ContainsKey(c))
-                {
-                    ExpressionNode child;
-
-                    child = AddChildNodeFromOpenCharacter(ref root, i);
-                    i = child.EndIndex.Value;
-                }
-                else if (breakers.Contains(c))
-                {
-                    ProcessBuffer(ref root, i - 1);
-                }
-                else
-                {
-                    StringBuffer.Append(c);
-                }
+                ProcessChar(ref root, ref lastCharType, ref i);
             }
             ProcessBuffer(ref root, i - 1);
             UploadEndIndexAllLevels(root);
             CollapseTree(ref root);
             tree.Root = root;
             return tree;
+        }
+
+        /// <summary>
+        /// Analiza el caracter en una cadena y lo procesa, pudiendo crear nodos hijos, asignarles un operador o rellenar en <see cref="StringBuffer"/>.
+        /// </summary>
+        /// <param name="node">
+        /// Nodo que se está procesando en estos momentos. Si es conveniente, este nodo puede ser reemplazado por otro
+        /// (por ejemplo, este nodo pasa a formar parte de otro debido a las operaciones siguientes).
+        /// </param>
+        /// <param name="lastCharType">
+        /// Último tipo de caracter leído. 
+        /// Este permite identificar cuándo se ha cambiado de valor a operación u otros, sin tener que separar mediante espacios.
+        /// </param>
+        /// <param name="charIndex">
+        /// Índice del caracter que se está analizando dentro de <paramref name="node"/> 
+        /// (<seealso cref="ExpressionNode.ExpressionTree"/>, <seealso cref="ExpressionTree.Value"/>)
+        /// </param>
+        private void ProcessChar(ref ExpressionNode node, ref CharType lastCharType, ref int charIndex)
+        {
+            var value = node.ExpressionTree.Value;
+            var c = value[charIndex];
+
+            if (delimiterCloser.ContainsKey(c))
+            {
+                ExpressionNode child;
+
+                child = AddChildNodeFromOpenCharacter(ref node, charIndex);
+                charIndex = child.EndIndex.Value; // TODO: Control de errores. Si llega null, es que no se encontró caracter de cierre.
+            }
+            else if (breakers.Contains(c))
+            {
+                ProcessBuffer(ref node, charIndex - 1);
+            }
+            else
+            {
+                if (StringBuffer.Length > 0 && lastCharType != GetCharType(c.ToString()))
+                    ProcessBuffer(ref node, charIndex - 1);
+
+                StringBuffer.Append(c);
+            }
+            lastCharType = GetCharType(StringBuffer.ToString());
         }
 
         /// <summary>
@@ -195,6 +221,7 @@ namespace qckdev.Linq.Expressions
         /// <returns></returns>
         private void SetEndIndex(ref ExpressionNode node, int startIndex, Func<char, bool> closeCriteria, bool recursive)
         {
+            var lastCharType = CharType.None;
             string value = node.ExpressionTree.Value;
             int flag = 0; // 0 None, 1 Posible fin, 2 Escape, 99 found.
 
@@ -205,7 +232,9 @@ namespace qckdev.Linq.Expressions
 
                 if (flag == 0 && closeCriteria(c))
                 {
-                    if (last)
+                    var possibleScape = c.In('\'', '"'); // Añadido HFrances: hay caracteres que, si vienen dos veces seguidos, es porque vienen "escapados" (ejemplo ', ").
+
+                    if (last || !possibleScape)
                     {
                         node.EndIndex = i; // Es el último caracter y es el de cierre.
                         flag = 99; // Fin de la cadena.
@@ -227,16 +256,9 @@ namespace qckdev.Linq.Expressions
                 else
                 {
                     flag = 0;
-                    if (recursive && delimiterCloser.ContainsKey(c))
+                    if (recursive)
                     {
-                        ExpressionNode child;
-
-                        child = AddChildNodeFromOpenCharacter(ref node, i);
-                        i = child.EndIndex.Value; // TODO: Control de errores. Si llega null, es que no se encontró caracter de cierre.
-                    }
-                    else if (recursive && breakers.Contains(c))
-                    {
-                        ProcessBuffer(ref node, i - 1);
+                        ProcessChar(ref node, ref lastCharType, ref i);
                     }
                     else
                     {
@@ -244,11 +266,20 @@ namespace qckdev.Linq.Expressions
                     }
                 }
             }
-            if (flag == 99 && recursive)
+            if (flag == 99)
             {
-                var pendingNode = node;
-                ProcessBuffer(ref pendingNode, node.EndIndex.Value - 1);
-                pendingNode.ToString();
+                if (recursive)
+                {
+                    var pendingNode = node;
+
+                    ProcessBuffer(ref pendingNode, node.EndIndex.Value - 1);
+                    if (pendingNode != node)
+                        pendingNode.ToString(); // Test breakpoint.
+                }
+                else
+                {
+                    node.NewText = StringBuffer.ToString();
+                }
             }
             StringBuffer.Clear();
         }
@@ -487,6 +518,32 @@ namespace qckdev.Linq.Expressions
             {
                 node.UpdateEndIndex();
             }
+        }
+
+        /// <summary>
+        /// Devuelve el tipo de elemento almacenado en la cadena <paramref name="value"/>.
+        /// </summary>
+        /// <param name="value">La cadena a ser analizada.</param>
+        /// <remarks>
+        /// Se utiliza para detectar cuándo pasa de valor a operador, o paréntesis u otra cosa.
+        /// </remarks>
+        private CharType GetCharType(string value)
+        {
+            CharType rdo = CharType.None;
+
+            // TODO: Qué pasará con las propiedades con formato [xxxx]?
+            if (value?.Length > 0)
+            {
+                if (operationTranslator.ContainsKey(value))
+                    rdo = CharType.Operator;
+                else if (value.Length == 1 && breakers.Contains(value[0]))
+                    rdo = CharType.Breaker;
+                else if (value.Length == 1 && (delimiterCloser.ContainsKey(value[0]) || delimiterCloser.ContainsValue(value[0])))
+                    rdo = CharType.Delimiter;
+                else
+                    rdo = CharType.Other;
+            }
+            return rdo;
         }
 
         #endregion

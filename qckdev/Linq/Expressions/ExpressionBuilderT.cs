@@ -273,7 +273,7 @@ namespace qckdev.Linq.Expressions
             string content;
             PropertyInfo pi;
 
-            content = expression.Text;
+            content = expression.NewText ?? expression.Text;
             switch (type)
             {
                 case ExpressionNodeType.StringType:

@@ -87,4 +87,16 @@ namespace qckdev.Linq.Expressions
         ArithmeticOperator,
     }
 
+    /// <summary>
+    /// Sets the char type.
+    /// </summary>
+    internal enum CharType
+    {
+        None,
+        Operator,
+        Delimiter,
+        Breaker,
+        Other,
+    }
+
 }
