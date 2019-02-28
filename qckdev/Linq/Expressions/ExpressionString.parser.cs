@@ -187,6 +187,11 @@ namespace qckdev.Linq.Expressions
                     LastArithmeticNode = null;
                     LastValueNode = rdo;
                     SetEndIndex(ref rdo, currentIndex + 1, closeCriteria, recursive: true);
+                    // After close.
+                    rdo.Locked = true;
+                    LastRelationalNode = null;
+                    LastArithmeticNode = null;
+                    LastValueNode = rdo;
                     break;
 
                 case '\'':
@@ -295,51 +300,17 @@ namespace qckdev.Linq.Expressions
             if (StringBuffer.Length > 0)
             {
                 var upperTextBuffer = StringBuffer.ToString().ToUpperInvariant();
-                var myparent = (LastArithmeticNode ?? LastRelationalNode ?? LastValueNode ?? parent);  // Para variables, operaciones aritmeticas y relacionales.
+                var lastOperationNode = (LastArithmeticNode ?? LastRelationalNode ?? LastValueNode ?? parent);  // Para variables, operaciones aritmeticas y relacionales.
 
                 if (operationTranslator.TryGetValue(upperTextBuffer, out ExpressionOperatorType @operator))
                 {
-                    switch (@operator)
-                    {
-                        case ExpressionOperatorType.And:
-                        case ExpressionOperatorType.Or:
-                            ProcessBufferLogicOperator(ref parent, @operator, currentIndex);
-                            break;
-
-                        case ExpressionOperatorType.Not:
-                            ProcessBufferLogicOperatorNot(myparent, @operator, currentIndex);
-                            break;
-
-                        case ExpressionOperatorType.Equals:
-                        case ExpressionOperatorType.NotEqual:
-                        case ExpressionOperatorType.GreaterThan:
-                        case ExpressionOperatorType.GreaterThanOrEqual:
-                        case ExpressionOperatorType.LessThan:
-                        case ExpressionOperatorType.LessThanOrEqual:
-                        case ExpressionOperatorType.Like:
-                        case ExpressionOperatorType.In:
-                            ProcessBufferEqualityOperator(myparent, @operator);
-                            break;
-
-                        case ExpressionOperatorType.Add:
-                        case ExpressionOperatorType.Substract:
-                        case ExpressionOperatorType.Multiply:
-                        case ExpressionOperatorType.Divide:
-                        case ExpressionOperatorType.Modulo:
-                        case ExpressionOperatorType.Power:
-                            ApplyParentNode(myparent, ExpressionNodeType.ArithmeticOperator, @operator);
-                            LastArithmeticNode = myparent;
-                            break;
-
-                        default:
-                            throw new NotImplementedException(@operator.ToString());
-                    }
+                    ProcessOperator(lastOperationNode, ref parent, @operator, currentIndex);
                 }
                 else
                 {
                     ExpressionNode rdo;
 
-                    rdo = myparent.Nodes.AddNew();
+                    rdo = lastOperationNode.Nodes.AddNew();
                     rdo.StartIndex = currentIndex - (StringBuffer.Length - 1);
                     rdo.Type = ExpressionNodeType.UnknownType;
                     LastValueNode = rdo;
@@ -347,6 +318,105 @@ namespace qckdev.Linq.Expressions
                 }
                 StringBuffer.Clear();
             }
+        }
+
+        private void ProcessOperator(ExpressionNode lastOperationNode, ref ExpressionNode parent, ExpressionOperatorType @operator, int currentIndex)
+        {
+            switch (@operator)
+            {
+                case ExpressionOperatorType.And:
+                case ExpressionOperatorType.Or:
+                    ProcessBufferLogicOperator(ref parent, @operator, currentIndex);
+                    break;
+
+                case ExpressionOperatorType.Not:
+                    ProcessBufferLogicOperatorNot(lastOperationNode, @operator, currentIndex);
+                    break;
+
+                case ExpressionOperatorType.Equals:
+                case ExpressionOperatorType.NotEqual:
+                case ExpressionOperatorType.GreaterThan:
+                case ExpressionOperatorType.GreaterThanOrEqual:
+                case ExpressionOperatorType.LessThan:
+                case ExpressionOperatorType.LessThanOrEqual:
+                case ExpressionOperatorType.Like:
+                case ExpressionOperatorType.In:
+                    ProcessBufferEqualityOperator(lastOperationNode, @operator);
+                    break;
+
+                case ExpressionOperatorType.Add:
+                case ExpressionOperatorType.Substract:
+                case ExpressionOperatorType.Multiply:
+                case ExpressionOperatorType.Divide:
+                case ExpressionOperatorType.Modulo:
+                case ExpressionOperatorType.Power:
+                    ProcessBufferArithmeticOperator(lastOperationNode, @operator);
+                    break;
+
+                default:
+                    throw new NotImplementedException(@operator.ToString());
+            }
+        }
+
+        private void ProcessBufferArithmeticOperator(ExpressionNode lastOperationNode, ExpressionOperatorType @operator)
+        {
+            var prior1 = GetOperatorPriority(lastOperationNode.Operator);
+            var prior2 = GetOperatorPriority(@operator);
+
+            if (!lastOperationNode.Locked && prior1 != null && prior2 != null && prior1 != prior2)
+            {
+                ExpressionNode node = null;
+
+                // Se mezlan sumas, multiplicaciones, potencias... y hay que agrupar las operaciones.
+                if (prior1 < prior2)
+                {
+                    // Segundo operador del último módulo, ahí se encapsulará la siguiente operación.
+                    node = lastOperationNode.Nodes.Last();
+                }
+                else
+                {
+                    node = GetParentArithmeticNode(lastOperationNode, @operator);
+                }
+                ApplyParentNode(node, ExpressionNodeType.ArithmeticOperator, @operator);
+                LastArithmeticNode = node;
+            }
+            else
+            {
+                // Mismo nivel, las operaciones se van solapando.
+                ApplyParentNode(lastOperationNode, ExpressionNodeType.ArithmeticOperator, @operator);
+                LastArithmeticNode = lastOperationNode;
+            }
+        }
+
+        private static ExpressionNode GetParentArithmeticNode(ExpressionNode lastOperationNode, ExpressionOperatorType @operator)
+        {
+            ExpressionNode node = null;
+            var prior2 = GetOperatorPriority(@operator);
+            var nodePath = lastOperationNode.GetNodePath().Reverse().ToArray();
+
+            // Buscar un nodo cuyo tipo de operación sea del mismo nivel, ahí se encapsulará la operación.
+            for (int i = 1; i < nodePath.Length && node == null; i++) // Saltar el primero, puesto que el el propio nodo.
+            {
+                var parentNode = nodePath[i];
+                int? prior1 = GetOperatorPriority(parentNode.Operator);
+
+                if (prior1 == null)
+                {
+                    node = parentNode;
+                }
+                else if (prior1 <= prior2)
+                {
+                    if (parentNode.Locked)
+                    {
+                        node = parentNode;
+                    }
+                    else
+                    {
+                        node = parentNode.Nodes.Last();
+                    }
+                }
+            }
+            return node;
         }
 
         private void ProcessBufferLogicOperator(ref ExpressionNode parent, ExpressionOperatorType @operator, int currentIndex)
@@ -456,12 +526,12 @@ namespace qckdev.Linq.Expressions
         {
             var rdo = new ExpressionNode(node.ExpressionTree)
             {
-
                 // Mover la expresión debajo del operador.
                 Type = node.Type,
                 Operator = node.Operator,
                 StartIndex = node.StartIndex,
-                EndIndex = node.EndIndex
+                EndIndex = node.EndIndex,
+                Locked = node.Locked,
             };
             rdo.Nodes.AddRange(node.Nodes);
 
@@ -470,6 +540,7 @@ namespace qckdev.Linq.Expressions
             node.Type = parentType;
             node.Operator = parentOperator;
             node.EndIndex = null;
+            node.Locked = false;
         }
 
         /// <summary>
@@ -527,7 +598,7 @@ namespace qckdev.Linq.Expressions
         /// <remarks>
         /// Se utiliza para detectar cuándo pasa de valor a operador, o paréntesis u otra cosa.
         /// </remarks>
-        private CharType GetCharType(string value)
+        private static CharType GetCharType(string value)
         {
             CharType rdo = CharType.None;
 
@@ -542,6 +613,37 @@ namespace qckdev.Linq.Expressions
                     rdo = CharType.Delimiter;
                 else
                     rdo = CharType.Other;
+            }
+            return rdo;
+        }
+
+        /// <summary>
+        /// Devuelve la prioridad de cálculo del operador de menor a mayor. 
+        /// Esto permite hacer las multiplicaciones antes que las sumas y las potencias antes que las multiplicaciones.
+        /// </summary>
+        /// <param name="operator">Operador a validar.</param>
+        /// <returns>La prioridad de cálculo del operador, de menor a mayor.</returns>
+        private static int? GetOperatorPriority(ExpressionOperatorType @operator)
+        {
+            int? rdo = null;
+
+            switch (@operator)
+            {
+                case ExpressionOperatorType.Add:
+                case ExpressionOperatorType.Substract:
+                    rdo = 0;
+                    break;
+                case ExpressionOperatorType.Multiply:
+                case ExpressionOperatorType.Divide:
+                    rdo = 1;
+                    break;
+                case ExpressionOperatorType.Power:
+                    rdo = 2;
+                    break;
+                case ExpressionOperatorType.Modulo:
+                    throw new NotImplementedException(@operator.ToString());
+                default:
+                    break; // Do Nothing.
             }
             return rdo;
         }

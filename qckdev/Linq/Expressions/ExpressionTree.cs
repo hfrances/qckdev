@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Xml.Serialization;
 using qckdev.Reflection;
 
@@ -60,6 +61,23 @@ namespace qckdev.Linq.Expressions
         #region methods
 
         /// <summary>
+        /// Returns an <see cref="Array"/> with the <see cref="ExpressionNode"/> elements of the <paramref name="node"/> path.
+        /// </summary>
+        /// <param name="node"><see cref="ExpressionNode"/> to search.</param>
+        /// <returns>An <see cref="Array"/> with the <see cref="ExpressionNode"/> elements or empty if the <paramref name="node"/> was not found.</returns>
+        public IEnumerable<ExpressionNode> GetNodePath(ExpressionNode node)
+        {
+            var path = new List<ExpressionNode>() { node };
+            bool found;
+
+            found = GetNodePath(this.Root, node, path);
+            if (!found)
+                path.Clear();
+
+            return path.ToArray();
+        }
+
+        /// <summary>
         /// Returns a string that represents the current object.
         /// </summary>
         /// <returns>
@@ -89,6 +107,34 @@ namespace qckdev.Linq.Expressions
 
         #endregion
 
+        #region static methods 
+
+        private static bool GetNodePath(ExpressionNode parent, ExpressionNode node, IList<ExpressionNode> path)
+        {
+            bool found = false;
+
+            if (parent.Nodes.Contains(node))
+            {
+                path.Insert(0, parent);
+                found = true;
+            }
+            else
+            {
+                for (int i = 0; i < parent.Nodes.Count && !found; i++)
+                {
+                    var child = parent.Nodes[i];
+
+                    found = GetNodePath(child, node, path);
+                    if (found)
+                    {
+                        path.Insert(0, child);
+                    }
+                }
+            }
+            return found;
+        }
+
+        #endregion
 
         #region IEquatable implementation
 

@@ -25,19 +25,55 @@ namespace qckdevTest.Linq
         [DataRow("((4 + 4))", 8)]
         [DataRow("( (4 + 4) )", 8)]
         [DataRow("( ( 4 + 4 ) )", 8)]
+        // TODO: negatives.
+        //[DataRow("-1", -1)]
+        //[DataRow("5*-1", -5)]
         public void SimpleArithmeticTest1(string predicate, int expected)
         {
             SimpleArithmeticTestCore(predicate, expected);
         }
 
+        /// <remarks>
+        /// https://www.calculatorsoup.com/calculators/math/math-equation-solver.php
+        /// </remarks>
         [TestMethod]
         [DataRow("4 * 2", 8)]
         [DataRow("4 * 2 + 3", 11)]
         [DataRow("(4 * 2) + 3", 11)]
         [DataRow("4 * (2 + 3)", 20)]
-        // TODO: no coge bien el orden de los operadores.
-        //[DataRow("3 + 2 * 4", 11)]
-        public void SimpleArithmeticTest2(string predicate, int expected)
+        [DataRow("4^1*(2+3)", 20)]
+        [DataRow("(4)^1*(2+3)", 20)]
+        [DataRow("(2+2)^1*(2+3)", 20)]
+        [DataRow("6/2", 3)]
+        [DataRow("(3+3)/2", 3)]
+        [DataRow("3 + 2 * 4", 11)]
+        [DataRow("3 + 2 * 4 * 2", 19)]
+        [DataRow("3 + 2 * 4 * 2 + 3", 22)]
+        [DataRow("2^16", 65536)]
+        [DataRow("2^16 + 3", 65539)]
+        [DataRow("3^2*5", 45)]
+        [DataRow("3 + 2^16 + 3", 65542)]
+        [DataRow("3 + 2 * 4 * 2^16 + 3", 524294)]
+        [DataRow("3 + 2 * 4 * 2^16 + 3^2", 524300)]
+        [DataRow("3 + 2 * 4 * 2^16 + 3^2*5", 524336)]
+        [DataRow("3 + (2 * 4 * 2^16) + ((3^2)*5)", 524336)]
+        [DataRow("(4^4)+4", 260)]
+        [DataRow("(3+2)^2*(5^3)", 3125)]
+        [DataRow("(3+2)^2*(5^3)^2", 390625)]
+        [DataRow("(3+2)^2*(5^3)^2*(5^0)*(5^4)", 244140625)]
+        [DataRow("(10+5^2)*((5*2)+9+3^3)/2", 805)]
+        [DataRow("(10+5^2)*((5*2)+9-3^3)/2", -140)]
+        [DataRow("2*(6+7)-8^2", -38)] // Fails.
+        // TODO: negatives.
+        //[DataRow("(10+5^2)*((5*-2)+9-3^3)/2", -490)]
+        public void SimpleArithmeticTest2a(string predicate, int expected)
+        {
+            SimpleArithmeticTestCore(predicate, expected);
+        }
+
+        [TestMethod]
+        [DataRow("(4^4)^4", 4294967296)]
+        public void SimpleArithmeticTest2b(string predicate, long expected)
         {
             SimpleArithmeticTestCore(predicate, expected);
         }
@@ -109,15 +145,6 @@ namespace qckdevTest.Linq
         }
 
 
-        private void SimpleArithmeticTestCore<TResult>(string predicate, TResult expected)
-        {
-            var expressionTree = qckdev.Linq.Expressions.ExpressionString.BuildTree(predicate);
-            var expression = qckdev.Linq.Expressions.ExpressionBuilder<object, TResult>.Create(expressionTree);
-            var lambda = expression.Compile();
-
-            Assert.AreEqual(expected, lambda.Invoke(null));
-        }
-
         private void SimpleArithmeticTestCore<T, TResult>(string predicate, T parameter, TResult expected)
         {
             var expressionTree = qckdev.Linq.Expressions.ExpressionString.BuildTree(predicate);
@@ -125,6 +152,11 @@ namespace qckdevTest.Linq
             var lambda = expression.Compile();
 
             Assert.AreEqual(expected, lambda.Invoke(parameter));
+        }
+
+        private void SimpleArithmeticTestCore<TResult>(string predicate, TResult expected)
+        {
+            SimpleArithmeticTestCore<object, TResult>(predicate, null, expected);
         }
 
     }

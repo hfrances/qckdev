@@ -36,6 +36,11 @@ namespace qckdev.Linq.Expressions
         internal ExpressionTree ExpressionTree { get; set; }
 
         /// <summary>
+        /// Gets or sets if this nodo is between parentheses.
+        /// </summary>
+        public bool Locked { get; set; }
+
+        /// <summary>
         /// Gets the start index in the <see cref="ExpressionTree.Value"/>.
         /// </summary>
         public int? StartIndex { get; set; }
@@ -86,6 +91,15 @@ namespace qckdev.Linq.Expressions
 
 
         #region metods 
+
+        /// <summary>
+        /// Returns an <see cref="Array"/> with the <see cref="ExpressionNode"/> elements of the <paramref name="node"/> path.
+        /// </summary>
+        /// <returns>An <see cref="Array"/> with the <see cref="ExpressionNode"/> elements.</returns>
+        public IEnumerable<ExpressionNode> GetNodePath()
+        {
+            return this.ExpressionTree.GetNodePath(this);
+        }
 
         /// <summary>
         /// Retuns if the element has child nodes. This class is for Serialization.
