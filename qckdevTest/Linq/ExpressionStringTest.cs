@@ -63,9 +63,6 @@ namespace qckdevTest.Linq
         [DataRow("(3+2)^2*(5^3)^2*(5^0)*(5^4)", 244140625)]
         [DataRow("(10+5^2)*((5*2)+9+3^3)/2", 805)]
         [DataRow("(10+5^2)*((5*2)+9-3^3)/2", -140)]
-        [DataRow("2*(6+7)-8^2", -38)] // Fails.
-        // TODO: negatives.
-        //[DataRow("(10+5^2)*((5*-2)+9-3^3)/2", -490)]
         public void SimpleArithmeticTest2a(string predicate, int expected)
         {
             SimpleArithmeticTestCore(predicate, expected);
@@ -74,6 +71,15 @@ namespace qckdevTest.Linq
         [TestMethod]
         [DataRow("(4^4)^4", 4294967296)]
         public void SimpleArithmeticTest2b(string predicate, long expected)
+        {
+            SimpleArithmeticTestCore(predicate, expected);
+        }
+
+        [TestMethod]
+        [DataRow("2*(6+7)-8^2", -38)] // Fails.
+        // TODO: negatives.
+        //[DataRow("(10+5^2)*((5*-2)+9-3^3)/2", -490)]
+        public void SimpleArithmeticTest2c(string predicate, int expected)
         {
             SimpleArithmeticTestCore(predicate, expected);
         }

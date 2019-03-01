@@ -189,9 +189,9 @@ namespace qckdev.Linq.Expressions
                     SetEndIndex(ref rdo, currentIndex + 1, closeCriteria, recursive: true);
                     // After close.
                     rdo.Locked = true;
-                    LastRelationalNode = null;
-                    LastArithmeticNode = null;
-                    LastValueNode = rdo;
+                    //LastRelationalNode = null;
+                    //LastArithmeticNode = null;
+                    //LastValueNode = rdo;
                     break;
 
                 case '\'':
@@ -363,7 +363,8 @@ namespace qckdev.Linq.Expressions
             var prior1 = GetOperatorPriority(lastOperationNode.Operator);
             var prior2 = GetOperatorPriority(@operator);
 
-            if (!lastOperationNode.Locked && prior1 != null && prior2 != null && prior1 != prior2)
+            // TODO: array de arithmetic nodes.
+            if (!lastOperationNode.Locked && lastOperationNode.Nodes.Any() && prior1 != prior2)
             {
                 ExpressionNode node = null;
 
@@ -415,6 +416,10 @@ namespace qckdev.Linq.Expressions
                         node = parentNode.Nodes.Last();
                     }
                 }
+            }
+            if (node == null)
+            {
+                node = nodePath.Last(); // Root.
             }
             return node;
         }
@@ -623,9 +628,9 @@ namespace qckdev.Linq.Expressions
         /// </summary>
         /// <param name="operator">Operador a validar.</param>
         /// <returns>La prioridad de cálculo del operador, de menor a mayor.</returns>
-        private static int? GetOperatorPriority(ExpressionOperatorType @operator)
+        private static int GetOperatorPriority(ExpressionOperatorType @operator)
         {
-            int? rdo = null;
+            int rdo;
 
             switch (@operator)
             {
@@ -643,6 +648,7 @@ namespace qckdev.Linq.Expressions
                 case ExpressionOperatorType.Modulo:
                     throw new NotImplementedException(@operator.ToString());
                 default:
+                    rdo = 0;
                     break; // Do Nothing.
             }
             return rdo;
