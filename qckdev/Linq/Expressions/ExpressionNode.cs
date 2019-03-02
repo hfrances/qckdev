@@ -35,6 +35,9 @@ namespace qckdev.Linq.Expressions
 
         internal ExpressionTree ExpressionTree { get; set; }
 
+        internal ExpressionNodeCollection ParentCollection { private get; set; }
+        internal ExpressionNode ParentNode => this.ParentCollection?.Owner;
+
         /// <summary>
         /// Gets or sets if this nodo is between parentheses.
         /// </summary>
@@ -82,7 +85,7 @@ namespace qckdev.Linq.Expressions
         /// <summary>
         /// Gets the final value of the <see cref="ExpressionNode"/> converted during the process or null if it must takes <see cref="Text"/> value.
         /// </summary>
-        public string NewText
+        public string FormattedText
         {
             get; set;
         }
@@ -98,7 +101,16 @@ namespace qckdev.Linq.Expressions
         /// <returns>An <see cref="Array"/> with the <see cref="ExpressionNode"/> elements.</returns>
         public IEnumerable<ExpressionNode> GetNodePath()
         {
-            return this.ExpressionTree.GetNodePath(this);
+            var rdo = new List<ExpressionNode>();
+            var item = this;
+
+            do
+            {
+                rdo.Insert(0, item);
+                item = item?.ParentCollection?.Owner;
+            } while (item != null);
+            return rdo.ToArray();
+            //return this.ExpressionTree.GetNodePath(this).ToArray();
         }
 
         /// <summary>
@@ -116,7 +128,7 @@ namespace qckdev.Linq.Expressions
         public override string ToString()
         {
             var @operator = (this.Operator == ExpressionOperatorType.None ? (ExpressionOperatorType?)null : this.Operator);
-            return string.Format("Expr {0} {1}:    {2}", this.Type, @operator, this.NewText ?? this.Text);
+            return string.Format("Expr {0} {1}:    {2}", this.Type, @operator, this.FormattedText ?? this.Text);
         }
 
         #endregion
@@ -203,6 +215,18 @@ namespace qckdev.Linq.Expressions
         public ExpressionNode Owner { get; }
 
         /// <summary>
+        /// Añade y devuelve un nuevo valor de tipo <see cref="ExpressionNode"/> en la colección actual.
+        /// </summary>
+        /// <returns>Un nuevo valor de tipo <see cref="ExpressionNode"/> añadido a la colección actual.</returns>
+        public ExpressionNode AddNew()
+        {
+            var rdo = new ExpressionNode(this.Owner.ExpressionTree);
+
+            this.Add(rdo);
+            return rdo;
+        }
+
+        /// <summary>
         /// Adds the elements of the specified collection to the end of the <see cref="ExpressionNodeCollection"/>.
         /// </summary>
         /// <param name="collection">The collection whose elements should be added to the end of the <see cref="ExpressionNodeCollection"/>.</param>
@@ -223,6 +247,7 @@ namespace qckdev.Linq.Expressions
         protected override void InsertItem(int index, ExpressionNode item)
         {
             item.ExpressionTree = Owner.ExpressionTree;
+            item.ParentCollection = this;
             base.InsertItem(index, item);
         }
 

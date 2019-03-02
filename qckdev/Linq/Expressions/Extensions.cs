@@ -10,19 +10,6 @@ namespace qckdev.Linq.Expressions
     internal static class Extensions
     {
 
-        /// <summary>
-        /// Añade y devuelve un nuevo valor de tipo <see cref="ExpressionNode"/> en la colección actual.
-        /// </summary>
-        /// <param name="collection">Colección de elementos donde se va a añadir.</param>
-        /// <returns></returns>
-        internal static ExpressionNode AddNew(this ExpressionNodeCollection collection)
-        {
-            var rdo = new ExpressionNode(collection.Owner.ExpressionTree);
-
-            collection.Add(rdo);
-            return rdo;
-        }
-
         internal static void UpdateEndIndex(this ExpressionNode node)
         {
             var maxEndIndex = node.Nodes?.Max(x => x.EndIndex) ?? node.EndIndex;
@@ -32,6 +19,22 @@ namespace qckdev.Linq.Expressions
         internal static PropertyInfo GetProperty(this Dictionary<string, PropertyInfo> properties, string propertyName)
         {
             return properties[propertyName]; // TODO: Mejorar error.
+        }
+
+        internal static void InsertTree(this ExpressionNode node, ExpressionTree tree)
+        {
+            node.Nodes.Add(tree.Root); // TODO: Si solo uno, reemplazar.<
+            InsertTreeRenumerate(node, node.StartIndex.Value);
+        }
+
+        private static void InsertTreeRenumerate(ExpressionNode parentNode, int charIndexIncrement)
+        {
+
+            foreach (var childNode in parentNode.Nodes.Where(x => x.ExpressionTree != parentNode.ExpressionTree))
+            {
+                childNode.ExpressionTree = parentNode.ExpressionTree;
+                InsertTreeRenumerate(childNode, charIndexIncrement);
+            }
         }
 
     }
