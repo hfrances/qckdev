@@ -106,7 +106,14 @@ namespace qckdevTest.Linq
         [DataRow("3>2", true)]
         [DataRow("1>=2", false)]
         [DataRow("1=<2", true)]
-        public void ExpressionStringTest0005_Comparison_Int_Simple(string predicate, bool expected)
+        public void ExpressionStringTest0005a_Comparison_Int_Simple(string predicate, bool expected)
+        {
+            SimpleArithmeticTestCore(predicate, expected);
+        }
+
+        [TestMethod]
+        [DataRow("(1=<2) == true", true)]
+        public void ExpressionStringTest0005b_Comparison_Int_Complex(string predicate, bool expected)
         {
             SimpleArithmeticTestCore(predicate, expected);
         }
@@ -123,9 +130,10 @@ namespace qckdevTest.Linq
         [DataRow("'Texto' != 'Texta'", true)]
         [DataRow("'Texto' <> 'Texta'", true)]
         [DataRow("'Texto' == 'Tex*'", false)]
-        // TODO: implementar.
+        // TODO: implementar. Comprobar rendimiento.
         //[DataRow("'Texto' = 'Tex*'", true)]
         //[DataRow("'Texto' LIKE 'Tex*'", true)]
+        //[DataRow("'Texto' == 'texto'", true)]
         public void ExpressionStringTest0007_Comparison_String_Simple(string predicate, bool expected)
         {
             SimpleArithmeticTestCore(predicate, expected);
@@ -177,14 +185,27 @@ namespace qckdevTest.Linq
         }
 
         [TestMethod]
-        //[DataRow("1 == 1 AND 2 == 2", true)]
+        [DataRow("1 == 1 AND 2 == 2", true)]
         [DataRow("1 == 2 OR 2 == 2", true)]
-        //[DataRow("1 == 1 OR 2 == 1", true)]
+        [DataRow("1 == 1 OR 2 == 1", true)]
         public void ExpressionStringTest0012_Logical_Simple(string predicate, bool expected)
         {
             SimpleArithmeticTestCore(predicate, expected);
         }
 
+        /// <remarks>
+        /// <seealso href="https://stackoverflow.com/questions/1241142/sql-logic-operator-precedence-and-and-or"/>
+        /// </remarks>
+        [TestMethod]
+        [DataRow("[x]==1 OR [y]==1 And [z]==1", true)]
+        [DataRow("[x]==1 OR ([y]==1 And [z]==1)", true)]
+        [DataRow("([x]==1 OR [y]==1) And [z]==1", false)]
+        public void ExpressionStringTest0013_Logical_WithItem(string predicate, bool expected)
+        {
+            var item = new { x = 1, y = 0, z = 0 };
+
+            SimpleArithmeticTestCore(predicate, item, expected);
+        }
 
         #region common
 

@@ -405,7 +405,7 @@ namespace qckdev.Linq.Expressions
             {
                 case ExpressionOperatorType.And:
                 case ExpressionOperatorType.Or:
-                    ProcessBufferLogicOperator(ref parent, @operator, currentIndex);
+                    ProcessBufferLogicOperator(ref current, @operator);
                     break;
 
                 case ExpressionOperatorType.Not:
@@ -439,65 +439,35 @@ namespace qckdev.Linq.Expressions
 
         private void ProcessBufferArithmeticOperator(ref ExpressionNode currentNode, ExpressionOperatorType @operator)
         {
-            int newPriority = GetOperatorPriority(@operator);
-            bool repeat = true;
-            var currentOperator = GetArithmeticOperator(currentNode);
-            var currentPriority = GetOperatorPriority(currentOperator);
-
-            if (newPriority >= currentPriority)
-            {
-                repeat = false; // Puesto que la operación anterior es de menor prioridad, este es el nivel correcto.
-            }
-
-            while (repeat)
-            {
-                var parentNode = currentNode.ParentNode;
-
-                if (parentNode == null)
+            Func<ExpressionNodeType, bool> isValidNode =
+                delegate (ExpressionNodeType type)
                 {
-                    repeat = false; // Top level, no se puede ir más arriba.
-                }
-                else if (parentNode.Locked)
-                {
-                    // A partir de la primera vez, si el nodo está bloqueado, ya no se podrá subir más hacia arriba
-                    // (el nodo inicial puede ser de paréntesis, pero está fuera de é).
-                    repeat = false;
-                }
-                else
-                {
-                    var parentOperator = GetArithmeticOperator(parentNode);
-                    var parentPriority = GetOperatorPriority(parentOperator);
+                    return type.In(ExpressionNodeType.ArithmeticOperator, ExpressionNodeType.Default) || IsValueNode(type);
+                };
 
-                    if (newPriority >= parentPriority)
-                    {
-                        repeat = false; // Puesto que la operación de nivel superior es de menor prioridad, este es el nivel correcto.
-                    }
-                    else
-                    {
-                        currentNode = parentNode; // Probar suerte con el padre.
-                    }
-                }
-            }
+            // Buscar el nodo donde se puede aplicar el operador.
+            currentNode = FindNodeForOperator(currentNode, @operator, isValidNode, GetArithmeticOperator);
 
             // Las operaciones se van solapando.
             ApplyParentNode(currentNode, ExpressionNodeType.ArithmeticOperator, @operator);
         }
 
-        private void ProcessBufferLogicOperator(ref ExpressionNode parent, ExpressionOperatorType @operator, int currentIndex)
+        private void ProcessBufferLogicOperator(ref ExpressionNode currentNode, ExpressionOperatorType @operator)
         {
-            var backIndex = (currentIndex - StringBuffer.Length - 1);
-            var previousParent = parent;
+            Func<ExpressionNodeType, bool> isValidNode =
+                delegate (ExpressionNodeType type)
+                {
+                    return type.In(
+                        ExpressionNodeType.LogicalOperator,
+                        ExpressionNodeType.ArithmeticOperator,
+                        ExpressionNodeType.RelationalOperator);
+                };
 
-            CurrentNode?.UpdateEndIndex();
-            CurrentNode = null;
-            LastRelationalNode?.UpdateEndIndex();
-            LastRelationalNode = null;
-
-            parent = ApplyOrCreateLogicOperator(previousParent, @operator, backIndex);
-            if (parent != previousParent)
-            {
-                LastLogicNodes.TryReplace(previousParent, parent);
-            }
+            // Buscar el nodo donde se puede aplicar el operador.
+            currentNode = FindNodeForOperator(currentNode, @operator, isValidNode, GetLogicalOperator);
+            
+            // Las operaciones se van solapando.
+            ApplyParentNode(currentNode, ExpressionNodeType.LogicalOperator, @operator);
         }
 
         private void ProcessBufferLogicOperatorNot(ExpressionNode myparent, ExpressionOperatorType @operator, int currentIndex)
@@ -681,7 +651,9 @@ namespace qckdev.Linq.Expressions
 
         /// <summary>
         /// Devuelve la prioridad de cálculo del operador de menor a mayor. 
-        /// Esto permite hacer las multiplicaciones antes que las sumas y las potencias antes que las multiplicaciones.
+        /// Esto permite hacer las multiplicaciones antes que las sumas, 
+        /// las potencias antes que las multiplicaciones, 
+        /// los AND antes que los OR...
         /// </summary>
         /// <param name="operator">Operador a validar.</param>
         /// <returns>La prioridad de cálculo del operador, de menor a mayor.</returns>
@@ -711,34 +683,127 @@ namespace qckdev.Linq.Expressions
                     throw new NotImplementedException(@operator.ToString());
                 default:
                     rdo = 0;
-                    break; // Do Nothing.
+                    break;
             }
             return rdo;
         }
 
         /// <summary>
-        /// Devuelve el operador adjunto al nodo actual.
+        /// Devuelve si el tipo de nodo puede contener un valor.
         /// </summary>
-        /// <param name="currentNode"></param>
-        /// <returns></returns>
-        private static ExpressionOperatorType GetArithmeticOperator(ExpressionNode currentNode)
+        /// <param name="nodeType">Tipo de nodo a validar.</param>
+        /// <returns>True si el tipo puede contener un valor, false en caso contrario.</returns>
+        private static bool IsValueNode(ExpressionNodeType nodeType)
+        {
+            return nodeType.In(
+                ExpressionNodeType.UnknownType,
+                ExpressionNodeType.StringType,
+                ExpressionNodeType.DateType,
+                ExpressionNodeType.ListType,
+                ExpressionNodeType.PropertyType);
+        }
+
+        /// <summary>
+        /// Devuelve el operador adjunto a un nodo específico.
+        /// </summary>
+        /// <param name="node">Nodo de búsqueda.</param>
+        /// <returns>El operador adjunto al nodo especificado.</returns>
+        private static ExpressionOperatorType GetArithmeticOperator(ExpressionNode node)
         {
             ExpressionOperatorType? rdo = null;
 
             do
             {
-                var parentNode = currentNode.ParentNode;
+                var parentNode = node.ParentNode;
 
                 if (parentNode == null)
-                    rdo = currentNode.Operator; // Primer nivel.
-                else if (currentNode.Type == ExpressionNodeType.ArithmeticOperator)
-                    rdo = currentNode.Operator; // Operación aritmética.
+                    rdo = node.Operator; // Primer nivel.
+                else if (node.Type == ExpressionNodeType.ArithmeticOperator)
+                    rdo = node.Operator; // Operación aritmética.
                 else if (parentNode.Locked)
                     rdo = parentNode.Operator; // El padre es paréntesis, no se puede subir más arriba.
                 else
-                    currentNode = parentNode; // Probar suerte con el padre.
+                    node = parentNode; // Probar suerte con el padre.
             } while (rdo == null);
             return rdo.Value;
+        }
+
+        /// <summary>
+        /// Devuelve el operador adjunto a un nodo específico.
+        /// </summary>
+        /// <param name="node">Nodo de búsqueda.</param>
+        /// <returns>El operador adjunto al nodo especificado.</returns>
+        private static ExpressionOperatorType GetLogicalOperator(ExpressionNode node)
+        {
+            ExpressionOperatorType? rdo = null;
+
+            do
+            {
+                var parentNode = node.ParentNode;
+
+                if (parentNode == null)
+                    rdo = node.Operator; // Primer nivel.
+                else if (node.Type == ExpressionNodeType.LogicalOperator)
+                    rdo = node.Operator; // Operación lógica.
+                else if (parentNode.Locked)
+                    rdo = parentNode.Operator; // El padre es paréntesis, no se puede subir más arriba.
+                else
+                    node = parentNode; // Probar suerte con el padre.
+            } while (rdo == null);
+            return rdo.Value;
+        }
+
+        /// <summary>
+        /// Devuelve el nodo más próximo a <paramref name="currentNode"/> al que se le pueda asignar la operación especificada.
+        /// </summary>
+        /// <param name="currentNode">Nodo de inicio de búsqueda.</param>
+        /// <param name="operator">Operador que se desea aplicar.</param>
+        /// <param name="isValidNodeFunc">Función que valida los nodos sobre los que puede buscar.</param>
+        /// <param name="getOperatorFunc">Función que devuelve el tipo de operador del nodo durante las búsquedas.</param>
+        /// <returns>El nodo más próximo al que se le pueda asignar la operación especificada.</returns>
+        private static ExpressionNode FindNodeForOperator(ExpressionNode currentNode, ExpressionOperatorType @operator,
+            Func<ExpressionNodeType, bool> isValidNodeFunc, Func<ExpressionNode, ExpressionOperatorType> getOperatorFunc)
+        {
+            bool repeat = true;
+            int newPriority = GetOperatorPriority(@operator);
+            var currentOperator = getOperatorFunc(currentNode);
+            var currentPriority = GetOperatorPriority(currentOperator);
+
+            if (isValidNodeFunc(currentNode.Type) && newPriority >= currentPriority)
+            {
+                repeat = false; // Puesto que la operación anterior es de menor prioridad, este es el nivel correcto.
+            }
+
+            while (repeat)
+            {
+                var parentNode = currentNode.ParentNode;
+
+                if (parentNode == null)
+                {
+                    repeat = false; // Top level, no se puede ir más arriba.
+                }
+                else if (parentNode.Locked || !isValidNodeFunc(parentNode.Type))
+                {
+                    // A partir de la primera vez, si el nodo está bloqueado, ya no se podrá subir más hacia arriba
+                    // (el nodo inicial puede ser de paréntesis, pero está fuera de é).
+                    repeat = false;
+                }
+                else
+                {
+                    var parentOperator = getOperatorFunc(parentNode);
+                    var parentPriority = GetOperatorPriority(parentOperator);
+
+                    if (isValidNodeFunc(currentNode.Type) && newPriority >= parentPriority)
+                    {
+                        repeat = false; // Puesto que la operación de nivel superior es de menor prioridad, este es el nivel correcto.
+                    }
+                    else
+                    {
+                        currentNode = parentNode; // Probar suerte con el padre.
+                    }
+                }
+            }
+            return currentNode;
         }
 
         #endregion
