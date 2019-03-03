@@ -39,7 +39,7 @@ namespace qckdev.Linq.Expressions
         internal ExpressionNode ParentNode => this.ParentCollection?.Owner;
 
         /// <summary>
-        /// Gets or sets if this nodo is between parentheses.
+        /// Gets or sets if this nodo cannot be altered during the <see cref="ExpressionTree"/> build (for example parentheses).
         /// </summary>
         public bool Locked { get; set; }
 

@@ -106,6 +106,10 @@ namespace qckdevTest.Linq
         [DataRow("3>2", true)]
         [DataRow("1>=2", false)]
         [DataRow("1=<2", true)]
+        [DataRow("true==true", true)]
+        [DataRow("false==false", true)]
+        [DataRow("true!=false", true)]
+        [DataRow("true==false", false)]
         public void ExpressionStringTest0005a_Comparison_Int_Simple(string predicate, bool expected)
         {
             SimpleArithmeticTestCore(predicate, expected);
@@ -130,13 +134,26 @@ namespace qckdevTest.Linq
         [DataRow("'Texto' != 'Texta'", true)]
         [DataRow("'Texto' <> 'Texta'", true)]
         [DataRow("'Texto' == 'Tex*'", false)]
-        // TODO: implementar. Comprobar rendimiento.
-        //[DataRow("'Texto' = 'Tex*'", true)]
-        //[DataRow("'Texto' LIKE 'Tex*'", true)]
-        //[DataRow("'Texto' == 'texto'", true)]
-        public void ExpressionStringTest0007_Comparison_String_Simple(string predicate, bool expected)
+        //[DataRow("'Texto' == 'texto'", true)] // TODO: implementar case insensitive, comprobar rendimiento.
+        public void ExpressionStringTest0007a_Comparison_String_Simple(string predicate, bool expected)
         {
             SimpleArithmeticTestCore(predicate, expected);
+        }
+
+        // TODO: implementar LIKE, comprobar rendimiento.
+        [TestMethod]
+        [DataRow("'Texto' = 'Tex*'", true)]
+        [DataRow("'Texto' LIKE 'Tex*'", true)]
+        public void ExpressionStringTest0007b_Comparison_String_Like(string predicate, bool expected)
+        {
+            try
+            {
+                SimpleArithmeticTestCore(predicate, expected);
+            }
+            catch (NotImplementedException ex)
+            {
+                Assert.Inconclusive($"{ex.GetType().Name}: {ex.Message}");
+            }
         }
 
         // TODO: implementar.
@@ -190,6 +207,9 @@ namespace qckdevTest.Linq
         [DataRow("[Value] = 'Pata")]
         [DataRow("[Value = 'Patata'")]
         [DataRow("Value] = 'Patata'")]
+        [DataRow("[Value] IN (1, 2, 3")]
+        [DataRow("[Value] IN (1, 2, 3 AND 1==1")]
+        [DataRow("[Value] IN (1, 2, 3 && 1==1")]
         public void ExpressionStringTest0011_Comparison_FormatException(string predicate)
         {
             SimpleArithmeticTestCore(predicate, (string)null);
@@ -197,12 +217,18 @@ namespace qckdevTest.Linq
 
         [TestMethod]
         [DataRow("1 == 1 AND 2 == 2", true)]
+        [DataRow("1 == 1 && 2 == 2", true)]
         [DataRow("1 == 2 OR 2 == 2", true)]
+        [DataRow("1 == 2 || 2 == 2", true)]
         [DataRow("1 == 1 OR 2 == 1", true)]
-        [DataRow("true==true", true)]
-        [DataRow("false==false", true)]
-        [DataRow("true!=false", true)]
-        [DataRow("true==false", false)]
+        [DataRow("1 == 1 || 2 == 1", true)]
+        [DataRow("!false==false", false)]
+        [DataRow("not false==false", false)]
+        [DataRow("!(false==false)", false)]
+        [DataRow("not (false==false)", false)]
+        [DataRow("!true==false", true)]
+        [DataRow("!(true==false)", true)]
+        [DataRow("not (true==false)", true)]
         public void ExpressionStringTest0012_Logical_Simple(string predicate, bool expected)
         {
             SimpleArithmeticTestCore(predicate, expected);
@@ -215,6 +241,9 @@ namespace qckdevTest.Linq
         [DataRow("[x]==1 OR [y]==1 And [z]==1", true)]
         [DataRow("[x]==1 OR ([y]==1 And [z]==1)", true)]
         [DataRow("([x]==1 OR [y]==1) And [z]==1", false)]
+        [DataRow("([x]==1 OR [y]==1) And ![z]==1", true)]
+        [DataRow("([x]==1 OR [y]==1) And !([z]==1)", true)]
+        [DataRow("([x]==1 OR [y]==1) And (![z]==1)", true)]
         public void ExpressionStringTest0013_Logical_WithItem(string predicate, bool expected)
         {
             var item = new { x = 1, y = 0, z = 0 };

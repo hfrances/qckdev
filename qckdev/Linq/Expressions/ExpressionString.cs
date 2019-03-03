@@ -113,7 +113,7 @@ namespace qckdev.Linq.Expressions
             var root = tree.Root;
 
             // Procesar cadena.
-            ProcessSubstring(ref root, 0, null, delimiterOpened: false);
+            ProcessSubstring(root, 0, null, delimiterOpened: false);
 
             // Finalizar.
             UploadEndIndexAllLevels(root);
@@ -133,7 +133,7 @@ namespace qckdev.Linq.Expressions
         /// Indica si se está buscando dentro de una zona incluida en <see cref="DelimiterChars"/>, 
         /// para no lanzar error de formato si encuentra un carácter de cierre.
         /// </param>
-        private void ProcessSubstring(ref ExpressionNode node, int startIndex, int? endIndex, bool delimiterOpened)
+        private void ProcessSubstring(ExpressionNode node, int startIndex, int? endIndex, bool delimiterOpened)
         {
             var value = node.ExpressionTree.Value;
             var lastCharType = CharType.None;
@@ -141,17 +141,16 @@ namespace qckdev.Linq.Expressions
 
             for (i = startIndex; i <= (endIndex ?? value.Length - 1); i++)
             {
-                ProcessChar(ref node, ref lastCharType, ref i, delimiterOpened);
+                ProcessChar(node, ref lastCharType, ref i, delimiterOpened);
             }
-            ProcessBuffer(ref node, i - 1, formattedText: false);
+            ProcessBuffer(node, i - 1, formattedText: false);
         }
 
         /// <summary>
         /// Analiza el caracter en una cadena y lo procesa, pudiendo crear nodos hijos, asignarles un operador o rellenar en <see cref="StringBuffer"/>.
         /// </summary>
         /// <param name="node">
-        /// Nodo que se está procesando en estos momentos. Si es conveniente, este nodo puede ser reemplazado por otro
-        /// (por ejemplo, este nodo pasa a formar parte de otro debido a las operaciones siguientes).
+        /// Nodo que se está procesando en estos momentos.
         /// </param>
         /// <param name="lastCharType">
         /// Último tipo de caracter leído. 
@@ -168,7 +167,7 @@ namespace qckdev.Linq.Expressions
         /// para no lanzar error de formato si encuentra un carácter de cierre.
         /// </param>
         /// <exception cref="FormatException">La cadena a procesar es incorrecta.</exception>
-        private void ProcessChar(ref ExpressionNode node, ref CharType lastCharType, ref int charIndex, bool delimiterOpened)
+        private void ProcessChar(ExpressionNode node, ref CharType lastCharType, ref int charIndex, bool delimiterOpened)
         {
             var value = node.ExpressionTree.Value;
             var c = value[charIndex];
@@ -178,7 +177,7 @@ namespace qckdev.Linq.Expressions
                 // Se ha detectado un carácter de apertura (un paréntesis, una comilla, un corchete...). 
                 // Procesa su contenido hasta en contrar el carácter de cierre.
                 // Mueve el contador hasta el último carácter leído.
-                ProcessBuffer(ref node, charIndex - 1, formattedText: false);
+                ProcessBuffer(node, charIndex - 1, formattedText: false);
                 AddChildNodeFromOpenCharacter(node, ref charIndex);
             }
             else if (!delimiterOpened && DelimiterChars.ContainsValue(c))
@@ -187,12 +186,12 @@ namespace qckdev.Linq.Expressions
             }
             else if (BreakerChars.Contains(c))
             {
-                ProcessBuffer(ref node, charIndex - 1, formattedText: false);
+                ProcessBuffer(node, charIndex - 1, formattedText: false);
             }
             else
             {
                 if (StringBuffer.Length > 0 && lastCharType != GetCharType(c.ToString()))
-                    ProcessBuffer(ref node, charIndex - 1, formattedText: false);
+                    ProcessBuffer(node, charIndex - 1, formattedText: false);
 
                 StringBuffer.Append(c);
             }
@@ -309,11 +308,7 @@ namespace qckdev.Linq.Expressions
                     flag = 0;
                     if (recursive)
                     {
-                        var processNode = node;
-
-                        ProcessChar(ref processNode, ref lastCharType, ref i, true);
-                        if (processNode != node)
-                            throw new NotSupportedException($"Oops! Something was not planned for method {nameof(CloseNodeFromOpenCharacter)}.\n{value}"); // Control de robustez.
+                        ProcessChar(node, ref lastCharType, ref i, true);
                     }
                     else
                     {
@@ -328,10 +323,7 @@ namespace qckdev.Linq.Expressions
                 if (recursive)
                 {
                     // Es necesario para los paréntesis ya que puede llegar a crear nodos hijos.
-                    var processNode = node;
-                    ProcessBuffer(ref processNode, processNode.EndIndex.Value - 1, useFormattedText);
-                    if (processNode != node)
-                        throw new NotSupportedException($"Oops! Something was not planned for method {nameof(CloseNodeFromOpenCharacter)}.\n{value}"); // Control de robustez.
+                    ProcessBuffer(node, node.EndIndex.Value - 1, useFormattedText);
                 }
                 else
                 {
@@ -344,7 +336,7 @@ namespace qckdev.Linq.Expressions
             }
             else
             {
-                // TODO: Controlar error o continuar adelante? (creo que si continua adelante el ProcessBuffer hará el resto pero hay que probarlo).
+                // Do nothing: el resto del proceso es robusto y saltará un "FormatException".
             }
         }
 
@@ -352,8 +344,7 @@ namespace qckdev.Linq.Expressions
         /// Procesa el texto pendiente en el buffer.
         /// </summary>
         /// <param name="parentNode">
-        /// Nodo actual de procesamiento.
-        /// Para <see cref="ProcessBufferLogicOperator"/> el nodo podría ser sustituido por otro.
+        /// Nodo de procesamiento (sólo lo utilizará si no existe ningún valor en <see cref="CurrentNode"/>.
         /// </param>
         /// <param name="charIndex">
         /// Índice del caracter que se está analizando dentro de <paramref name="parentNode"/>
@@ -362,17 +353,17 @@ namespace qckdev.Linq.Expressions
         /// Establece si el valor pendiente del buffer debe almacenarse en <see cref="ExpressionNode.FormattedText"/>.
         /// Este valor sustituirá al de la propiedad <see cref="ExpressionNode.Text"/> durante el procesamiento.
         /// </param>
-        private void ProcessBuffer(ref ExpressionNode parentNode, int charIndex, bool formattedText)
+        private void ProcessBuffer(ExpressionNode parentNode, int charIndex, bool formattedText)
         {
 
             if (StringBuffer.Length > 0)
             {
                 var upperTextBuffer = StringBuffer.ToString().ToUpperInvariant();
-                var currentNode = this.CurrentNode ?? parentNode; //(LastArithmeticNode ?? LastRelationalNode ?? LastValueNode ?? parentNode);  // Para variables, operaciones aritmeticas y relacionales.
+                var currentNode = this.CurrentNode ?? parentNode;
 
                 if (OperationMap.TryGetValue(upperTextBuffer, out ExpressionOperatorType @operator))
                 {
-                    ProcessOperator(ref parentNode, ref currentNode, @operator, charIndex);
+                    ProcessOperator(ref currentNode, @operator, charIndex);
                 }
                 else
                 {
@@ -394,17 +385,25 @@ namespace qckdev.Linq.Expressions
         }
 
 
-        private void ProcessOperator(ref ExpressionNode parent, ref ExpressionNode current, ExpressionOperatorType @operator, int currentIndex)
+        private void ProcessOperator(ref ExpressionNode current, ExpressionOperatorType @operator, int charIndex)
         {
             switch (@operator)
             {
+                case ExpressionOperatorType.Add:
+                case ExpressionOperatorType.Substract:
+                case ExpressionOperatorType.Multiply:
+                case ExpressionOperatorType.Divide:
+                case ExpressionOperatorType.Modulo:
+                case ExpressionOperatorType.Power:
+                    ProcessBufferArithmeticOperator(ref current, @operator);
+                    break;
+
                 case ExpressionOperatorType.And:
                 case ExpressionOperatorType.Or:
                     ProcessBufferLogicOperator(ref current, @operator);
                     break;
-
                 case ExpressionOperatorType.Not:
-                    ProcessBufferLogicOperatorNot(current, @operator, currentIndex);
+                    ProcessBufferLogicOperatorNot(ref current, charIndex);
                     break;
 
                 case ExpressionOperatorType.Equals:
@@ -416,15 +415,6 @@ namespace qckdev.Linq.Expressions
                 case ExpressionOperatorType.Like:
                 case ExpressionOperatorType.In:
                     ProcessBufferEqualityOperator(current, @operator);
-                    break;
-
-                case ExpressionOperatorType.Add:
-                case ExpressionOperatorType.Substract:
-                case ExpressionOperatorType.Multiply:
-                case ExpressionOperatorType.Divide:
-                case ExpressionOperatorType.Modulo:
-                case ExpressionOperatorType.Power:
-                    ProcessBufferArithmeticOperator(ref current, @operator);
                     break;
 
                 default:
@@ -453,7 +443,8 @@ namespace qckdev.Linq.Expressions
                 return type.In(
                     ExpressionNodeType.LogicalOperator,
                     ExpressionNodeType.ArithmeticOperator,
-                    ExpressionNodeType.RelationalOperator);
+                    ExpressionNodeType.RelationalOperator,
+                    ExpressionNodeType.Default);
             }
 
             // Buscar el nodo donde se puede aplicar el operador.
@@ -463,30 +454,21 @@ namespace qckdev.Linq.Expressions
             ApplyParentNode(currentNode, ExpressionNodeType.LogicalOperator, @operator);
         }
 
-        private void ProcessBufferLogicOperatorNot(ExpressionNode myparent, ExpressionOperatorType @operator, int currentIndex)
+        private void ProcessBufferLogicOperatorNot(ref ExpressionNode currentNode, int charIndex)
         {
-            ExpressionNode rdo;
+            ExpressionNode newNode;
 
-            CurrentNode?.UpdateEndIndex();
-            CurrentNode = null;
-
-            rdo = myparent.Nodes.AddNew();
-            rdo.StartIndex = currentIndex;
-            rdo.Type = ExpressionNodeType.LogicalOperator;
-            rdo.Operator = @operator;
+            newNode = currentNode.Nodes.AddNew();
+            newNode.StartIndex = charIndex;
+            newNode.Type = ExpressionNodeType.LogicalOperator;
+            newNode.Operator = ExpressionOperatorType.Not;
+            currentNode = newNode;
         }
 
-        private void ProcessBufferEqualityOperator(ExpressionNode myparent, ExpressionOperatorType @operator)
+        private void ProcessBufferEqualityOperator(ExpressionNode currentNode, ExpressionOperatorType @operator)
         {
-            if (CurrentNode == null)
-            {
-                throw new FormatException("Expression operator must have some property or constant.");
-            }
-            else
-            {
-                ApplyParentNode(myparent, ExpressionNodeType.RelationalOperator, @operator); // Convierte el nodo en un nodo de tipo RelationalOperator y crea por debajo un nodo con la información del nodo original.
-                CurrentNode = myparent;
-            }
+            // Convierte el nodo en un nodo de tipo RelationalOperator y crea por debajo un nodo con la información del nodo original.
+            ApplyParentNode(currentNode, ExpressionNodeType.RelationalOperator, @operator); 
         }
 
         #endregion
@@ -691,19 +673,21 @@ namespace qckdev.Linq.Expressions
         private static ExpressionNode FindNodeForOperator(ExpressionNode currentNode, ExpressionOperatorType @operator,
             Func<ExpressionNodeType, bool> isValidNodeFunc, Func<ExpressionNode, ExpressionOperatorType> getOperatorFunc)
         {
-            bool repeat = true;
-            int newPriority = GetOperatorPriority(@operator);
+            ExpressionNode rdo;
+            var repeat = true;
+            var newPriority = GetOperatorPriority(@operator);
             var currentOperator = getOperatorFunc(currentNode);
             var currentPriority = GetOperatorPriority(currentOperator);
 
-            if (isValidNodeFunc(currentNode.Type) && newPriority >= currentPriority)
+            rdo = currentNode;
+            if (isValidNodeFunc(rdo.Type) && newPriority >= currentPriority)
             {
                 repeat = false; // Puesto que la operación anterior es de menor prioridad, este es el nivel correcto.
             }
 
             while (repeat)
             {
-                var parentNode = currentNode.ParentNode;
+                var parentNode = rdo.ParentNode;
 
                 if (parentNode == null)
                 {
@@ -720,17 +704,17 @@ namespace qckdev.Linq.Expressions
                     var parentOperator = getOperatorFunc(parentNode);
                     var parentPriority = GetOperatorPriority(parentOperator);
 
-                    if (isValidNodeFunc(currentNode.Type) && newPriority >= parentPriority)
+                    if (isValidNodeFunc(rdo.Type) && newPriority >= parentPriority)
                     {
                         repeat = false; // Puesto que la operación de nivel superior es de menor prioridad, este es el nivel correcto.
                     }
                     else
                     {
-                        currentNode = parentNode; // Probar suerte con el padre.
+                        rdo = parentNode; // Probar suerte con el padre.
                     }
                 }
             }
-            return currentNode;
+            return rdo;
         }
 
         /// <summary>

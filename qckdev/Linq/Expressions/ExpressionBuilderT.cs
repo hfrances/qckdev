@@ -220,11 +220,18 @@ namespace qckdev.Linq.Expressions
 
             if (expression.Type == ExpressionNodeType.LogicalOperator)
             {
-                if (expression.Operator == ExpressionOperatorType.Not && expression.Nodes.Count == 1)
+                if (expression.Operator == ExpressionOperatorType.Not)
                 {
-                    var child = BuildRelationalExpression(expression.Nodes.First());
+                    if (expression.Nodes.Count == 1)
+                    {
+                        var child = BuildRelationalExpression(expression.Nodes.First());
 
-                    rdo = Expression.Not(child);
+                        rdo = Expression.Not(child);
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException($"Operator '{expression.Operator}' cannot have more of one expression node.");
+                    }
                 }
                 else if (expression.Nodes.Count > 0)
                 {
@@ -358,6 +365,8 @@ namespace qckdev.Linq.Expressions
                 case ExpressionOperatorType.LessThanOrEqual:
                     rdo = Expression.LessThanOrEqual(expr1, expr2);
                     break;
+                case ExpressionOperatorType.Like:
+                    throw new NotImplementedException(@operator.ToString());
                 default:
                     throw new InvalidOperationException(@operator.ToString()); // TODO: Mejorar error.
             }
