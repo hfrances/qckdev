@@ -17,6 +17,7 @@ namespace qckdev.Reflection
 
         /// <summary>
         /// Creates an instance of the type designated by the specified generic type parameter.
+        /// It works with public and non-public constructors.
         /// </summary>
         /// <param name="objectType">The type to create.</param >
         /// <param name="parameters">
