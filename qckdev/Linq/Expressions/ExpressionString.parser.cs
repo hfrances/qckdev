@@ -95,10 +95,6 @@ namespace qckdev.Linq.Expressions
 
         ExpressionNode LastRelationalNode { get; set; }
 
-        //ExpressionNode LastArithmeticNode { get; set; }
-
-        //ExpressionNode LastValueNode { get; set; }
-
         ExpressionNode CurrentNode { get; set; }
 
         #endregion
@@ -221,7 +217,7 @@ namespace qckdev.Linq.Expressions
             string value = parentNode.ExpressionTree.Value;
             char c = value[charIndex];
             Func<char, bool> closeCriteria;
-            var myparent = this.CurrentNode ?? parentNode; //(LastArithmeticNode ?? LastRelationalNode ?? LastValueNode ?? node);
+            var myparent = this.CurrentNode ?? parentNode;
 
             switch (c)
             {
@@ -404,9 +400,7 @@ namespace qckdev.Linq.Expressions
 
         private void ProcessOperator(ref ExpressionNode parent, ref ExpressionNode current, ExpressionOperatorType @operator, int currentIndex)
         {
-            //LastArithmeticNode = null;
             LastRelationalNode = null;
-            //LastValueNode = null;
             switch (@operator)
             {
                 case ExpressionOperatorType.And:
@@ -487,7 +481,6 @@ namespace qckdev.Linq.Expressions
 
             // Las operaciones se van solapando.
             ApplyParentNode(currentNode, ExpressionNodeType.ArithmeticOperator, @operator);
-            //LastArithmeticNode = currentNode;
         }
 
         private void ProcessBufferLogicOperator(ref ExpressionNode parent, ExpressionOperatorType @operator, int currentIndex)
@@ -497,11 +490,8 @@ namespace qckdev.Linq.Expressions
 
             CurrentNode?.UpdateEndIndex();
             CurrentNode = null;
-            //LastArithmeticNode?.UpdateEndIndex();
-            //LastArithmeticNode = null;
             LastRelationalNode?.UpdateEndIndex();
             LastRelationalNode = null;
-            //LastValueNode = null;
 
             parent = ApplyOrCreateLogicOperator(previousParent, @operator, backIndex);
             if (parent != previousParent)
@@ -516,24 +506,20 @@ namespace qckdev.Linq.Expressions
 
             CurrentNode?.UpdateEndIndex();
             CurrentNode = null;
-            //LastArithmeticNode?.UpdateEndIndex();
-            //LastArithmeticNode = null; 
             LastRelationalNode?.UpdateEndIndex();
             LastRelationalNode = null;
-            //LastValueNode = null;
 
             rdo = myparent.Nodes.AddNew();
             rdo.StartIndex = currentIndex;
             rdo.Type = ExpressionNodeType.LogicalOperator;
             rdo.Operator = @operator;
-            //LastValueNode = rdo;
         }
 
         private void ProcessBufferEqualityOperator(ExpressionNode myparent, ExpressionOperatorType @operator)
         {
             if (LastRelationalNode == null)
             {
-                if (1 == 2) //(LastValueNode == null)
+                if (CurrentNode == null)
                 {
                     throw new FormatException("Expression operator must have some property or constant.");
                 }
@@ -541,7 +527,6 @@ namespace qckdev.Linq.Expressions
                 {
                     ApplyParentNode(myparent, ExpressionNodeType.RelationalOperator, @operator); // Convierte el nodo en un nodo de tipo RelationalOperator y crea por debajo un nodo con la información del nodo original.
                     CurrentNode = myparent;
-                    //LastArithmeticNode = myparent;
                     LastRelationalNode = myparent;
                 }
             }
@@ -680,7 +665,6 @@ namespace qckdev.Linq.Expressions
         {
             CharType rdo = CharType.None;
 
-            // TODO: Qué pasará con las propiedades con formato [xxxx]?
             if (value?.Length > 0)
             {
                 if (OperationMap.ContainsKey(value))
@@ -701,6 +685,9 @@ namespace qckdev.Linq.Expressions
         /// </summary>
         /// <param name="operator">Operador a validar.</param>
         /// <returns>La prioridad de cálculo del operador, de menor a mayor.</returns>
+        /// <remarks>
+        /// <seealso href="https://stackoverflow.com/questions/1241142/sql-logic-operator-precedence-and-and-or"/>
+        /// </remarks>
         private static int GetOperatorPriority(ExpressionOperatorType @operator)
         {
             int rdo;
@@ -709,10 +696,12 @@ namespace qckdev.Linq.Expressions
             {
                 case ExpressionOperatorType.Add:
                 case ExpressionOperatorType.Substract:
+                case ExpressionOperatorType.Or:
                     rdo = 0;
                     break;
                 case ExpressionOperatorType.Multiply:
                 case ExpressionOperatorType.Divide:
+                case ExpressionOperatorType.And:
                     rdo = 1;
                     break;
                 case ExpressionOperatorType.Power:

@@ -96,7 +96,7 @@ namespace qckdev.Linq.Expressions
         #region metods 
 
         /// <summary>
-        /// Returns an <see cref="Array"/> with the <see cref="ExpressionNode"/> elements of the <paramref name="node"/> path.
+        /// Returns an <see cref="Array"/> with the <see cref="ExpressionNode"/> elements of the node path.
         /// </summary>
         /// <returns>An <see cref="Array"/> with the <see cref="ExpressionNode"/> elements.</returns>
         public IEnumerable<ExpressionNode> GetNodePath()
@@ -110,7 +110,6 @@ namespace qckdev.Linq.Expressions
                 item = item?.ParentCollection?.Owner;
             } while (item != null);
             return rdo.ToArray();
-            //return this.ExpressionTree.GetNodePath(this).ToArray();
         }
 
         /// <summary>

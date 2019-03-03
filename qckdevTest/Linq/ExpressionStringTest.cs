@@ -142,11 +142,11 @@ namespace qckdevTest.Linq
 
         [TestMethod]
         [DataRow("[Value]*[Factor]", 20)]
-        public void ExpressionStringTest0009_Arithmetic_WithItem(string predicate, int result)
+        public void ExpressionStringTest0009_Arithmetic_WithItem(string predicate, int expected)
         {
             var item = new { Value = 5, Factor = 4 };
 
-            SimpleArithmeticTestCore(predicate, item, result);
+            SimpleArithmeticTestCore(predicate, item, expected);
         }
 
         [TestMethod]
@@ -176,6 +176,18 @@ namespace qckdevTest.Linq
             SimpleArithmeticTestCore(predicate, (string)null);
         }
 
+        [TestMethod]
+        //[DataRow("1 == 1 AND 2 == 2", true)]
+        [DataRow("1 == 2 OR 2 == 2", true)]
+        //[DataRow("1 == 1 OR 2 == 1", true)]
+        public void ExpressionStringTest0012_Logical_Simple(string predicate, bool expected)
+        {
+            SimpleArithmeticTestCore(predicate, expected);
+        }
+
+
+        #region common
+
         private void SimpleArithmeticTestCore<T, TResult>(string predicate, T parameter, TResult expected)
         {
             var expressionTree = qckdev.Linq.Expressions.ExpressionString.BuildTree(predicate);
@@ -190,6 +202,8 @@ namespace qckdevTest.Linq
         {
             SimpleArithmeticTestCore<object, TResult>(predicate, null, expected);
         }
+
+        #endregion
 
     }
 }

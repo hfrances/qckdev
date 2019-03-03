@@ -61,23 +61,6 @@ namespace qckdev.Linq.Expressions
         #region methods
 
         /// <summary>
-        /// Returns an <see cref="Array"/> with the <see cref="ExpressionNode"/> elements of the <paramref name="node"/> path.
-        /// </summary>
-        /// <param name="node"><see cref="ExpressionNode"/> to search.</param>
-        /// <returns>An <see cref="Array"/> with the <see cref="ExpressionNode"/> elements or empty if the <paramref name="node"/> was not found.</returns>
-        public IEnumerable<ExpressionNode> GetNodePath(ExpressionNode node)
-        {
-            var path = new List<ExpressionNode>() { node };
-            bool found;
-
-            found = GetNodePath(this.Root, node, path);
-            if (!found)
-                path.Clear();
-
-            return path.ToArray();
-        }
-
-        /// <summary>
         /// Returns a string that represents the current object.
         /// </summary>
         /// <returns>
