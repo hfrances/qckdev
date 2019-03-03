@@ -2,7 +2,14 @@
 
   <PropertyGroup>
     <!--<TargetFramework>netstandard2.0</TargetFramework>-->
-    <TargetFrameworks>netstandard2.0;portable-net451+win81+wpa81</TargetFrameworks> <!-- portable-net45+sl50+win8+wpa81-->
+    <TargetFrameworks>netstandard2.0;portable-net451+win81+wpa81</TargetFrameworks>
+    <AssemblyVersion>0.1.0.0</AssemblyVersion>
+    <FileVersion>0.1.0.0</FileVersion>
+    <Version>0.1.0</Version>
+    <Company>TrCode</Company>
+    <Authors>hfrances</Authors>
+    <PackageReleaseNotes></PackageReleaseNotes>
+    <Product>qckdev (Preview)</Product> <!-- portable-net45+sl50+win8+wpa81-->
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
