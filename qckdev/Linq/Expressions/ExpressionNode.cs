@@ -85,6 +85,7 @@ namespace qckdev.Linq.Expressions
         /// <summary>
         /// Gets the final value of the <see cref="ExpressionNode"/> converted during the process or null if it must takes <see cref="Text"/> value.
         /// </summary>
+        [XmlElement(IsNullable = true)]
         public string FormattedText
         {
             get; set;

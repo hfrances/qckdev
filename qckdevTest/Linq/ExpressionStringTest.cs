@@ -141,11 +141,21 @@ namespace qckdevTest.Linq
 
         // TODO: implementar.
         [TestMethod]
-        [DataRow("0 IN (1, 2, 3, 0)", true)]
+        [DataRow("[Value2] IN (1, 2, 3, 0)", true)]
+        [DataRow("[Value1] == 1 AND [Value2] IN (1, 2, 3, 0)", true)]
+        [DataRow("[Value1]==1 AND [Value2] IN (1, 2, 3, 0) OR [Value3]==false", true)]
         public void ExpressionStringTest0008_Comparison_Int_InClause(string predicate, bool expected)
         {
-            Assert.Inconclusive("Not implemented.");
-            //SimpleArithmeticTestCore(predicate, expected);
+            var item = new { Value1 = 1, Value2 = 0, Value3 = true };
+
+            try
+            {
+                SimpleArithmeticTestCore(predicate, item, expected);
+            }
+            catch (NotImplementedException ex)
+            {
+                Assert.Inconclusive($"{ex.GetType().Name}: {ex.Message}");
+            }
         }
 
         [TestMethod]
@@ -160,6 +170,7 @@ namespace qckdevTest.Linq
         [TestMethod]
         [DataRow("[Value]=='Patata'", "Patata", true)]
         [DataRow("[Value]=='Patata(s)'", "Patata(s)", true)]
+        [DataRow("Value=='Patata'", "Patata", true)] // Without property brakets.
         [DataRow(@"[Value]=='Patata'''", "Patata'", true)]
         [DataRow(@"[Value]=='Patata\''", "Patata'", true)]
         [DataRow("[Value]=='Patata\"'", "Patata\"", true)]
@@ -188,6 +199,10 @@ namespace qckdevTest.Linq
         [DataRow("1 == 1 AND 2 == 2", true)]
         [DataRow("1 == 2 OR 2 == 2", true)]
         [DataRow("1 == 1 OR 2 == 1", true)]
+        [DataRow("true==true", true)]
+        [DataRow("false==false", true)]
+        [DataRow("true!=false", true)]
+        [DataRow("true==false", false)]
         public void ExpressionStringTest0012_Logical_Simple(string predicate, bool expected)
         {
             SimpleArithmeticTestCore(predicate, expected);

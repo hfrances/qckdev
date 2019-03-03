@@ -81,7 +81,6 @@ namespace qckdev.Linq.Expressions
         private ExpressionString()
         {
             StringBuffer = new StringBuilder();
-            LastLogicNodes = new List<ExpressionNode>();
         }
 
         #endregion
@@ -90,10 +89,6 @@ namespace qckdev.Linq.Expressions
         #region properties
 
         StringBuilder StringBuffer { get; }
-
-        List<ExpressionNode> LastLogicNodes { get; }
-
-        ExpressionNode LastRelationalNode { get; set; }
 
         ExpressionNode CurrentNode { get; set; }
 
@@ -210,50 +205,45 @@ namespace qckdev.Linq.Expressions
         /// se moverá hasta el paréntesis de cierre.
         /// </param>
         /// <exception cref="FormatException">La cadena a procesar es incorrecta.</exception>
-        [SuppressMessage("Minor Code Smell", "S3241:Methods should not return values that are never used", Justification = "Maybe it is necessary in the future.")]
+        [SuppressMessage("Minor Code Smell", "S3241:Methods should not return values that are never used", Justification = "Return value could be necessary in the future.")]
         private ExpressionNode AddChildNodeFromOpenCharacter(ExpressionNode parentNode, ref int charIndex)
         {
             ExpressionNode childNode = null;
-            string value = parentNode.ExpressionTree.Value;
+            var currentNode = this.CurrentNode ?? parentNode;
+            string value = currentNode.ExpressionTree.Value;
             char c = value[charIndex];
             Func<char, bool> closeCriteria;
-            var myparent = this.CurrentNode ?? parentNode;
+            ExpressionNodeType nodeType;
+            bool isLocked;
+            bool recursive;
 
             switch (c)
             {
                 case '(':
-                    closeCriteria = delegate (char x) { return x == DelimiterChars[c]; };
-                    childNode = myparent.Nodes.AddNew();
-                    childNode.Locked = true; // Bloquear el nodo ya que es una expresión entre paréntesis (lo que se encuentre dentro deberá ir dentro y lo que se encuentre fuera deberá ir fuera).
-                    if (myparent.Operator == ExpressionOperatorType.In)
-                    {
-                        childNode.Type = ExpressionNodeType.ListType;
-                        LastRelationalNode = childNode;
-                    }
+                    isLocked = true; // Bloquear el nodo ya que es una expresión entre paréntesis (lo que se encuentre dentro deberá ir dentro y lo que se encuentre fuera deberá ir fuera).
+                    recursive = true;
+                    if (currentNode.Operator == ExpressionOperatorType.In)
+                        nodeType = ExpressionNodeType.ListType;
                     else
-                    {
-                        LastRelationalNode = null;
-                    }
-                    CurrentNode = childNode;
-                    SetEndIndex(childNode, ref charIndex, closeCriteria, recursive: true);
-                    CurrentNode = childNode;
+                        nodeType = ExpressionNodeType.Default;
                     break;
 
-                case '\'':
-                case '#':
-                case '[':
-                    closeCriteria = delegate (char x) { return x == DelimiterChars[c]; };
-                    childNode = myparent.Nodes.AddNew();
-                    childNode.Type = DelimiterTypes[c];
-                    CurrentNode = childNode;
-                    SetEndIndex(childNode, ref charIndex, closeCriteria, recursive: false);
-                    CurrentNode = childNode;
+                default: // ', #, [
+                    nodeType = DelimiterTypes[c];
+                    isLocked = false;
+                    recursive = false;
                     break;
-
-                default:
-                    throw new NotSupportedException();
 
             }
+            closeCriteria = delegate (char x) { return x == DelimiterChars[c]; };
+            childNode = currentNode.Nodes.AddNew();
+            childNode.Type = nodeType;
+            childNode.Locked = isLocked;
+            childNode.StartIndex = charIndex;
+            CurrentNode = childNode;
+
+            CloseNodeFromOpenCharacter(childNode, ref charIndex, closeCriteria, recursive);
+            CurrentNode = childNode;
             if (childNode.EndIndex == null)
             {
                 // Si llega null, es que no se encontró caracter de cierre, por lo que el formato de texto probablemente sea erróneo.
@@ -269,16 +259,15 @@ namespace qckdev.Linq.Expressions
         /// <param name="charIndex"></param>
         /// <param name="closeCriteria"></param>
         /// <param name="recursive"></param>
-        /// <returns></returns>
-        private void SetEndIndex(ExpressionNode node, ref int charIndex, Func<char, bool> closeCriteria, bool recursive)
+        [SuppressMessage("Critical Code Smell", "S3776:Cognitive Complexity of methods should not be too high", Justification = "Cognitive complexity could be higher if this method is split.")]
+        private void CloseNodeFromOpenCharacter(ExpressionNode node, ref int charIndex, Func<char, bool> closeCriteria, bool recursive)
         {
             var lastCharType = CharType.None;
             var value = node.ExpressionTree.Value;
-            var flag = 0; // 0 None, 1 Posible fin, 2 Escape, 99 found.
+            var flag = 0; // [0] Continuar leyendo; [1] Posible fin; [2] Caracter de escape; [99] Fin de la cadena.
             var useFormattedText = false;
             int i;
 
-            node.StartIndex = charIndex;
             charIndex++;
             for (i = charIndex; i < value.Length && flag != 99; i++)
             {
@@ -319,7 +308,7 @@ namespace qckdev.Linq.Expressions
 
                         ProcessChar(ref processNode, ref lastCharType, ref i, true);
                         if (processNode != node)
-                            throw new NotSupportedException($"Oops! Something was not planned for method {nameof(SetEndIndex)}.\n{value}"); // Control de robustez.
+                            throw new NotSupportedException($"Oops! Something was not planned for method {nameof(CloseNodeFromOpenCharacter)}.\n{value}"); // Control de robustez.
                     }
                     else
                     {
@@ -337,13 +326,14 @@ namespace qckdev.Linq.Expressions
                     var processNode = node;
                     ProcessBuffer(ref processNode, processNode.EndIndex.Value - 1, useFormattedText);
                     if (processNode != node)
-                        throw new NotSupportedException($"Oops! Something was not planned for method {nameof(SetEndIndex)}.\n{value}"); // Control de robustez.
+                        throw new NotSupportedException($"Oops! Something was not planned for method {nameof(CloseNodeFromOpenCharacter)}.\n{value}"); // Control de robustez.
                 }
                 else
                 {
                     // Se utiliza para los nodos de tipo valor. Se aplica el valor directamente al nodo.
                     if (useFormattedText)
                         node.FormattedText = StringBuffer.ToString();
+                    this.CurrentNode = node;
                     StringBuffer.Clear();
                 }
             }
@@ -398,9 +388,9 @@ namespace qckdev.Linq.Expressions
             }
         }
 
+
         private void ProcessOperator(ref ExpressionNode parent, ref ExpressionNode current, ExpressionOperatorType @operator, int currentIndex)
         {
-            LastRelationalNode = null;
             switch (@operator)
             {
                 case ExpressionOperatorType.And:
@@ -439,11 +429,10 @@ namespace qckdev.Linq.Expressions
 
         private void ProcessBufferArithmeticOperator(ref ExpressionNode currentNode, ExpressionOperatorType @operator)
         {
-            Func<ExpressionNodeType, bool> isValidNode =
-                delegate (ExpressionNodeType type)
-                {
-                    return type.In(ExpressionNodeType.ArithmeticOperator, ExpressionNodeType.Default) || IsValueNode(type);
-                };
+            bool isValidNode(ExpressionNodeType type)
+            {
+                return type.In(ExpressionNodeType.ArithmeticOperator, ExpressionNodeType.Default) || IsValueNode(type);
+            }
 
             // Buscar el nodo donde se puede aplicar el operador.
             currentNode = FindNodeForOperator(currentNode, @operator, isValidNode, GetArithmeticOperator);
@@ -454,18 +443,17 @@ namespace qckdev.Linq.Expressions
 
         private void ProcessBufferLogicOperator(ref ExpressionNode currentNode, ExpressionOperatorType @operator)
         {
-            Func<ExpressionNodeType, bool> isValidNode =
-                delegate (ExpressionNodeType type)
-                {
-                    return type.In(
-                        ExpressionNodeType.LogicalOperator,
-                        ExpressionNodeType.ArithmeticOperator,
-                        ExpressionNodeType.RelationalOperator);
-                };
+            bool isValidNode(ExpressionNodeType type)
+            {
+                return type.In(
+                    ExpressionNodeType.LogicalOperator,
+                    ExpressionNodeType.ArithmeticOperator,
+                    ExpressionNodeType.RelationalOperator);
+            }
 
             // Buscar el nodo donde se puede aplicar el operador.
             currentNode = FindNodeForOperator(currentNode, @operator, isValidNode, GetLogicalOperator);
-            
+
             // Las operaciones se van solapando.
             ApplyParentNode(currentNode, ExpressionNodeType.LogicalOperator, @operator);
         }
@@ -476,8 +464,6 @@ namespace qckdev.Linq.Expressions
 
             CurrentNode?.UpdateEndIndex();
             CurrentNode = null;
-            LastRelationalNode?.UpdateEndIndex();
-            LastRelationalNode = null;
 
             rdo = myparent.Nodes.AddNew();
             rdo.StartIndex = currentIndex;
@@ -487,65 +473,20 @@ namespace qckdev.Linq.Expressions
 
         private void ProcessBufferEqualityOperator(ExpressionNode myparent, ExpressionOperatorType @operator)
         {
-            if (LastRelationalNode == null)
+            if (CurrentNode == null)
             {
-                if (CurrentNode == null)
-                {
-                    throw new FormatException("Expression operator must have some property or constant.");
-                }
-                else
-                {
-                    ApplyParentNode(myparent, ExpressionNodeType.RelationalOperator, @operator); // Convierte el nodo en un nodo de tipo RelationalOperator y crea por debajo un nodo con la información del nodo original.
-                    CurrentNode = myparent;
-                    LastRelationalNode = myparent;
-                }
+                throw new FormatException("Expression operator must have some property or constant.");
             }
             else
             {
-                throw new FormatException("Previous RelationalNode was not closed."); // TODO: Mejor excepción.
+                ApplyParentNode(myparent, ExpressionNodeType.RelationalOperator, @operator); // Convierte el nodo en un nodo de tipo RelationalOperator y crea por debajo un nodo con la información del nodo original.
+                CurrentNode = myparent;
             }
         }
 
         #endregion
 
         #region methods static 
-
-        /// <summary>
-        /// Aplica el operador al nodo especificado. En caso de que el nodo ya tenga otro operador, crea un nodo superior.
-        /// </summary>
-        /// <param name="node">Nodo al que aplicar el operador.</param>
-        /// <param name="operator">Operador a aplicar.</param>
-        /// <param name="endIndex">Indica el punto de inicio del operador. Este valor se aplicará como EndIndex a <paramref name="node"/> cuando se tenga que crear un nodo padre.</param>
-        /// <returns>Devuelve el nodo con el operador aplicado. Puede ser el mismo o un nodo creado y colocado en el nivel superior.</returns>
-        private static ExpressionNode ApplyOrCreateLogicOperator(ExpressionNode node, ExpressionOperatorType @operator, int endIndex)
-        {
-            var rdo = node;
-
-            if (node.Operator == ExpressionOperatorType.None)
-            {
-                // Reaprovechar el nodo.
-                node.Type = ExpressionNodeType.LogicalOperator;
-                node.Operator = @operator;
-            }
-            else if (node.Operator == @operator)
-            {
-                // Ya se está reaprovechando el nodo.
-            }
-            else
-            {
-                // Crear un nodo por encima.
-                rdo = new ExpressionNode(node.ExpressionTree)
-                {
-                    Type = ExpressionNodeType.LogicalOperator,
-                    Operator = @operator,
-                    StartIndex = node.StartIndex, // Dado que aglutina a este nodo, se le pone su posición de inicio.
-                    EndIndex = node.EndIndex
-                };
-                rdo.Nodes.Add(node);
-                node.EndIndex = endIndex; // Al nodo original, se le pone la posición actual como punto final.
-            }
-            return rdo;
-        }
 
         /// <summary>
         /// Modifica la expresión del parámetro <paramref name="node"/> añadiendo primero los datos actuales a un nodo inferior.
@@ -577,54 +518,6 @@ namespace qckdev.Linq.Expressions
         }
 
         /// <summary>
-        /// Elimina todos los nodos que están vacíos (<see cref="ExpressionNodeType.Default"/>) para dejar el arbol lo más limpio posible.
-        /// </summary>
-        /// <param name="node">Nodo desde el que limpiar.</param>
-        private static void CollapseTree(ref ExpressionNode node)
-        {
-
-            foreach (var child in node.Nodes.ToArray())
-            {
-                var newChild = child;
-
-                CollapseTree(ref newChild);
-                if (newChild == null)
-                {
-                    node.Nodes.Remove(child);
-                }
-                else if (newChild != child)
-                {
-                    node.Nodes.TryReplace(child, newChild);
-                }
-            }
-            if (node.Type == ExpressionNodeType.Default && node.Nodes.Count < 2)
-            {
-                node = node.Nodes.FirstOrDefault();
-            }
-        }
-
-        /// <summary>
-        /// Calcula el <see cref="ExpressionNode.EndIndex"/> del elemento y de todos sus elementos hijos que todavía tengan este valor vacío.
-        /// </summary>
-        /// <param name="node">Nodo a revisar.</param>
-        /// <remarks>
-        /// Se utiliza para todos aquellos tipos de elementos que no se sabe el valor de <see cref="ExpressionNode.EndIndex"/> 
-        /// hasta tenerse todos los nodos hijos.
-        /// </remarks>
-        private static void UploadEndIndexAllLevels(ExpressionNode node)
-        {
-
-            foreach (var child in node.Nodes)
-            {
-                UploadEndIndexAllLevels(child);
-            }
-            if (node.EndIndex == null)
-            {
-                node.UpdateEndIndex();
-            }
-        }
-
-        /// <summary>
         /// Devuelve el tipo de elemento almacenado en la cadena <paramref name="value"/>.
         /// </summary>
         /// <param name="value">La cadena a ser analizada.</param>
@@ -650,45 +543,6 @@ namespace qckdev.Linq.Expressions
         }
 
         /// <summary>
-        /// Devuelve la prioridad de cálculo del operador de menor a mayor. 
-        /// Esto permite hacer las multiplicaciones antes que las sumas, 
-        /// las potencias antes que las multiplicaciones, 
-        /// los AND antes que los OR...
-        /// </summary>
-        /// <param name="operator">Operador a validar.</param>
-        /// <returns>La prioridad de cálculo del operador, de menor a mayor.</returns>
-        /// <remarks>
-        /// <seealso href="https://stackoverflow.com/questions/1241142/sql-logic-operator-precedence-and-and-or"/>
-        /// </remarks>
-        private static int GetOperatorPriority(ExpressionOperatorType @operator)
-        {
-            int rdo;
-
-            switch (@operator)
-            {
-                case ExpressionOperatorType.Add:
-                case ExpressionOperatorType.Substract:
-                case ExpressionOperatorType.Or:
-                    rdo = 0;
-                    break;
-                case ExpressionOperatorType.Multiply:
-                case ExpressionOperatorType.Divide:
-                case ExpressionOperatorType.And:
-                    rdo = 1;
-                    break;
-                case ExpressionOperatorType.Power:
-                    rdo = 2;
-                    break;
-                case ExpressionOperatorType.Modulo:
-                    throw new NotImplementedException(@operator.ToString());
-                default:
-                    rdo = 0;
-                    break;
-            }
-            return rdo;
-        }
-
-        /// <summary>
         /// Devuelve si el tipo de nodo puede contener un valor.
         /// </summary>
         /// <param name="nodeType">Tipo de nodo a validar.</param>
@@ -701,6 +555,60 @@ namespace qckdev.Linq.Expressions
                 ExpressionNodeType.DateType,
                 ExpressionNodeType.ListType,
                 ExpressionNodeType.PropertyType);
+        }
+
+        /// <summary>
+        /// Devuelve la prioridad de cálculo del operador de menor a mayor. 
+        /// Esto permite hacer las multiplicaciones antes que las sumas, las potencias antes que las multiplicaciones, los AND antes que los OR, etc.
+        /// </summary>
+        /// <param name="operator">Operador a validar.</param>
+        /// <returns>La prioridad de cálculo del operador, de menor a mayor.</returns>
+        /// <remarks>
+        /// <seealso href="https://stackoverflow.com/questions/1241142/sql-logic-operator-precedence-and-and-or"/>
+        /// <seealso href="https://docs.microsoft.com/en-us/sql/t-sql/language-elements/operator-precedence-transact-sql?view=sql-server-2017"/>
+        /// </remarks>
+        private static int GetOperatorPriority(ExpressionOperatorType @operator)
+        {
+            int rdo;
+
+            switch (@operator)
+            {
+                case ExpressionOperatorType.Like:
+                case ExpressionOperatorType.In:
+                case ExpressionOperatorType.Or:
+                    rdo = 1;
+                    break;
+                case ExpressionOperatorType.And:
+                    rdo = 2;
+                    break;
+                case ExpressionOperatorType.Not:
+                    rdo = 3;
+                    break;
+                case ExpressionOperatorType.Equals:
+                case ExpressionOperatorType.NotEqual:
+                case ExpressionOperatorType.GreaterThan:
+                case ExpressionOperatorType.GreaterThanOrEqual:
+                case ExpressionOperatorType.LessThan:
+                case ExpressionOperatorType.LessThanOrEqual:
+                    rdo = 4;
+                    break;
+                case ExpressionOperatorType.Add:
+                case ExpressionOperatorType.Substract:
+                    rdo = 5;
+                    break;
+                case ExpressionOperatorType.Multiply:
+                case ExpressionOperatorType.Divide:
+                case ExpressionOperatorType.Modulo:
+                    rdo = 6;
+                    break;
+                case ExpressionOperatorType.Power:
+                    rdo = 7;
+                    break;
+                default:
+                    rdo = 0;
+                    break;
+            }
+            return rdo;
         }
 
         /// <summary>
@@ -804,6 +712,54 @@ namespace qckdev.Linq.Expressions
                 }
             }
             return currentNode;
+        }
+
+        /// <summary>
+        /// Elimina todos los nodos que están vacíos (<see cref="ExpressionNodeType.Default"/>) para dejar el arbol lo más limpio posible.
+        /// </summary>
+        /// <param name="node">Nodo desde el que limpiar.</param>
+        private static void CollapseTree(ref ExpressionNode node)
+        {
+
+            foreach (var child in node.Nodes.ToArray())
+            {
+                var newChild = child;
+
+                CollapseTree(ref newChild);
+                if (newChild == null)
+                {
+                    node.Nodes.Remove(child);
+                }
+                else if (newChild != child)
+                {
+                    node.Nodes.TryReplace(child, newChild);
+                }
+            }
+            if (node.Type == ExpressionNodeType.Default && node.Nodes.Count < 2)
+            {
+                node = node.Nodes.FirstOrDefault();
+            }
+        }
+
+        /// <summary>
+        /// Calcula el <see cref="ExpressionNode.EndIndex"/> del elemento y de todos sus elementos hijos que todavía tengan este valor vacío.
+        /// </summary>
+        /// <param name="node">Nodo a revisar.</param>
+        /// <remarks>
+        /// Se utiliza para todos aquellos tipos de elementos que no se sabe el valor de <see cref="ExpressionNode.EndIndex"/> 
+        /// hasta tenerse todos los nodos hijos.
+        /// </remarks>
+        private static void UploadEndIndexAllLevels(ExpressionNode node)
+        {
+
+            foreach (var child in node.Nodes)
+            {
+                UploadEndIndexAllLevels(child);
+            }
+            if (node.EndIndex == null)
+            {
+                node.UpdateEndIndex();
+            }
         }
 
         #endregion
