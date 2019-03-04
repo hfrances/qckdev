@@ -17,6 +17,7 @@ namespace qckdevTest.Linq
         [DataRow("4", 4)]
         [DataRow("4+4", 8)]
         [DataRow("4 + 4", 8)]
+        [DataRow("4 - 4", 0)]
         [DataRow("(4)", 4)]
         [DataRow("(4+4)", 8)]
         [DataRow("(4 + 4)", 8)]
@@ -25,9 +26,15 @@ namespace qckdevTest.Linq
         [DataRow("((4 + 4))", 8)]
         [DataRow("( (4 + 4) )", 8)]
         [DataRow("( ( 4 + 4 ) )", 8)]
-        // TODO: negatives.
-        //[DataRow("-1", -1)]
-        //[DataRow("5*-1", -5)]
+        [DataRow("-1", -1)]
+        [DataRow("5*-1", -5)]
+        [DataRow("(5*1)-1", 4)]
+        [DataRow("(-1*5)-1", -6)]
+        [DataRow("(-1 * 5) - 1", -6)]
+        [DataRow("(-1*-5)-1", 4)]
+        [DataRow("(-1 * -5) - 1", 4)]
+        [DataRow("(-1*-5)-1-1", 3)]
+        [DataRow("(-1*-5) - 1 - 1", 3)]
         public void ExpressionStringTest0001_Arithmetic_Simple(string predicate, int expected)
         {
             SimpleArithmeticTestCore(predicate, expected);
@@ -82,8 +89,7 @@ namespace qckdevTest.Linq
         [DataRow("3+(4*2)", 11)]
         [DataRow("2*3+3^1", 9)]
         [DataRow("2*(6+7)-8^2", -38)]
-        // TODO: negatives.
-        //[DataRow("(10+5^2)*((5*-2)+9-3^3)/2", -490)]
+        [DataRow("(10+5^2)*((5*-2)+9-3^3)/2", -490)]
         public void ExpressionStringTest0004_Arithmetic_Special(string predicate, int expected)
         {
             SimpleArithmeticTestCore(predicate, expected);
@@ -187,7 +193,7 @@ namespace qckdevTest.Linq
         [TestMethod]
         [DataRow("[Value]=='Patata'", "Patata", true)]
         [DataRow("[Value]=='Patata(s)'", "Patata(s)", true)]
-        [DataRow("Value=='Patata'", "Patata", true)] // Without property brakets.
+        [DataRow("Value=='Patata'", "Patata", true)] // Test without property brakets.
         [DataRow(@"[Value]=='Patata'''", "Patata'", true)]
         [DataRow(@"[Value]=='Patata\''", "Patata'", true)]
         [DataRow("[Value]=='Patata\"'", "Patata\"", true)]
@@ -229,7 +235,14 @@ namespace qckdevTest.Linq
         [DataRow("!true==false", true)]
         [DataRow("!(true==false)", true)]
         [DataRow("not (true==false)", true)]
-        public void ExpressionStringTest0012_Logical_Simple(string predicate, bool expected)
+        public void ExpressionStringTest0012a_Logical_Simple(string predicate, bool expected)
+        {
+            SimpleArithmeticTestCore(predicate, expected);
+        }
+
+        [TestMethod]
+        [DataRow("(-1*-5)-1 == 4 AND -1==-1", true)]
+        public void ExpressionStringTest0012b_Logical_Advanced(string predicate, bool expected)
         {
             SimpleArithmeticTestCore(predicate, expected);
         }

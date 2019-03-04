@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Xml.Serialization;
 using System.Diagnostics.CodeAnalysis;
+using qckdev.Linq;
 
 namespace qckdev.Linq.Expressions
 {
@@ -171,6 +172,7 @@ namespace qckdev.Linq.Expressions
         {
             var value = node.ExpressionTree.Value;
             var c = value[charIndex];
+            var negativeSymbol = false;
 
             if (DelimiterChars.ContainsKey(c))
             {
@@ -190,12 +192,32 @@ namespace qckdev.Linq.Expressions
             }
             else
             {
-                if (StringBuffer.Length > 0 && lastCharType != GetCharType(c.ToString()))
+                var currentNode = this.CurrentNode ?? node;
+
+                if (c == '-' && (
+                        // El nodo actual un nodo-valor y el elemento que hay en el buffer es un operador.
+                        // Procesar el buffer para crear el nodo-operador y empezar a rellenar el nodo-valor.
+                        (lastCharType == CharType.Operator && IsValueNode(currentNode.Type)) ||
+                        // El nodo actual es un nodo-operador, por lo que ya estamos en la fase de rellenar el nodo-valor.
+                        (StringBuffer.Length == 0 && IsOperatorNode(currentNode.Type)) ||
+                        // No hay ninguna operación aritmética en proceso. Es un nodo-valor.
+                        (StringBuffer.Length == 0 && !IsArithmeticBranch(node))
+                    ))
+                {
+                    // Es símbolo negativo.
                     ProcessBuffer(node, charIndex - 1, formattedText: false);
+                    negativeSymbol = true;
+                }
+                else if (StringBuffer.Length > 0 && lastCharType != GetCharType(c.ToString()))
+                {
+                    ProcessBuffer(node, charIndex - 1, formattedText: false);
+                }
 
                 StringBuffer.Append(c);
             }
-            lastCharType = GetCharType(StringBuffer.ToString());
+            lastCharType = (negativeSymbol ?
+                CharType.Other :
+                    GetCharType(StringBuffer.ToString()));
         }
 
         /// <summary>
@@ -414,7 +436,7 @@ namespace qckdev.Linq.Expressions
                 case ExpressionOperatorType.LessThanOrEqual:
                 case ExpressionOperatorType.Like:
                 case ExpressionOperatorType.In:
-                    ProcessBufferEqualityOperator(current, @operator);
+                    ProcessBufferRelationalOperator(ref current, @operator);
                     break;
 
                 default:
@@ -465,10 +487,21 @@ namespace qckdev.Linq.Expressions
             currentNode = newNode;
         }
 
-        private void ProcessBufferEqualityOperator(ExpressionNode currentNode, ExpressionOperatorType @operator)
+        private void ProcessBufferRelationalOperator(ref ExpressionNode currentNode, ExpressionOperatorType @operator)
         {
-            // Convierte el nodo en un nodo de tipo RelationalOperator y crea por debajo un nodo con la información del nodo original.
-            ApplyParentNode(currentNode, ExpressionNodeType.RelationalOperator, @operator); 
+            bool isValidNode(ExpressionNodeType type)
+            {
+                return type.In(
+                    ExpressionNodeType.ArithmeticOperator,
+                    ExpressionNodeType.RelationalOperator,
+                    ExpressionNodeType.Default);
+            }
+
+            // Buscar el nodo donde se puede aplicar el operador.
+            currentNode = FindNodeForOperator(currentNode, @operator, isValidNode, GetRelationalOperator);
+
+            // Las operaciones se van solapando.
+            ApplyParentNode(currentNode, ExpressionNodeType.RelationalOperator, @operator);
         }
 
         #endregion
@@ -556,6 +589,19 @@ namespace qckdev.Linq.Expressions
                 ExpressionNodeType.DateType,
                 ExpressionNodeType.ListType,
                 ExpressionNodeType.PropertyType);
+        }
+
+        /// <summary>
+        /// Devuelve si el tipo de nodo es un operador.
+        /// </summary>
+        /// <param name="nodeType">Tipo de nodo a validar.</param>
+        /// <returns>True si el tipo es un operador, false en caso contrario.</returns>
+        private static bool IsOperatorNode(ExpressionNodeType nodeType)
+        {
+            return nodeType.In(
+                ExpressionNodeType.ArithmeticOperator,
+                ExpressionNodeType.LogicalOperator,
+                ExpressionNodeType.RelationalOperator);
         }
 
         /// <summary>
@@ -663,6 +709,54 @@ namespace qckdev.Linq.Expressions
         }
 
         /// <summary>
+        /// Devuelve el operador adjunto a un nodo específico.
+        /// </summary>
+        /// <param name="node">Nodo de búsqueda.</param>
+        /// <returns>El operador adjunto al nodo especificado.</returns>
+        private static ExpressionOperatorType GetRelationalOperator(ExpressionNode node)
+        {
+            ExpressionOperatorType? rdo = null;
+
+            do
+            {
+                var parentNode = node.ParentNode;
+
+                if (parentNode == null)
+                    rdo = node.Operator; // Primer nivel.
+                else if (node.Type == ExpressionNodeType.RelationalOperator)
+                    rdo = node.Operator; // Operación relacional.
+                else if (parentNode.Locked)
+                    rdo = parentNode.Operator; // El padre es paréntesis, no se puede subir más arriba.
+                else
+                    node = parentNode; // Probar suerte con el padre.
+            } while (rdo == null);
+            return rdo.Value;
+        }
+
+        /// <summary>
+        /// Devuelve un valor que indica si la rama en la que se encuentra el nodo es una rama aritmética.
+        /// </summary>
+        /// <param name="node">Nodo de búsqueda.</param>
+        /// <returns>True si la rama es aritmética, false en caso contrario.</returns>
+        /// <remarks>
+        /// Se utiliza para poder diferenciar si el símbolo "-" es porque va a ser un número negativo o una resta.
+        /// </remarks>
+        private static bool IsArithmeticBranch(ExpressionNode node)
+        {
+            bool rdo;
+
+            if (node.Type == ExpressionNodeType.Default && node.Nodes.Count == 1)
+            {
+                rdo = IsArithmeticBranch(node.Nodes[0]);
+            }
+            else
+            {
+                rdo = (GetArithmeticOperator(node) != ExpressionOperatorType.None);
+            }
+            return rdo;
+        }
+
+        /// <summary>
         /// Devuelve el nodo más próximo a <paramref name="currentNode"/> al que se le pueda asignar la operación especificada.
         /// </summary>
         /// <param name="currentNode">Nodo de inicio de búsqueda.</param>
@@ -680,7 +774,7 @@ namespace qckdev.Linq.Expressions
             var currentPriority = GetOperatorPriority(currentOperator);
 
             rdo = currentNode;
-            if (isValidNodeFunc(rdo.Type) && newPriority >= currentPriority)
+            if (isValidNodeFunc(rdo.Type) && newPriority > currentPriority)
             {
                 repeat = false; // Puesto que la operación anterior es de menor prioridad, este es el nivel correcto.
             }
@@ -704,7 +798,7 @@ namespace qckdev.Linq.Expressions
                     var parentOperator = getOperatorFunc(parentNode);
                     var parentPriority = GetOperatorPriority(parentOperator);
 
-                    if (isValidNodeFunc(rdo.Type) && newPriority >= parentPriority)
+                    if (isValidNodeFunc(rdo.Type) && newPriority > parentPriority)
                     {
                         repeat = false; // Puesto que la operación de nivel superior es de menor prioridad, este es el nivel correcto.
                     }
