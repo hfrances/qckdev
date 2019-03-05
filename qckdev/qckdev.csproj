@@ -3,7 +3,7 @@
   <PropertyGroup>
     <!--<TargetFramework>netstandard2.0</TargetFramework>-->
     <!-- portable-net45+sl50+win8+wpa81-->
-    <TargetFrameworks>netstandard2.0;netstandard1.2;portable-net451+win81+wpa81;net35</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0;portable-net451+win81+wpa81;net35</TargetFrameworks>
     <AssemblyVersion>0.2.0.0</AssemblyVersion>
     <FileVersion>0.1.0.0</FileVersion>
     <Version>0.2.0</Version>
@@ -21,15 +21,12 @@
     <DefineConstants>$(DefineConstants);STANDARD20</DefineConstants>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)'=='netstandard1.2'">
-    <DefineConstants>$(DefineConstants);STANDARD12;PORTABLE</DefineConstants>
-  </PropertyGroup>
-
   <PropertyGroup Condition="'$(TargetFramework)'=='portable-net451+win81+wpa81'">
     <!--<TargetFrameworkIdentifier>.NETPortable</TargetFrameworkIdentifier>-->
-    <!--<TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>-->
-    <!--<TargetFrameworkProfile>Profile151</TargetFrameworkProfile>-->
-    <DefineConstants>$(DefineConstants);PROFILE151;PORTABLE</DefineConstants>
+    <!--<TargetFrameworkVersion>v4.0</TargetFrameworkVersion>-->
+    <!--<TargetFrameworkProfile>Profile47</TargetFrameworkProfile>-->
+    <!--<DefineConstants>$(DefineConstants);PROFILE47</DefineConstants>-->
+    <DefineConstants>$(DefineConstants);PORTABLE</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)'=='net35'">
@@ -46,10 +43,6 @@
 
   <ItemGroup>
     <PackageReference Include="MSBuild.Sdk.Extras" Version="1.0.5" PrivateAssets="all" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)'=='netstandard1.2'">
-    <PackageReference Include="CoreCompat.Newtonsoft.Json" Version="9.0.2-beta001" PrivateAssets="all" />
   </ItemGroup>
 
   <Import Project="$(MSBuildSDKExtrasTargets)" Condition="Exists('$(MSBuildSDKExtrasTargets)')" />

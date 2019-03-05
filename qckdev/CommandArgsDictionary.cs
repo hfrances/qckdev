@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.Serialization;
 
 namespace qckdev
 {
@@ -23,7 +24,7 @@ namespace qckdev
 
 #if PORTABLE // EXCLUDE.
 #else
-        private CommandArgsDictionary(System.Runtime.Serialization.SerializationInfo info, System.Runtime.Serialization.StreamingContext context)
+        private CommandArgsDictionary(SerializationInfo info, StreamingContext context)
             :base(info, context) { }
 #endif
 
