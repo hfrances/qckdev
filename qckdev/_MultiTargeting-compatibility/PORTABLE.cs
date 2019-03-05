@@ -11,11 +11,11 @@ namespace System
     /// This class cannot be inherited.
     /// </summary>
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Enum | AttributeTargets.Delegate, Inherited = false)]
-    sealed class SerializableAttribute : Attribute
+    internal sealed class SerializableAttribute : Attribute
     {
     }
 }
 
 #else
-    // Ya existe el atributo.
+    // Ya existe.
 #endif
