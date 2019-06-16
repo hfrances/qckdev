@@ -1,5 +1,5 @@
 # qckdev (Preview)
-
+[![NuGet](https://img.shields.io/nuget/v/qckdev.svg?logo=nuget)](https://www.nuget.org/packages/qckdev)
 [![Build status](https://hfrances.visualstudio.com/Main/_apis/build/status/qckdev-Github)](https://hfrances.visualstudio.com/Main/_build/latest?definitionId=2)
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=qckdev&metric=alert_status)](https://sonarcloud.io/dashboard?id=qckdev)
 [![Coverage](https://sonarcloud.io/api/project_badges/measure?project=qckdev&metric=coverage)](https://sonarcloud.io/dashboard?id=qckdev)
