@@ -22,6 +22,7 @@ namespace qckdev
         /// A <see cref="String"/> equivalent to the substring that begins and ends at a specified characters.
         /// or the original <paramref name="value"/> if it does not contains starts and ends characters.
         /// </returns>
+        [Obsolete("This method is obsolete and will disappear in coming versions.")]
         public static string Substring(this string value, string start, string end)
         {
             string rdo = value;
@@ -73,7 +74,7 @@ namespace qckdev
         }
 
         /// <summary>
-        /// Clears the contents of the string builder.
+        /// Clears string builder content.
         /// </summary>
         /// <param name="value">
         /// The <see cref="StringBuilder"/> to clear.
