@@ -68,6 +68,148 @@
             <returns>A <see cref="T:qckdev.CommandArgsDictionary"/> with the information splitted.</returns>
             <exception cref="T:System.ArgumentNullException"><paramref name="args"/> is null.</exception>
         </member>
+        <member name="M:qckdev.ComponentModel.PropertyDescriptorCache.Cache(System.Type)">
+            <summary>
+            Returns the collection of properties for a specified type of component.
+            </summary>
+            <param name="type">A <see cref="T:System.Type"/> that represents the component to get properties for.</param>
+            <returns>
+            A <see cref="T:System.ComponentModel.PropertyDescriptorCollection"/> with the properties for a specified type of component.
+            </returns>
+        </member>
+        <member name="T:qckdev.ComponentModel.TypeDescriptorHelper">
+            <summary>
+            Provides information about the characteristics for a component, such as its attributes, properties, and events. 
+            This class cannot be inherited.
+            </summary>
+        </member>
+        <member name="M:qckdev.ComponentModel.TypeDescriptorHelper.GetCachedPropertyDescriptors(System.Type)">
+            <summary>
+            Returns the collection of properties for a specified type of component.
+            </summary>
+            <param name="type">A <see cref="T:System.Type"/> that represents the component to get properties for.</param>
+            <returns>
+            A <see cref="T:System.ComponentModel.PropertyDescriptorCollection"/> with the properties for a specified type of component.
+            </returns>
+        </member>
+        <member name="M:qckdev.ComponentModel.TypeDescriptorHelper.GetPropertiesFull(System.Type)">
+            <summary>
+            Returns the collection of properties for a specified type of component.
+            Includes all levels for interfaces.
+            </summary>
+            <param name="componentType">A <see cref="T:System.Type"/> that represents the component to get properties for.</param>
+            <returns>A <see cref="T:System.ComponentModel.PropertyDescriptorCollection"/> with the properties for a specified type of component.</returns>
+        </member>
+        <member name="F:qckdev.Data.CommandHelper.TypeMap">
+            <remarks>
+            <seealso href="https://stackoverflow.com/questions/7952142/how-to-resolve-system-type-to-system-data-dbtype"/>
+            </remarks>
+        </member>
+        <member name="M:qckdev.Data.CommandHelper.GetDbType(System.Type)">
+            <summary>
+            Converts a <see cref="T:System.Type"/> to an equivalent <see cref="T:System.Data.DbType"/> value.
+            </summary>
+            <param name="type">The <see cref="T:System.Type"/> to convert.</param>
+            <returns>
+            A <see cref="T:System.Data.DbType"/> value that is equivalent to the specified <paramref name="type"/> 
+            or <see cref="F:System.Data.DbType.Object"/> if no equivalent is found.
+            </returns>
+            <remarks>
+            <seealso href="https://stackoverflow.com/questions/7952142/how-to-resolve-system-type-to-system-data-dbtype"/>
+            </remarks>
+        </member>
+        <member name="T:qckdev.Data.DataExtensions">
+            <summary>
+            Defines the extension methods to the <see cref="N:System.Data"/> namespace.
+            </summary>
+        </member>
+        <member name="M:qckdev.Data.DataExtensions.Clone``1(``0)">
+            <summary>
+            Creates a new connection that is a copy of the current instance.
+            </summary>
+            <param name="connection">The connection to clone.</param>
+            <returns>A new connection that is a copy of this instance.</returns>
+        </member>
+        <member name="M:qckdev.Data.DataExtensions.ExecuteNonQueryAuto(System.Data.IDbCommand)">
+            <summary>
+            Executes an SQL statement against the Connection object of a .NET Framework data provider, and returns the number of rows affected.
+            If the connection is closed, it is automatically opened and closed. Otherwise the connection status does not change.
+            </summary>
+            <param name="command">The command to execute.</param>
+            <returns>The number of rows affected.</returns>
+            <exception cref="T:System.InvalidOperationException">The connection does not exist. -or- The connection is not open.</exception>
+        </member>
+        <member name="M:qckdev.Data.DataExtensions.ExecuteScalar``1(System.Data.IDbCommand)">
+            <summary>
+            Executes the query, and returns the first column of the first row in the resultset returned by the query. Extra columns or rows are ignored.
+            </summary>
+            <typeparam name="T">The returned value type.</typeparam>
+            <param name="command">The command to execute.</param>
+            <returns>
+            The first column of the first row in the resultset converted to <typeparamref name="T"/> type. 
+            When the result is <see cref="F:System.DBNull.Value"/>, it is converted to null.
+            </returns>
+        </member>
+        <member name="M:qckdev.Data.DataExtensions.ExecuteScalarAuto(System.Data.IDbCommand)">
+            <summary>
+            Executes the query, and returns the first column of the first row in the resultset returned by the query. Extra columns or rows are ignored.
+            If the connection is closed, it is automatically opened and closed. Otherwise the connection status does not change.
+            </summary>
+            <param name="command">The command to execute.</param>
+            <returns>The first column of the first row in the resultset.</returns>
+        </member>
+        <member name="M:qckdev.Data.DataExtensions.ExecuteScalarAuto``1(System.Data.IDbCommand)">
+            <summary>
+            Executes the query, and returns the first column of the first row in the resultset returned by the query. Extra columns or rows are ignored.
+            If the connection is closed, it is automatically opened and closed. Otherwise the connection status does not change.
+            </summary>
+            <typeparam name="T">The returned value type.</typeparam>
+            <param name="command">The command to execute.</param>
+            <returns>
+            The first column of the first row in the resultset converted to <typeparamref name="T"/> type. 
+            When the result is <see cref="F:System.DBNull.Value"/>, it is converted to null.
+            </returns>
+        </member>
+        <member name="M:qckdev.Data.DataExtensions.ExecuteReaderAuto(System.Data.IDbCommand)">
+            <summary>
+            Executes the <see cref="P:System.Data.IDbCommand.CommandText"/> against the <see cref="P:System.Data.IDbCommand.Connection"/> 
+            and builds an <see cref="T:System.Data.IDataReader"/>.
+            If the connection is closed, it is automatically opened and closed. Otherwise the connection status does not change.
+            </summary>
+            <param name="command">The command to execute.</param>
+            <returns>An <see cref="T:System.Data.IDataReader"/> object.</returns>
+        </member>
+        <member name="M:qckdev.Data.DataExtensions.ExecuteReaderAuto(System.Data.IDbCommand,System.Data.CommandBehavior)">
+            <summary>
+            Executes the <see cref="P:System.Data.IDbCommand.CommandText"/> against the <see cref="P:System.Data.IDbCommand.Connection"/>, 
+            and builds an <see cref="T:System.Data.IDataReader"/> using one of the <see cref="T:System.Data.CommandBehavior"/> values.
+            If the connection is closed, it is automatically opened and closed. Otherwise the connection status does not change.
+            </summary>
+            <param name="command">The command to execute.</param>
+            <param name="behavior">One of the System.Data.CommandBehavior values.</param>
+            <returns>An <see cref="T:System.Data.IDataReader"/> object.</returns>
+        </member>
+        <member name="M:qckdev.Data.DataExtensions.CreateParameterWithValue``1(System.Data.IDbCommand,System.String,``0)">
+            <summary>
+            Creates a new instance of an <see cref="T:System.Data.IDbDataParameter"/> object.
+            </summary>
+            <typeparam name="TValue">Value type of the parameter.</typeparam>
+            <param name="command"></param>
+            <param name="parameterName">The name of the parameter.</param>
+            <param name="value">The value to be added. If the value is null, it sends a <see cref="F:System.DBNull.Value"/>.</param>
+            <returns>A <see cref="T:System.Data.IDbDataParameter"/> object.</returns>
+        </member>
+        <member name="M:qckdev.Data.DataExtensions.CreateParameterWithValue``1(System.Data.IDbCommand,System.String,``0,System.Data.ParameterDirection)">
+            <summary>
+            Creates a new instance of an <see cref="T:System.Data.IDbDataParameter"/> object.
+            </summary>
+            <typeparam name="TValue">Value type of the parameter.</typeparam>
+            <param name="command"></param>
+            <param name="parameterName">The name of the parameter.</param>
+            <param name="value">The value to be added. If the value is null, it sends a <see cref="F:System.DBNull.Value"/>.</param>
+            <param name="direction">One of the <see cref="T:System.Data.ParameterDirection"/> values.</param>
+            <returns>A <see cref="T:System.Data.IDbDataParameter"/> object.</returns>
+        </member>
         <member name="T:qckdev.Extensions">
             <summary>
             Provides a set of static (Shared in Visual Basic) methods.
@@ -94,9 +236,18 @@
             <param name="values">List of values to compare.</param>
             <returns>Returns true if one of list values matches with the specified value.</returns>
         </member>
+        <member name="M:qckdev.Extensions.In(System.String,System.Boolean,System.String[])">
+            <summary>
+            Determines whether a specified value matches any value in a a list.
+            </summary>
+            <param name="this">Value to validate.</param>
+            <param name="ignoreCase">Ignores case sensitive.</param>
+            <param name="values">List of values to compare.</param>
+            <returns>Returns true if one of list values matches with the specified value.</returns>
+        </member>
         <member name="M:qckdev.Extensions.Clear(System.Text.StringBuilder)">
             <summary>
-            Clears the contents of the string builder.
+            Clears string builder content.
             </summary>
             <param name="value">
             The <see cref="T:System.Text.StringBuilder"/> to clear.
@@ -165,7 +316,7 @@
             <returns>true if the instances are equal; otherwise false.</returns>
             <remarks>
             If <paramref name="item1"/> and <paramref name="item2"/> are <see cref="T:System.String"/>, 
-            it uses <see cref="M:System.String.Compare(System.String,System.String,System.Boolean)"/> with <see cref="P:qckdev.Key.IgnoreCase"/> parameter.
+            it uses <see cref="M:System.String.Compare(System.String,System.String,System.StringComparison)"/> with <see cref="P:qckdev.Key.IgnoreCase"/> parameter.
             </remarks>
         </member>
         <member name="M:qckdev.Key.ToArray">
@@ -383,6 +534,15 @@
             <paramref name="resultSelector"/> is null.
             </exception>
         </member>
+        <member name="M:qckdev.Linq.Enumerable.ForEach``1(System.Collections.Generic.IEnumerable{``0},System.Action{``0})">
+            <summary>
+            Performs the specified action on each element of the <see cref="T:System.Collections.Generic.IEnumerable`1"/>.
+            </summary>
+            <param name="enumerable">Elements where apply the action.</param>
+            <param name="action">The <see cref="T:System.Action`1"/> delegate to perform on each element of the <see cref="T:System.Collections.Generic.IEnumerable`1"/>.</param>
+            <exception cref="T:System.ArgumentNullException">action is null.</exception>
+            <exception cref="T:System.InvalidOperationException">An element in the collection has been modified.</exception>
+        </member>
         <member name="T:qckdev.Linq.Expressions.ExpressionOperatorType">
             <summary>
             Defines the operation type to be applied in an <see cref="T:qckdev.Linq.Expressions.ExpressionNode"/>.
@@ -484,6 +644,11 @@
             <summary>
             A node that represents a relational operator. 
             For example <see cref="F:qckdev.Linq.Expressions.ExpressionOperatorType.Add"/>, <see cref="F:qckdev.Linq.Expressions.ExpressionOperatorType.Modulo"/>, ...
+            </summary>
+        </member>
+        <member name="T:qckdev.Linq.Expressions.CharType">
+            <summary>
+            Sets the char type.
             </summary>
         </member>
         <member name="T:qckdev.Linq.Expressions.ExpressionBuilder">
@@ -645,7 +810,7 @@
             <summary>
             Creates a <see cref="T:System.Linq.Expressions.MethodCallExpression"/> that returns an object of the specified type and whose value is equivalent to the specified object.
             </summary>
-            <param name="expression">An <see cref="T:System.Linq.Expressions.Expression"/> that implements the <see cref="T:System.IConvertible"/> interface</param>
+            <param name="expression">An <see cref="T:System.Linq.Expressions.Expression"/> that implements the System.IConvertible interface</param>
             <param name="conversionType">The type of object to return.</param>
             <returns></returns>
         </member>
@@ -680,6 +845,11 @@
             Represents a part of a <see cref="T:System.String"/> expression in a <see cref="P:qckdev.Linq.Expressions.ExpressionNode.ExpressionTree"/>.
             </summary>
         </member>
+        <member name="P:qckdev.Linq.Expressions.ExpressionNode.Locked">
+            <summary>
+            Gets or sets if this nodo cannot be altered during the <see cref="P:qckdev.Linq.Expressions.ExpressionNode.ExpressionTree"/> build (for example parentheses).
+            </summary>
+        </member>
         <member name="P:qckdev.Linq.Expressions.ExpressionNode.StartIndex">
             <summary>
             Gets the start index in the <see cref="P:qckdev.Linq.Expressions.ExpressionTree.Value"/>.
@@ -710,6 +880,17 @@
             <summary>
             Gets the <see cref="T:System.String"/> part of the <see cref="P:qckdev.Linq.Expressions.ExpressionNode.ExpressionTree"/>.
             </summary>
+        </member>
+        <member name="P:qckdev.Linq.Expressions.ExpressionNode.FormattedText">
+            <summary>
+            Gets the final value of the <see cref="T:qckdev.Linq.Expressions.ExpressionNode"/> converted during the process or null if it must takes <see cref="P:qckdev.Linq.Expressions.ExpressionNode.Text"/> value.
+            </summary>
+        </member>
+        <member name="M:qckdev.Linq.Expressions.ExpressionNode.GetNodePath">
+            <summary>
+            Returns an <see cref="T:System.Array"/> with the <see cref="T:qckdev.Linq.Expressions.ExpressionNode"/> elements of the node path.
+            </summary>
+            <returns>An <see cref="T:System.Array"/> with the <see cref="T:qckdev.Linq.Expressions.ExpressionNode"/> elements.</returns>
         </member>
         <member name="M:qckdev.Linq.Expressions.ExpressionNode.ShouldSerializeNodes">
             <summary>
@@ -760,6 +941,12 @@
             The parent <see cref="T:qckdev.Linq.Expressions.ExpressionNode"/>.
             </summary>
         </member>
+        <member name="M:qckdev.Linq.Expressions.ExpressionNodeCollection.AddNew">
+            <summary>
+            Añade y devuelve un nuevo valor de tipo <see cref="T:qckdev.Linq.Expressions.ExpressionNode"/> en la colección actual.
+            </summary>
+            <returns>Un nuevo valor de tipo <see cref="T:qckdev.Linq.Expressions.ExpressionNode"/> añadido a la colección actual.</returns>
+        </member>
         <member name="M:qckdev.Linq.Expressions.ExpressionNodeCollection.AddRange(System.Collections.Generic.IEnumerable{qckdev.Linq.Expressions.ExpressionNode})">
             <summary>
             Adds the elements of the specified collection to the end of the <see cref="T:qckdev.Linq.Expressions.ExpressionNodeCollection"/>.
@@ -779,88 +966,117 @@
             Provide methods to convert a <see cref="T:System.String"/> expression to <see cref="T:qckdev.Linq.Expressions.ExpressionTree"/>.
             </summary>
         </member>
+        <member name="F:qckdev.Linq.Expressions.ExpressionString.OperationMap">
+            <summary>
+            Relación entre los operadores en formato texto y los operadores en formato objeto.
+            </summary>
+        </member>
+        <member name="F:qckdev.Linq.Expressions.ExpressionString.BreakerChars">
+            <summary>
+            Lista de caracteres que indican que se cambia de elemento durante la lectura.
+            </summary>
+        </member>
+        <member name="F:qckdev.Linq.Expressions.ExpressionString.ScapeChars">
+            <summary>
+            Lista de caracteres que tienen funcionamiento especial pero, que si vienen dos veces seguidas, se refiere al carácter en sí.
+            </summary>
+        </member>
+        <member name="F:qckdev.Linq.Expressions.ExpressionString.DelimiterChars">
+            <summary>
+            Relación entre el caracter de apertura y el de cierre.
+            </summary>
+        </member>
+        <member name="F:qckdev.Linq.Expressions.ExpressionString.DelimiterTypes">
+            <summary>
+            Relación entre el caracter de apertura y el tipo de dato.
+            </summary>
+        </member>
+        <member name="M:qckdev.Linq.Expressions.ExpressionString.ParseExpressionString(System.String)">
+            <summary>
+            Recorre todos los caracteres de la cadena y los procesa.
+            </summary>
+            <param name="value">Cadena de texto.</param>
+            <returns>El <see cref="T:qckdev.Linq.Expressions.ExpressionTree"/> con los elementos de la cadena.</returns>
+        </member>
+        <member name="M:qckdev.Linq.Expressions.ExpressionString.ProcessSubstring(qckdev.Linq.Expressions.ExpressionNode,System.Int32,System.Nullable{System.Int32},System.Boolean)">
+            <summary>
+            Procesa el rango específico de la cadena contenida en <see cref="P:qckdev.Linq.Expressions.ExpressionTree.Value"/> 
+            (accesible desde <seealso cref="P:qckdev.Linq.Expressions.ExpressionNode.ExpressionTree"/>).
+            </summary>
+            <param name="node">Nodo de trabajo.</param>
+            <param name="startIndex">Índice del primer caracter a leer en <see cref="P:qckdev.Linq.Expressions.ExpressionTree.Value"/></param>
+            <param name="endIndex">Índice del último caracter a leer en <see cref="P:qckdev.Linq.Expressions.ExpressionTree.Value"/> o null para leer hasta el final.</param>
+            <param name="delimiterOpened">
+            Indica si se está buscando dentro de una zona incluida en <see cref="F:qckdev.Linq.Expressions.ExpressionString.DelimiterChars"/>, 
+            para no lanzar error de formato si encuentra un carácter de cierre.
+            </param>
+        </member>
+        <member name="M:qckdev.Linq.Expressions.ExpressionString.ProcessChar(qckdev.Linq.Expressions.ExpressionNode,qckdev.Linq.Expressions.CharType@,System.Int32@,System.Boolean)">
+            <summary>
+            Analiza el caracter en una cadena y lo procesa, pudiendo crear nodos hijos, asignarles un operador o rellenar en <see cref="P:qckdev.Linq.Expressions.ExpressionString.StringBuffer"/>.
+            </summary>
+            <param name="node">
+            Nodo que se está procesando en estos momentos.
+            </param>
+            <param name="lastCharType">
+            Último tipo de caracter leído. 
+            Este permite identificar cuándo se ha cambiado de valor a operación u otros, sin tener que separar mediante espacios.
+            </param>
+            <param name="charIndex">
+            Índice del caracter que se está analizando dentro de <paramref name="node"/>
+            (<seealso cref="P:qckdev.Linq.Expressions.ExpressionNode.ExpressionTree"/>, <seealso cref="P:qckdev.Linq.Expressions.ExpressionTree.Value"/>).
+            Si es conveniente, este valor puede ser reemplazado por otro (por ejemplo, al encontrar una apertura de paréntesis, 
+            se moverá hasta el paréntesis de cierre.
+            </param>
+            <param name="delimiterOpened">
+            Indica si se está buscando dentro de una zona incluida en <see cref="F:qckdev.Linq.Expressions.ExpressionString.DelimiterChars"/>, 
+            para no lanzar error de formato si encuentra un carácter de cierre.
+            </param>
+            <exception cref="T:System.FormatException">La cadena a procesar es incorrecta.</exception>
+        </member>
+        <member name="M:qckdev.Linq.Expressions.ExpressionString.AddChildNodeFromOpenCharacter(qckdev.Linq.Expressions.ExpressionNode,System.Int32@)">
+            <summary>
+            Crea un sub elemento a partir de un caracter de apertura.
+            </summary>
+            <param name="parentNode">Nodo actual de procesamiento.</param>
+            <param name="charIndex">
+            Índice del caracter que se está analizando dentro de <paramref name="parentNode"/>
+            (<seealso cref="P:qckdev.Linq.Expressions.ExpressionNode.ExpressionTree"/>, <seealso cref="P:qckdev.Linq.Expressions.ExpressionTree.Value"/>).
+            Si es conveniente, este valor puede ser reemplazado por otro (por ejemplo, al encontrar una apertura de paréntesis, 
+            se moverá hasta el paréntesis de cierre.
+            </param>
+            <exception cref="T:System.FormatException">La cadena a procesar es incorrecta.</exception>
+        </member>
+        <member name="M:qckdev.Linq.Expressions.ExpressionString.CloseNodeFromOpenCharacter(qckdev.Linq.Expressions.ExpressionNode,System.Int32@,System.Func{System.Char,System.Boolean},System.Boolean)">
+            <summary>
+            Recorre el texto en busca hasta que se encuenta el caracter de cierre.
+            </summary>
+            <param name="node">Nodo actual de procesamiento.</param>
+            <param name="charIndex"></param>
+            <param name="closeCriteria"></param>
+            <param name="recursive"></param>
+        </member>
+        <member name="M:qckdev.Linq.Expressions.ExpressionString.ProcessBuffer(qckdev.Linq.Expressions.ExpressionNode,System.Int32,System.Boolean)">
+            <summary>
+            Procesa el texto pendiente en el buffer.
+            </summary>
+            <param name="parentNode">
+            Nodo de procesamiento (sólo lo utilizará si no existe ningún valor en <see cref="P:qckdev.Linq.Expressions.ExpressionString.CurrentNode"/>.
+            </param>
+            <param name="charIndex">
+            Índice del caracter que se está analizando dentro de <paramref name="parentNode"/>
+            </param>
+            <param name="formattedText">
+            Establece si el valor pendiente del buffer debe almacenarse en <see cref="P:qckdev.Linq.Expressions.ExpressionNode.FormattedText"/>.
+            Este valor sustituirá al de la propiedad <see cref="P:qckdev.Linq.Expressions.ExpressionNode.Text"/> durante el procesamiento.
+            </param>
+        </member>
         <member name="M:qckdev.Linq.Expressions.ExpressionString.BuildTree(System.String)">
             <summary>
             Converts a <see cref="T:System.String"/> expression to <see cref="T:qckdev.Linq.Expressions.ExpressionTree"/>.
             </summary>
             <param name="value">The <see cref="T:System.String"/> expression to parse.</param>
             <returns>The <see cref="T:qckdev.Linq.Expressions.ExpressionTree"/> parsed.</returns>
-        </member>
-        <member name="M:qckdev.Linq.Expressions.ExpressionString.Serialize(qckdev.Linq.Expressions.ExpressionTree,System.String)">
-            <summary>
-            Serializes the specified <see cref="T:qckdev.Linq.Expressions.ExpressionTree"/> and writes the XML document to a file.
-            </summary>
-            <param name="item">The <see cref="T:qckdev.Linq.Expressions.ExpressionTree"/> to serialize.</param>
-            <param name="fileName">The complete file path to write.</param>
-        </member>
-        <member name="M:qckdev.Linq.Expressions.ExpressionString.Deserialize(System.String)">
-            <summary>
-            Deserializes the XML document contained by the specified file.
-            </summary>
-            <param name="fileName">The complete file path to read.</param>
-            <returns>The <see cref="T:qckdev.Linq.Expressions.ExpressionTree"/> being deserialized.</returns>
-            <exception cref="T:System.InvalidOperationException">
-            An error occurred during deserialization. The original exception is available using the <see cref="P:System.Exception.InnerException"/> property.
-            </exception>
-        </member>
-        <member name="M:qckdev.Linq.Expressions.ExpressionString.DeserializeString(System.String)">
-            <summary>
-            Deserializes the XML document contained by the specified <see cref="T:System.String"/>.
-            </summary>
-            <param name="content">The <see cref="T:System.String"/> to be deserilized.</param>
-            <returns>The <see cref="T:qckdev.Linq.Expressions.ExpressionTree"/> being deserialized.</returns>
-            <exception cref="T:System.InvalidOperationException">
-            An error occurred during deserialization. The original exception is available using the <see cref="P:System.Exception.InnerException"/> property.
-            </exception>
-        </member>
-        <member name="F:qckdev.Linq.Expressions.ExpressionString.operationTranslator">
-            <summary>
-            Relación entre los operadores en formato texto y los operadores en formato objeto.
-            </summary>
-        </member>
-        <member name="F:qckdev.Linq.Expressions.ExpressionString.delimiterCloser">
-            <summary>
-            Relación entre el caracter de apertura y el de cierre.
-            </summary>
-        </member>
-        <member name="F:qckdev.Linq.Expressions.ExpressionString.delimiterType">
-            <summary>
-            Relación entre el caracter de apertura y el tipo de dato.
-            </summary>
-        </member>
-        <member name="M:qckdev.Linq.Expressions.ExpressionString.AddChildNodeFromOpenCharacter(qckdev.Linq.Expressions.ExpressionNode@,System.Int32)">
-            <summary>
-            Crea un sub elemento a partir de un caracter de apertura.
-            </summary>
-            <param name="parent"></param>
-            <param name="currentIndex"></param>
-            <returns></returns>
-        </member>
-        <member name="M:qckdev.Linq.Expressions.ExpressionString.SetEndIndex(qckdev.Linq.Expressions.ExpressionNode@,System.Int32,System.Func{System.Char,System.Boolean},System.Boolean)">
-            <summary>
-            Recorre el texto en busca hasta que se encuenta el caracter de cierre.
-            </summary>
-            <param name="node"></param>
-            <param name="startIndex"></param>
-            <param name="closeCriteria"></param>
-            <param name="recursive"></param>
-            <returns></returns>
-        </member>
-        <member name="M:qckdev.Linq.Expressions.ExpressionString.ProcessBuffer(qckdev.Linq.Expressions.ExpressionNode@,System.Int32)">
-            <summary>
-            Procesa el texto pendiente en el buffer.
-            </summary>
-            <param name="parent"></param>
-            <param name="currentIndex"></param>
-        </member>
-        <member name="M:qckdev.Linq.Expressions.ExpressionString.ApplyOrCreateLogicOperator(qckdev.Linq.Expressions.ExpressionNode,qckdev.Linq.Expressions.ExpressionOperatorType,System.Int32)">
-            <summary>
-            Aplica el operador al nodo especificado. En caso de que el nodo ya tenga otro operador, crea un nodo superior.
-            </summary>
-            <param name="node">Nodo al que aplicar el operador.</param>
-            <param name="operator">Operador a aplicar.</param>
-            <param name="endIndex">Indica el punto de inicio del operador. Este valor se aplicará como EndIndex a <paramref name="node"/> cuando se tenga que crear un nodo padre.</param>
-            <returns>Devuelve el nodo con el operador aplicado. Puede ser el mismo o un nodo creado y colocado en el nivel superior.</returns>
         </member>
         <member name="M:qckdev.Linq.Expressions.ExpressionString.ApplyParentNode(qckdev.Linq.Expressions.ExpressionNode,qckdev.Linq.Expressions.ExpressionNodeType,qckdev.Linq.Expressions.ExpressionOperatorType)">
             <summary>
@@ -869,6 +1085,82 @@
             <param name="node">Nodo a modificar.</param>
             <param name="parentType">Nuevo tipo</param>
             <param name="parentOperator">Nuevo operador.</param>
+        </member>
+        <member name="M:qckdev.Linq.Expressions.ExpressionString.GetCharType(System.String)">
+            <summary>
+            Devuelve el tipo de elemento almacenado en la cadena <paramref name="value"/>.
+            </summary>
+            <param name="value">La cadena a ser analizada.</param>
+            <remarks>
+            Se utiliza para detectar cuándo pasa de valor a operador, o paréntesis u otra cosa.
+            </remarks>
+        </member>
+        <member name="M:qckdev.Linq.Expressions.ExpressionString.IsValueNode(qckdev.Linq.Expressions.ExpressionNodeType)">
+            <summary>
+            Devuelve si el tipo de nodo puede contener un valor.
+            </summary>
+            <param name="nodeType">Tipo de nodo a validar.</param>
+            <returns>True si el tipo puede contener un valor, false en caso contrario.</returns>
+        </member>
+        <member name="M:qckdev.Linq.Expressions.ExpressionString.IsOperatorNode(qckdev.Linq.Expressions.ExpressionNodeType)">
+            <summary>
+            Devuelve si el tipo de nodo es un operador.
+            </summary>
+            <param name="nodeType">Tipo de nodo a validar.</param>
+            <returns>True si el tipo es un operador, false en caso contrario.</returns>
+        </member>
+        <member name="M:qckdev.Linq.Expressions.ExpressionString.GetOperatorPriority(qckdev.Linq.Expressions.ExpressionOperatorType)">
+            <summary>
+            Devuelve la prioridad de cálculo del operador de menor a mayor. 
+            Esto permite hacer las multiplicaciones antes que las sumas, las potencias antes que las multiplicaciones, los AND antes que los OR, etc.
+            </summary>
+            <param name="operator">Operador a validar.</param>
+            <returns>La prioridad de cálculo del operador, de menor a mayor.</returns>
+            <remarks>
+            <seealso href="https://stackoverflow.com/questions/1241142/sql-logic-operator-precedence-and-and-or"/>
+            <seealso href="https://docs.microsoft.com/en-us/sql/t-sql/language-elements/operator-precedence-transact-sql?view=sql-server-2017"/>
+            </remarks>
+        </member>
+        <member name="M:qckdev.Linq.Expressions.ExpressionString.GetArithmeticOperator(qckdev.Linq.Expressions.ExpressionNode)">
+            <summary>
+            Devuelve el operador adjunto a un nodo específico.
+            </summary>
+            <param name="node">Nodo de búsqueda.</param>
+            <returns>El operador adjunto al nodo especificado.</returns>
+        </member>
+        <member name="M:qckdev.Linq.Expressions.ExpressionString.GetLogicalOperator(qckdev.Linq.Expressions.ExpressionNode)">
+            <summary>
+            Devuelve el operador adjunto a un nodo específico.
+            </summary>
+            <param name="node">Nodo de búsqueda.</param>
+            <returns>El operador adjunto al nodo especificado.</returns>
+        </member>
+        <member name="M:qckdev.Linq.Expressions.ExpressionString.GetRelationalOperator(qckdev.Linq.Expressions.ExpressionNode)">
+            <summary>
+            Devuelve el operador adjunto a un nodo específico.
+            </summary>
+            <param name="node">Nodo de búsqueda.</param>
+            <returns>El operador adjunto al nodo especificado.</returns>
+        </member>
+        <member name="M:qckdev.Linq.Expressions.ExpressionString.IsArithmeticBranch(qckdev.Linq.Expressions.ExpressionNode)">
+            <summary>
+            Devuelve un valor que indica si la rama en la que se encuentra el nodo es una rama aritmética.
+            </summary>
+            <param name="node">Nodo de búsqueda.</param>
+            <returns>True si la rama es aritmética, false en caso contrario.</returns>
+            <remarks>
+            Se utiliza para poder diferenciar si el símbolo "-" es porque va a ser un número negativo o una resta.
+            </remarks>
+        </member>
+        <member name="M:qckdev.Linq.Expressions.ExpressionString.FindNodeForOperator(qckdev.Linq.Expressions.ExpressionNode,qckdev.Linq.Expressions.ExpressionOperatorType,System.Func{qckdev.Linq.Expressions.ExpressionNodeType,System.Boolean},System.Func{qckdev.Linq.Expressions.ExpressionNode,qckdev.Linq.Expressions.ExpressionOperatorType})">
+            <summary>
+            Devuelve el nodo más próximo a <paramref name="currentNode"/> al que se le pueda asignar la operación especificada.
+            </summary>
+            <param name="currentNode">Nodo de inicio de búsqueda.</param>
+            <param name="operator">Operador que se desea aplicar.</param>
+            <param name="isValidNodeFunc">Función que valida los nodos sobre los que puede buscar.</param>
+            <param name="getOperatorFunc">Función que devuelve el tipo de operador del nodo durante las búsquedas.</param>
+            <returns>El nodo más próximo al que se le pueda asignar la operación especificada.</returns>
         </member>
         <member name="M:qckdev.Linq.Expressions.ExpressionString.CollapseTree(qckdev.Linq.Expressions.ExpressionNode@)">
             <summary>
@@ -935,13 +1227,6 @@
             true if the specified <see cref="T:System.Object"/> is equal to the current <see cref="T:qckdev.Linq.Expressions.ExpressionTree"/>; otherwise, false.
             </returns>
         </member>
-        <member name="M:qckdev.Linq.Expressions.Extensions.AddNew(qckdev.Linq.Expressions.ExpressionNodeCollection)">
-            <summary>
-            Añade y devuelve un nuevo valor de tipo <see cref="T:qckdev.Linq.Expressions.ExpressionNode"/> en la colección actual.
-            </summary>
-            <param name="collection">Colección de elementos donde se va a añadir.</param>
-            <returns></returns>
-        </member>
         <member name="T:qckdev.Linq.List">
             <summary>
             Provides a set of static methods for querying objects that implement <see cref="T:System.Collections.IList"/>.
@@ -998,75 +1283,6 @@
             </returns>
             <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.IList`1"/> is read-only </exception>
         </member>
-        <member name="M:qckdev.Reflection.Extensions.HasOwnValue(System.Type)">
-            <summary>
-            Returns a value indicating whether the <see cref="T:System.Type"/> is one of the primitive types, a value type or the <see cref="T:System.String"/> type.
-            </summary>
-            <param name="type"><see cref="T:System.Type"/> to check.</param>
-            <returns>
-            true if the the <see cref="T:System.Type"/> is one of the primitive types, a value type or the <see cref="T:System.String"/> type; otherwise, false.
-            </returns>
-        </member>
-        <member name="M:qckdev.Reflection.Extensions.CreateInstance(System.Type,System.Object[])">
-            <summary>
-            Creates an instance of the type designated by the specified generic type parameter.
-            </summary>
-            <param name="objectType">The type to create.</param >
-            <param name="parameters">
-            An array of arguments that match in number, order, and type the parameters of
-            the constructor to invoke. If args is an empty array or null, the constructor
-            that takes no parameters (the default constructor) is invoked.
-            </param>
-            <returns>A reference to the newly created object.</returns>
-        </member>
-        <member name="M:qckdev.Reflection.Extensions.GetConstructor(System.Type,System.Object[])">
-            <summary>
-            Searches for a public/non-public instance constructor whose parameters match the types in the specified <paramref name="objectType"/>.
-            </summary>
-            <param name="objectType">The <see cref="T:System.Type"/> where find the constructor.</param>
-            <param name="parameters">
-            An array of arguments that match in number, order, and type the parameters of
-            the constructor to invoke. If args is an empty array or null, the constructor
-            that takes no parameters (the default constructor) is returned.
-            </param>
-            <returns>
-            A <see cref="T:System.Reflection.ConstructorInfo"/> object representing the public instance constructor
-            whose parameters match the types in the parameter type array, if found; otherwise, null.
-            </returns>
-        </member>
-        <member name="M:qckdev.Reflection.Extensions.GetProperties2(System.Type)">
-            <summary>
-            When overridden in a derived class, searches for the properties of the current <see cref="T:System.Type"/>, using the specified binding constraints. Includes all levels for interfaces.
-            </summary>
-            <returns>
-            An array of <see cref="T:System.Reflection.PropertyInfo"/> objects representing all properties
-            of the current <see cref="T:System.Type"/> that match the specified binding constraints.-or-
-            An empty array of type <see cref="T:System.Reflection.PropertyInfo"/>, if the current <see cref="T:System.Type"/>
-            does not have properties, or if none of the properties match the binding constraints.
-            </returns>
-        </member>
-        <member name="M:qckdev.Reflection.Extensions.GetProperties2(System.Type,System.Reflection.BindingFlags)">
-            <summary>
-            When overridden in a derived class, searches for the properties of the current System.Type, using the specified binding constraints. Includes all levels for interfaces.
-            </summary>
-            <param name="type">Type declaration.</param>
-            <param name="bindingAttr">A bitmask comprised of one or more <see cref="T:System.Reflection.BindingFlags"/> that specify how the search is conducted.-or- Zero, to return null.</param>
-            <returns>
-            An array of <see cref="T:System.Reflection.PropertyInfo"/> objects representing all properties
-            of the current <see cref="T:System.Type"/> that match the specified binding constraints.-or-
-            An empty array of type <see cref="T:System.Reflection.PropertyInfo"/>, if the current <see cref="T:System.Type"/>
-            does not have properties, or if none of the properties match the binding constraints.
-            </returns>
-        </member>
-        <member name="M:qckdev.Reflection.PropertyDescriptorCache.Cache(System.Type)">
-            <summary>
-            Returns the collection of properties for a specified type of component.
-            </summary>
-            <param name="type">A <see cref="T:System.Type"/> that represents the component to get properties for.</param>
-            <returns>
-            A <see cref="T:System.ComponentModel.PropertyDescriptorCollection"/> with the properties for a specified type of component.
-            </returns>
-        </member>
         <member name="M:qckdev.Reflection.PropertyInfoCache.Cache(System.Type)">
             <summary>
             When overridden in a derived class, searches for the properties of the current <see cref="T:System.Type"/>, using the specified binding constraints. Includes all levels for interfaces.
@@ -1077,6 +1293,118 @@
             of the current <see cref="T:System.Type"/> that match the specified binding constraints.-or-
             An empty array of type <see cref="T:System.Reflection.PropertyInfo"/>, if the current <see cref="T:System.Type"/>
             does not have properties, or if none of the properties match the binding constraints.
+            </returns>
+        </member>
+        <member name="T:qckdev.Reflection.ReflectionExtensions">
+            <summary>
+            Defines the extension methods to the <see cref="N:System.Reflection"/> namespace.
+            </summary>
+        </member>
+        <member name="M:qckdev.Reflection.ReflectionExtensions.GetPropertiesFull(System.Type)">
+            <summary>
+            When overridden in a derived class, searches for the properties of the current <see cref="T:System.Type"/>, using the specified binding constraints. 
+            Includes all levels for interfaces.
+            </summary>
+            <returns>
+            An array of <see cref="T:System.Reflection.PropertyInfo"/> objects representing all properties
+            of the current <see cref="T:System.Type"/> that match the specified binding constraints.-or-
+            An empty array of type <see cref="T:System.Reflection.PropertyInfo"/>, if the current <see cref="T:System.Type"/>
+            does not have properties, or if none of the properties match the binding constraints.
+            </returns>
+        </member>
+        <member name="M:qckdev.Reflection.ReflectionExtensions.GetPropertiesFull(System.Type,System.Reflection.BindingFlags)">
+            <summary>
+            When overridden in a derived class, searches for the properties of the current System.Type, using the specified binding constraints. 
+            Includes all levels for interfaces.
+            </summary>
+            <param name="type">Type declaration.</param>
+            <param name="bindingAttr">A bitmask comprised of one or more <see cref="T:System.Reflection.BindingFlags"/> that specify how the search is conducted.-or- Zero, to return null.</param>
+            <returns>
+            An array of <see cref="T:System.Reflection.PropertyInfo"/> objects representing all properties
+            of the current <see cref="T:System.Type"/> that match the specified binding constraints.-or-
+            An empty array of type <see cref="T:System.Reflection.PropertyInfo"/>, if the current <see cref="T:System.Type"/>
+            does not have properties, or if none of the properties match the binding constraints.
+            </returns>
+        </member>
+        <member name="M:qckdev.Reflection.ReflectionExtensions.GetCachedProperties(System.Type)">
+            <summary>
+            When overridden in a derived class, searches for the properties of the current <see cref="T:System.Type"/>, using the specified binding constraints. Includes all levels for interfaces.
+            </summary>
+            <param name="type">A <see cref="T:System.Type"/> that represents the component to get properties for.</param>
+            <returns>
+            An <see cref="T:System.Collections.Generic.Dictionary`2"/> of <see cref="T:System.Reflection.PropertyInfo"/> objects representing all properties
+            of the current <see cref="T:System.Type"/> that match the specified binding constraints.-or-
+            An empty array of type <see cref="T:System.Reflection.PropertyInfo"/>, if the current <see cref="T:System.Type"/>
+            does not have properties, or if none of the properties match the binding constraints.
+            </returns>
+        </member>
+        <member name="M:qckdev.Reflection.ReflectionExtensions.HasOwnValue(System.Type)">
+            <summary>
+            Returns a value indicating whether the <see cref="T:System.Type"/> is one of the primitive types, a value type or the <see cref="T:System.String"/> type.
+            </summary>
+            <param name="type"><see cref="T:System.Type"/> to check.</param>
+            <returns>
+            true if the the <see cref="T:System.Type"/> is one of the primitive types, a value type or the <see cref="T:System.String"/> type; otherwise, false.
+            </returns>
+        </member>
+        <member name="M:qckdev.Reflection.ReflectionExtensions.CreateInstance(System.Type,System.Object[])">
+            <summary>.
+            Creates an instance of the type designated by the specified generic type parameter.
+            It works with public and non-public constructors.
+            </summary>
+            <param name="objectType">The type to create.</param >
+            <param name="parameters">
+            An array of arguments that match in number, order, and type the parameters of
+            the constructor to invoke. If args is an empty array or null, the constructor
+            that takes no parameters (the default constructor) is invoked.
+            </param>
+            <returns>A reference to the newly created object.</returns>
+        </member>
+        <member name="M:qckdev.Reflection.ReflectionExtensions.GetConstructor(System.Type,System.Object[])">
+            <summary>
+            Searches for a public/non-public instance constructor whose parameters match the types in the specified <paramref name="objectType"/>.
+            </summary>
+            <param name="objectType">The <see cref="T:System.Type"/> where find the constructor.</param>
+            <param name="parameters">
+            An array of arguments that match in number, order, and type the parameters of
+            the constructor to invoke. If args is an empty array or null, the constructor
+            that takes no parameters (the default constructor) is returned.
+            </param>
+            <returns>
+            A <see cref="T:System.Reflection.ConstructorInfo"/> object representing the public or non-public instance constructor
+            whose parameters match the types in the parameter type array, if found; otherwise, null.
+            </returns>
+        </member>
+        <member name="M:qckdev.Reflection.ReflectionExtensions.GetMethod(System.Type,System.String,System.Object[])">
+            <summary>
+            Searches for a public/non-public method whose parameters match the types in the specified <paramref name="type"/>.
+            </summary>
+            <param name="type">The <see cref="T:System.Type"/> where find the constructor.</param>
+            <param name="methodName">The string containing the name of the method.</param>
+            <param name="parameters">
+            An array of arguments that match in number, order, and type the parameters of
+            the method to invoke. If args is an empty array or null, the method
+            that takes no parameters is returned.
+            </param>
+            <returns>
+            A <see cref="T:System.Reflection.MethodInfo"/> object representing the public or non-public method
+            whose parameters match the types in the parameter type array, if found; otherwise, null.
+            </returns>
+        </member>
+        <member name="M:qckdev.Reflection.ReflectionExtensions.GetMethod(System.Type,System.String,System.Type[])">
+            <summary>
+            Searches for a public/non-public method whose parameters match the types in the specified <paramref name="type"/>.
+            </summary>
+            <param name="type">The <see cref="T:System.Type"/> where find the constructor.</param>
+            <param name="methodName">The string containing the name of the method.</param>
+            <param name="parameters">
+            An array of arguments that match in number, order, and type the parameters of
+            the method to invoke. If args is an empty array or null, the method
+            that takes no parameters is returned.
+            </param>
+            <returns>
+            A <see cref="T:System.Reflection.MethodInfo"/> object representing the public or non-public method
+            whose parameters match the types in the parameter type array, if found; otherwise, null.
             </returns>
         </member>
         <member name="T:qckdev.Reflection.ReflectionHelper">
@@ -1101,6 +1429,7 @@
         <member name="M:qckdev.Reflection.ReflectionHelper.CreateInstance(System.Type,System.Object[])">
             <summary>
             Creates an instance of the type designated by the specified generic type parameter.
+            It works with public and non-public constructors.
             </summary>
             <param name="objectType">The type to create.</param >
             <param name="parameters">
@@ -1122,21 +1451,6 @@
             </param>
             <returns>A reference to the newly created object.</returns>
         </member>
-        <member name="M:qckdev.Reflection.ReflectionHelper.GetConstructor(System.Type,System.Object[])">
-            <summary>
-            Searches for a public/non-public instance constructor whose parameters match the types in the specified <paramref name="objectType"/>.
-            </summary>
-            <param name="objectType">The <see cref="T:System.Type"/> where find the constructor.</param>
-            <param name="parameters">
-            An array of arguments that match in number, order, and type the parameters of
-            the constructor to invoke. If args is an empty array or null, the constructor
-            that takes no parameters (the default constructor) is returned.
-            </param>
-            <returns>
-            A <see cref="T:System.Reflection.ConstructorInfo"/> object representing the public instance constructor
-            whose parameters match the types in the parameter type array, if found; otherwise, null.
-            </returns>
-        </member>
         <member name="M:qckdev.Reflection.ReflectionHelper.GetConstructor``1(System.Object[])">
             <summary>
             Searches for a public/non-public instance constructor whose parameters match the types in the specified <typeparamref name="T"/>.
@@ -1152,26 +1466,25 @@
             whose parameters match the types in the parameter type array, if found; otherwise, null.
             </returns>
         </member>
-        <member name="M:qckdev.Reflection.ReflectionHelper.CacheProperties(System.Type)">
+        <member name="M:qckdev.Reflection.ReflectionHelper.GetConstructor(System.Type,System.Object[])">
             <summary>
-            When overridden in a derived class, searches for the properties of the current <see cref="T:System.Type"/>, using the specified binding constraints. Includes all levels for interfaces.
+            Searches for a public/non-public instance constructor whose parameters match the types in the specified <paramref name="objectType"/>.
             </summary>
-            <param name="type">A <see cref="T:System.Type"/> that represents the component to get properties for.</param>
+            <param name="objectType">The <see cref="T:System.Type"/> where find the constructor.</param>
+            <param name="parameters">
+            An array of arguments that match in number, order, and type the parameters of
+            the constructor to invoke. If args is an empty array or null, the constructor
+            that takes no parameters (the default constructor) is returned.
+            </param>
             <returns>
-            An <see cref="T:System.Collections.Generic.Dictionary`2"/> of <see cref="T:System.Reflection.PropertyInfo"/> objects representing all properties
-            of the current <see cref="T:System.Type"/> that match the specified binding constraints.-or-
-            An empty array of type <see cref="T:System.Reflection.PropertyInfo"/>, if the current <see cref="T:System.Type"/>
-            does not have properties, or if none of the properties match the binding constraints.
+            A <see cref="T:System.Reflection.ConstructorInfo"/> object representing the public instance constructor
+            whose parameters match the types in the parameter type array, if found; otherwise, null.
             </returns>
         </member>
-        <member name="M:qckdev.Reflection.ReflectionHelper.CachePropertyDescriptors(System.Type)">
+        <member name="M:qckdev.Reflection.ReflectionHelper.GetCallingMethod">
             <summary>
-            Returns the collection of properties for a specified type of component.
+            Returns a <see cref="T:System.Reflection.MethodBase"/> object representing the method that called to the executing method.
             </summary>
-            <param name="type">A <see cref="T:System.Type"/> that represents the component to get properties for.</param>
-            <returns>
-            A <see cref="T:System.ComponentModel.PropertyDescriptorCollection"/> with the properties for a specified type of component.
-            </returns>
         </member>
         <member name="T:qckdev.Shared">
             <summary>
