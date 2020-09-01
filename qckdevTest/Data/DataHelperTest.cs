@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using qckdev.Linq;
 using qckdev.Data;
+using System.Data;
 
 namespace qckdevTest.Data
 {
@@ -125,6 +126,34 @@ namespace qckdevTest.Data
                         {
                             reader.ToString();
                         }
+                    }
+                }
+
+                if (openBeforeStart)
+                    Assert.AreEqual(System.Data.ConnectionState.Open, conn.State);
+                else
+                    Assert.AreEqual(System.Data.ConnectionState.Closed, conn.State);
+            }
+        }
+
+        [TestMethod]
+        [DataRow(false)]
+        [DataRow(true)]
+        public void ExecuteDataTableAutoTest(bool openBeforeStart)
+        {
+
+            using (var conn = new System.Data.SqlClient.SqlConnection(CONNSTRING))
+            {
+                if (openBeforeStart)
+                    conn.Open();
+
+                using (var comm = conn.CreateCommand())
+                {
+                    comm.CommandText = $"SELECT * FROM syslanguages";
+                    using (var dataTable = comm.ExecuteDataTableAuto())
+                    {
+                        Assert.IsTrue(dataTable.Columns.OfType<DataColumn>().Any(), "No columns were loaded.");
+                        Assert.IsTrue(dataTable.Columns.OfType<DataColumn>().Any(), "No rows were loaded");
                     }
                 }
 

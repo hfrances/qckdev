@@ -189,6 +189,23 @@
             <param name="behavior">One of the System.Data.CommandBehavior values.</param>
             <returns>An <see cref="T:System.Data.IDataReader"/> object.</returns>
         </member>
+        <member name="M:qckdev.Data.DataExtensions.ExecuteDataTableAuto(System.Data.IDbCommand)">
+            <summary>
+            Returns a <see cref="T:System.Data.DataTable"/> with values from a data source using the supplied <see cref="T:System.Data.IDbCommand"/>. 
+            </summary>
+            <param name="command">The <see cref="T:System.Data.IDbCommand"/> to execute.</param>
+        </member>
+        <member name="M:qckdev.Data.DataExtensions.ExecuteDataTableAuto(System.Data.IDbCommand,System.Data.DataTable,System.Data.LoadOption)">
+            <summary>
+            Fills a <see cref="T:System.Data.DataTable"/> with values from a data source using the supplied <see cref="T:System.Data.IDbCommand"/>. 
+            If the <see cref="T:System.Data.DataTable"/> already contains rows, the incoming data from the data source is merged with the existing rows according to the value of the <paramref name="loadOption"/> parameter.
+            </summary>
+            <param name="command">The <see cref="T:System.Data.IDbCommand"/> to execute.</param>
+            <param name="table">The <see cref="T:System.Data.DataTable"/> to fill.</param>
+            <param name="loadOption">
+            A value from the System.Data.LoadOption enumeration that indicates how rows already in the <see cref="T:System.Data.DataTable"/> are combined with incoming rows that share the same primary key.
+            </param>
+        </member>
         <member name="M:qckdev.Data.DataExtensions.CreateParameterWithValue``1(System.Data.IDbCommand,System.String,``0)">
             <summary>
             Creates a new instance of an <see cref="T:System.Data.IDbDataParameter"/> object.

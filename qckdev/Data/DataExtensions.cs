@@ -104,6 +104,29 @@ namespace qckdev.Data
         }
 
         /// <summary>
+        /// Returns a <see cref="System.Data.DataTable"/> with values from a data source using the supplied <see cref="System.Data.IDbCommand"/>. 
+        /// </summary>
+        /// <param name="command">The <see cref="System.Data.IDbCommand"/> to execute.</param>
+        public static DataTable ExecuteDataTableAuto(this IDbCommand command)
+        {
+            return CommandHelper.ExecuteDataTableAuto(command);
+        }
+
+        /// <summary>
+        /// Fills a <see cref="System.Data.DataTable"/> with values from a data source using the supplied <see cref="System.Data.IDbCommand"/>. 
+        /// If the <see cref="System.Data.DataTable"/> already contains rows, the incoming data from the data source is merged with the existing rows according to the value of the <paramref name="loadOption"/> parameter.
+        /// </summary>
+        /// <param name="command">The <see cref="System.Data.IDbCommand"/> to execute.</param>
+        /// <param name="table">The <see cref="System.Data.DataTable"/> to fill.</param>
+        /// <param name="loadOption">
+        /// A value from the System.Data.LoadOption enumeration that indicates how rows already in the <see cref="System.Data.DataTable"/> are combined with incoming rows that share the same primary key.
+        /// </param>
+        public static void ExecuteDataTableAuto(this IDbCommand command, DataTable table, LoadOption loadOption)
+        {
+            CommandHelper.ExecuteDataTableAuto(command, table, loadOption);
+        }
+
+        /// <summary>
         /// Creates a new instance of an <see cref="System.Data.IDbDataParameter"/> object.
         /// </summary>
         /// <typeparam name="TValue">Value type of the parameter.</typeparam>
