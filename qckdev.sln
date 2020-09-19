@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.28010.2036
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30503.244
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "qckdev", "qckdev\qckdev.csproj", "{CA91C1A7-7BBD-4105-BF4E-50F74C013D51}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "qckdev", "qckdev\qckdev.csproj", "{CA91C1A7-7BBD-4105-BF4E-50F74C013D51}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "qckdevTest", "qckdevTest\qckdevTest.csproj", "{B6063C02-EA2A-41A1-85A3-8C059D24F978}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "qckdevTest", "qckdevTest\qckdevTest.csproj", "{B6063C02-EA2A-41A1-85A3-8C059D24F978}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
