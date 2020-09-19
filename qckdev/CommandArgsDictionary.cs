@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Runtime.Serialization;
 
 namespace qckdev
@@ -51,13 +49,8 @@ namespace qckdev
         public static CommandArgsDictionary Create(bool ignoreCase, params string[] args)
         {
             CommandArgsDictionary lst;
-            string key = null;
-            string value = null;
-            int pIniKey = 0;
-            int pEndKey = 0;
-
             if (args == null)
-                throw new ArgumentNullException("args");
+                throw new ArgumentNullException(nameof(args));
             else if (ignoreCase)
                 lst = new CommandArgsDictionary(StringComparer.OrdinalIgnoreCase);
             else
@@ -65,12 +58,14 @@ namespace qckdev
 
             for (int i = 0; i <= args.Length - 1; i++)
             {
-                key = i.ToString();
-                value = args[i];
-                pIniKey = args[i].IndexOf('/');
+                string key = i.ToString();
+                string value = args[i];
+                int pIniKey = args[i].IndexOf('/');
+
                 if (pIniKey >= 0)
                 {
-                    pEndKey = args[i].IndexOf(':');
+                    int pEndKey = args[i].IndexOf(':');
+
                     if (pEndKey < 0)
                     {
                         key = args[i].Substring(pIniKey + 1, args[i].Length - pIniKey - 1);

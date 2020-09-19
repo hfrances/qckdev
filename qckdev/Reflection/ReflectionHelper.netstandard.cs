@@ -2,13 +2,9 @@
 #else
 
 using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Text;
 
 namespace qckdev.Reflection
 {
@@ -28,8 +24,8 @@ namespace qckdev.Reflection
         /// <returns>A reference to the newly created object.</returns>
         public static object CreateInstance(Type objectType, params object[] parameters)
         {
-            object o = null;
-            ConstructorInfo c = null;
+            object o;
+            ConstructorInfo c;
 
             c = GetConstructor(objectType, parameters);
             if (c == null)
@@ -88,11 +84,10 @@ namespace qckdev.Reflection
         public static ConstructorInfo GetConstructor(Type objectType, params object[] parameters)
         {
             ConstructorInfo c = null;
+            ConstructorInfo[] carr;
             int i = 0;
 
-            ConstructorInfo[] carr = null;
             carr = objectType.GetConstructors(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-
             while (i < carr.Length && c == null)
             {
                 var itemParameters = carr[i].GetParameters();
