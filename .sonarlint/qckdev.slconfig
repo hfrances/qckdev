@@ -5,10 +5,11 @@
     "Name": "hfrances"
   },
   "ProjectKey": "qckdev",
+  "ProjectName": "qckdev",
   "Profiles": {
     "CSharp": {
       "ProfileKey": "AV8HSwklKRUdRrN4j6SF",
-      "ProfileTimestamp": "2019-01-14T10:58:53+01:00"
+      "ProfileTimestamp": "2020-07-20T13:51:42Z"
     }
   }
 }

@@ -2,14 +2,14 @@
 #else
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using qckdev.Reflection;
 
 namespace qckdev.Reflection
 {
+
+    /// <summary>
+    /// Provides a set of static methods for <see cref="System.Reflection"/> namespace.
+    /// </summary>
     public static partial class ReflectionExtensions
     {
 
@@ -23,119 +23,62 @@ namespace qckdev.Reflection
         /// true if the the <see cref="Type"/> is one of the primitive types, a value type or the <see cref="string"/> type; otherwise, false.
         /// </returns>
         public static bool HasOwnValue(this Type type)
-        {
-            return (type.IsPrimitive || type.IsValueType || type == stringType);
-        }
+            => (type.IsPrimitive || type.IsValueType || type == stringType);
 
-        // TODO: Quitar.
-        /// <summary>.
-        /// Creates an instance of the type designated by the specified generic type parameter.
-        /// It works with public and non-public constructors.
-        /// </summary>
-        /// <param name="objectType">The type to create.</param >
-        /// <param name="parameters">
-        /// An array of arguments that match in number, order, and type the parameters of
-        /// the constructor to invoke. If args is an empty array or null, the constructor
-        /// that takes no parameters (the default constructor) is invoked.
-        /// </param>
-        /// <returns>A reference to the newly created object.</returns>
-        [Obsolete("Already exists in .NET Framework.")]
-        public static object CreateInstance(this Type objectType, params object[] parameters)
-        {
-            return ReflectionHelper.CreateInstance(objectType, parameters);
-        }
-
-        // TODO: Quitar.
         /// <summary>
-        /// Searches for a public/non-public instance constructor whose parameters match the types in the specified <paramref name="objectType"/>.
+        /// Searches for the specified method whose parameters match the specified argument
+        /// types and modifiers, using the specified binding constraints.
+        /// Works with generic methods.
         /// </summary>
-        /// <param name="objectType">The <see cref="Type"/> where find the constructor.</param>
-        /// <param name="parameters">
-        /// An array of arguments that match in number, order, and type the parameters of
-        /// the constructor to invoke. If args is an empty array or null, the constructor
-        /// that takes no parameters (the default constructor) is returned.
+        /// <param name="type">The <see cref="System.Type"/> where find the method.</param>
+        /// <param name="name">
+        /// The string containing the name of the method to get.
+        /// </param>
+        /// <param name="types">
+        /// An array of <see cref="System.Type"/> objects representing the number, order, and type of the
+        /// parameters for the method to get. 
+        /// -or- 
+        /// An empty array of <see cref="System.Type"/> objects
+        /// (as provided by the <see cref="System.Type.EmptyTypes"/> field) to get a method that takes
+        /// no parameters.
+        /// For generic types, set generic parameter types before the parameters for the method.
         /// </param>
         /// <returns>
-        /// A <see cref="ConstructorInfo"/> object representing the public or non-public instance constructor
-        /// whose parameters match the types in the parameter type array, if found; otherwise, null.
+        /// An object representing the method that matches the specified requirements, if
+        /// found; otherwise, null.
         /// </returns>
-        [Obsolete("Already exists in .NET Framework.")]
-        public static ConstructorInfo GetConstructor(this Type objectType, params object[] parameters)
-        {
-            return ReflectionHelper.GetConstructor(objectType, parameters);
-        }
+        public static MethodInfo GetMethodExt(this Type type, string name, params Type[] types)
+            => ReflectionHelper.GetMethodExt(type, name, types);
 
-        // TODO: Quitar.
         /// <summary>
-        /// Searches for a public/non-public method whose parameters match the types in the specified <paramref name="type"/>.
+        /// Searches for the specified method whose parameters match the specified argument
+        /// types and modifiers, using the specified binding constraints.
+        /// Works with generic methods.
         /// </summary>
-        /// <param name="type">The <see cref="Type"/> where find the constructor.</param>
-        /// <param name="methodName">The string containing the name of the method.</param>
-        /// <param name="parameters">
-        /// An array of arguments that match in number, order, and type the parameters of
-        /// the method to invoke. If args is an empty array or null, the method
-        /// that takes no parameters is returned.
+        /// <param name="type">The <see cref="System.Type"/> where find the method.</param>
+        /// <param name="name">The string containing the name of the method to get.</param>
+        /// <param name="bindingAttr">
+        /// A bitmask comprised of one or more <see cref="BindingFlags"/> that specify
+        /// how the search is conducted. 
+        /// -or-
+        /// Zero, to return null.
+        /// </param>
+        /// <param name="types">
+        /// An array of <see cref="System.Type"/> objects representing the number, order, and type of the
+        /// parameters for the method to get. 
+        /// -or- 
+        /// An empty array of <see cref="System.Type"/> objects
+        /// (as provided by the <see cref="System.Type.EmptyTypes"/> field) to get a method that takes
+        /// no parameters.
+        /// For generic types, set generic parameter types before the parameters for the method.
         /// </param>
         /// <returns>
-        /// A <see cref="MethodInfo"/> object representing the public or non-public method
-        /// whose parameters match the types in the parameter type array, if found; otherwise, null.
+        /// An object representing the method that matches the specified requirements, if
+        /// found; otherwise, null.
         /// </returns>
-        [Obsolete("Already exists in .NET Framework.")]
-        public static MethodInfo GetMethod(this Type type, string methodName, params object[] parameters)
-        {
-            return GetMethod(type, methodName, Type.GetTypeArray(parameters));
-        }
-
-        // TODO: Quitar.
-        /// <summary>
-        /// Searches for a public/non-public method whose parameters match the types in the specified <paramref name="type"/>.
-        /// </summary>
-        /// <param name="type">The <see cref="Type"/> where find the constructor.</param>
-        /// <param name="methodName">The string containing the name of the method.</param>
-        /// <param name="parameters">
-        /// An array of arguments that match in number, order, and type the parameters of
-        /// the method to invoke. If args is an empty array or null, the method
-        /// that takes no parameters is returned.
-        /// </param>
-        /// <returns>
-        /// A <see cref="MethodInfo"/> object representing the public or non-public method
-        /// whose parameters match the types in the parameter type array, if found; otherwise, null.
-        /// </returns>
-        [Obsolete("Already exists in .NET Framework.")]
-        public static MethodInfo GetMethod(this Type type, string methodName, params Type[] parameters)
-        {
-            MethodInfo m = null;
-            int i = 0;
-
-            MethodInfo[] carr = null;
-            carr = type.GetMethods(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-                             .Where(x => x.Name == methodName)
-                             .ToArray();
-
-            while (i < carr.Length && m == null)
-            {
-                var itemParameters = carr[i].GetParameters();
-                if (itemParameters.Length == parameters.Length)
-                {
-                    bool b = true;
-                    int iParam = 0;
-
-                    while (iParam < parameters.Length && b)
-                    {
-                        b = parameters[iParam] == null ||
-                            parameters[iParam].IsAssignableFrom(itemParameters[iParam].ParameterType);
-                        iParam += 1;
-                    }
-                    if (b)
-                        m = carr[i];
-                }
-                i += 1;
-            }
-            if (m == null && type.BaseType != null)
-                m = GetMethod(type.BaseType, methodName, parameters);
-            return m;
-        }
-
+        public static MethodInfo GetMethodExt(this Type type, string name, BindingFlags bindingAttr, params Type[] types)
+            => ReflectionHelper.GetMethodExt(type, name, bindingAttr, types);
+        
     }
 }
 

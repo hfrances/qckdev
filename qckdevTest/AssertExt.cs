@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace qckdevTest
 {
-    static class Assert2
+    static class AssertExt
     {
 
         public const string DBNullCONST = "1B544BD7-608D-438F-B6DC-F3A1B538A898";

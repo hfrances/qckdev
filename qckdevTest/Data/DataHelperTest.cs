@@ -49,8 +49,8 @@ namespace qckdevTest.Data
         [TestMethod]
         [DataRow(false, "hola mundo", "hola mundo")]
         [DataRow(false, "", "")]
-        [DataRow(false, Assert2.DBNullCONST, null)]
-        [DataRow(true, Assert2.DBNullCONST, null)]
+        [DataRow(false, AssertExt.DBNullCONST, null)]
+        [DataRow(true, AssertExt.DBNullCONST, null)]
         public void ExecuteScalarAutoTest(bool openBeforeStart, object expected, string value)
         {
 
@@ -66,7 +66,7 @@ namespace qckdevTest.Data
                     comm.CommandText = $"SELECT @param";
                     comm.Parameters.AddWithValue("@param", (object)value ?? DBNull.Value);
                     rdo = comm.ExecuteScalarAuto();
-                    Assert2.AreEqualDBNull(expected, rdo);
+                    AssertExt.AreEqualDBNull(expected, rdo);
                 }
 
                 if (openBeforeStart)
@@ -96,7 +96,7 @@ namespace qckdevTest.Data
                     comm.CommandText = $"SELECT @param";
                     comm.Parameters.AddWithValue("@param", (object)value ?? DBNull.Value);
                     rdo = comm.ExecuteScalarAuto<string>();
-                    Assert2.AreEqualDBNull(expected, rdo);
+                    AssertExt.AreEqualDBNull(expected, rdo);
                 }
 
                 if (openBeforeStart)
@@ -173,7 +173,7 @@ namespace qckdevTest.Data
         [DataRow(true, "hello world", "hello world")]
         [DataRow(false, "hello world", "hello world")]
         [DataRow(true, null, null)]
-        [DataRow(false, null, Assert2.DBNullCONST)]
+        [DataRow(false, null, AssertExt.DBNullCONST)]
         public void CreateParameterWithValueTest_String(bool castResult, string parameterValue, object expectedResult)
         {
             CreateParameterWithValueTest<string>(castResult, parameterValue, expectedResult);
@@ -195,7 +195,7 @@ namespace qckdevTest.Data
         [DataRow(true, 0, 0)]
         [DataRow(false, 0, 0)]
         [DataRow(true, null, null)]
-        [DataRow(false, null, Assert2.DBNullCONST)]
+        [DataRow(false, null, AssertExt.DBNullCONST)]
         public void CreateParameterWithValueTest_IntegerNullable(bool castResult, int? parameterValue, object expectedResult)
         {
             CreateParameterWithValueTest<int?>(castResult, parameterValue, expectedResult);
@@ -220,7 +220,7 @@ namespace qckdevTest.Data
                         else
                             rdo = comm.ExecuteScalarAuto();
                     }
-                    Assert2.AreEqualDBNull(expectedResult, rdo);
+                    AssertExt.AreEqualDBNull(expectedResult, rdo);
                 }
             }
         }

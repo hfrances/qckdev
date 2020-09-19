@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using qckdev.Reflection;
 
 namespace qckdev.Reflection
 {
@@ -25,17 +22,18 @@ namespace qckdev.Reflection
         /// An empty array of type <see cref="PropertyInfo"/>, if the current <see cref="Type"/>
         /// does not have properties, or if none of the properties match the binding constraints.
         /// </returns>
+        public static IEnumerable<PropertyInfo> GetPropertiesFull(this Type type)
+        {
 #if PORTABLE
-        public static IEnumerable<PropertyInfo> GetPropertiesFull(this Type type)
-        {
             return type.GetRuntimeProperties().OrderBy(x => x.Name);
-        }
 #else
-        public static IEnumerable<PropertyInfo> GetPropertiesFull(this Type type)
-        {
             return GetPropertiesFull(type, BindingFlags.Instance | BindingFlags.Public);
+#endif
         }
 
+
+#if PORTABLE // EXCLUDE
+#else
         /// <summary>
         /// When overridden in a derived class, searches for the properties of the current System.Type, using the specified binding constraints. 
         /// Includes all levels for interfaces.
@@ -57,7 +55,6 @@ namespace qckdev.Reflection
                 rdo = rdo.Concat(type.GetInterfaces().SelectMany(x => GetPropertiesFull(x, bindingAttr)));
             return rdo.OrderBy(x => x.Name);
         }
-
 #endif
 
         /// <summary>
