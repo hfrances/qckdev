@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Text;
 
 namespace qckdev.Linq
 {
@@ -29,12 +27,9 @@ namespace qckdev.Linq
         /// The <paramref name="collection"/> has a fixed size.</exception>
         public static void AddRange<T>(this ICollection<T> collection, IEnumerable<T> e)
         {
-            IList<T> l;
-            ICollection<T> c;
-
-            if ((l = e as IList<T>) != null)
+            if (e is IList<T> l)
                 AddRange(collection, l);
-            else if ((c = e as ICollection<T>) != null)
+            else if (e is ICollection<T> c)
                 AddRange(collection, c.ToArray());
             else
                 AddRange(collection, e.ToArray());
