@@ -1,8 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using qckdev.Linq;
 using System;
-using System.Collections;
-using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 
 namespace qckdevTest.Linq
@@ -26,7 +24,6 @@ namespace qckdevTest.Linq
                     new { Number = 1, Line = (int?)2 },
                     new { Number = 2, Line = (int?)1 },
                     new { Number = 3, Line = (int?)null },
-
                 };
 
                 var actual =
@@ -37,60 +34,38 @@ namespace qckdevTest.Linq
                             (x, y) => new
                             {
                                 x.Number,
-                                y?.Line,
+                                Line = (int?)y.Line,
                             })
                         .OrderBy(x => x.Number)
                             .ThenBy(x => x.Line)
                         .ToArray();
 
-                AssertAreEqual(expected, actual);
+                AssertExt.AreEqual(expected, actual);
             }
         }
 
-        [TestMethod]
-        public void GroupJoinTest()
+        [TestMethod, ExpectedException(typeof(InvalidOperationException), "Exception expected.")]
+        public void LeftJoinTest_StringComparer()
         {
 
             using (var context = TestObjects.TestDbContext.CreateInstance())
             {
-                InitializeData(context);
-
-                var result =
-                    context.Parents
-                        .GroupJoin(context.Childs,
-                            x => x.Id,
-                            y => y.Id,
-                            (x, y) => x);
-
-                var resultArray = result.ToArray();
-                Assert.Inconclusive();
+                context.Parents
+                    .LeftJoin(context.Childs,
+                        x => x.Id.ToString(),
+                        y => y.Id.ToString(),
+                        (x, y) => new
+                        {
+                            x.Number,
+                            Line = (int?)y.Line,
+                        },
+                        StringComparer.CurrentCultureIgnoreCase)
+                    .OrderBy(x => x.Number)
+                        .ThenBy(x => x.Line)
+                    .ToArray();
             }
         }
 
-        [SuppressMessage("Critical Code Smell", "S1125:Remove unnecessary Boolean literal(s).", Justification = "Make sure that assignation in condition sentence is right.")]
-        private static void AssertAreEqual(IEnumerable expected, IEnumerable actual)
-        {
-
-            int expectedIndex = 0, actualIndex = 0;
-            bool expectedNext = false, actualNext = false;
-            var expectedEtor = expected.GetEnumerator();
-            var actualEtor = actual.GetEnumerator();
-
-            while (true == (expectedNext = expectedEtor.MoveNext())
-                || true == (actualNext = actualEtor.MoveNext()))
-            {
-                if (expectedNext)
-                    expectedIndex++;
-                if (actualNext)
-                    actualIndex++;
-
-                if (expectedNext && actualNext)
-                {
-                    Assert.AreEqual(expectedEtor.Current, actualEtor.Current, $"Index {expectedIndex}");
-                }
-            }
-            Assert.AreEqual(expectedIndex, actualIndex, $"Item count does not equal.");
-        }
 
         private static void InitializeData(TestObjects.TestDbContext context)
         {

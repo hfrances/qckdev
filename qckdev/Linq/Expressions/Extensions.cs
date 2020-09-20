@@ -16,7 +16,8 @@ namespace qckdev.Linq.Expressions
         /// Creates a new <see cref="Expression"/> replacing the current <see cref="ParameterExpression"/> for a new one.
         /// </summary>
         /// <param name="expression">Original <see cref="Expression"/>.</param>
-        /// <param name="newParameterExpression">The replacing <see cref="ParameterExpression"/>.</param>
+        /// <param name="parameter">The <see cref="ParameterExpression"/> which will be replaced.</param>
+        /// <param name="newExpression">The replacing <see cref="Expression"/>.</param>
         /// <returns>
         /// Returns a new <see cref="Expression"/> using the new <see cref="ParameterExpression"/>.
         /// </returns>
@@ -24,9 +25,10 @@ namespace qckdev.Linq.Expressions
         /// When the <see cref="Expression"/> is not one of the compatible types (
         /// <see cref="MemberExpression"/>, <see cref="MethodCallExpression"/>,
         /// <see cref="ParameterExpression"/>, <see cref="LambdaExpression"/>,
-        /// <see cref="BinaryExpression"/>, <see cref="ConstantExpression"/>).
+        /// <see cref="BinaryExpression"/>, <see cref="ConstantExpression"/>,
+        /// <see cref="NewExpression"/>, <see cref="UnaryExpression"/>).
         /// </exception>
-        public static Expression ReplaceParameter(this Expression expression, ParameterExpression newParameterExpression)
+        public static Expression ReplaceParameter(this Expression expression, ParameterExpression parameter, Expression newExpression)
         {
             var expressionList = GetExpressionPath(expression);
             Expression expressionPart = null;
@@ -34,34 +36,54 @@ namespace qckdev.Linq.Expressions
             // Build expression list with the new parameter expression.
             foreach (var subexpression in expressionList)
             {
-                if (subexpression is ParameterExpression)
+                if (subexpression is ParameterExpression parameterExpr)
                 {
-                    expressionPart = newParameterExpression;
+                    // Replace parameter for new expression.
+                    expressionPart = (parameterExpr == parameter ? newExpression : parameterExpr);
                 }
-                else if (subexpression is ConstantExpression constantExpr)
+                else if (subexpression is ConstantExpression constantExpression)
                 {
-                    expressionPart = constantExpr;
+                    expressionPart = constantExpression;
                 }
-                else if (subexpression is MemberExpression memberExpr)
+                else if (subexpression is MemberExpression memberExpression)
                 {
-                    expressionPart = Expression.MakeMemberAccess(expressionPart, memberExpr.Member);
+                    expressionPart = Expression.MakeMemberAccess(expressionPart, memberExpression.Member);
                 }
-                else if (subexpression is MethodCallExpression methodExpr)
+                else if (subexpression is MethodCallExpression methodExpression)
                 {
-                    var arguments = methodExpr.Arguments.Select(x =>
-                        x.ReplaceParameter(newParameterExpression)
+                    var arguments = methodExpression.Arguments.Select(x =>
+                        ReplaceParameter(x, parameter, newExpression)
                     );
-                    expressionPart = Expression.Call(expressionPart, methodExpr.Method, arguments);
+                    expressionPart = Expression.Call(expressionPart, methodExpression.Method, arguments);
                 }
-                else if (subexpression is BinaryExpression binaryExpr)
+                else if (subexpression is BinaryExpression binaryExpression)
                 {
-                    expressionPart = Expression.MakeBinary(binaryExpr.NodeType,
-                        binaryExpr.Left.ReplaceParameter(newParameterExpression),
-                        binaryExpr.Right.ReplaceParameter(newParameterExpression));
+                    expressionPart = Expression.MakeBinary(binaryExpression.NodeType,
+                        ReplaceParameter(binaryExpression.Left, parameter, newExpression),
+                        ReplaceParameter(binaryExpression.Right, parameter, newExpression));
+                }
+                else if (subexpression is NewExpression newExpr)
+                {
+                    expressionPart = Expression.New(newExpr.Constructor,
+                        newExpr.Arguments.Select(x=> ReplaceParameter(x, parameter, newExpression)));
+                }
+                else if (subexpression is UnaryExpression unaryExpression)
+                {
+                    expressionPart = Expression.MakeUnary(
+                        unaryExpression.NodeType, expressionPart, unaryExpression.Type);
                 }
                 else if (subexpression is LambdaExpression lambdaExpr)
                 {
-                    expressionPart = Expression.Lambda(expressionPart, newParameterExpression);
+                    var newExpressions =
+                        lambdaExpr.Parameters
+                            .Select(x => x == parameter ? (ParameterExpression)newExpression : x);
+
+                    // NOTE: It will perform exception if "newExpression" cannot cast to "ParameterExpression".
+#if NET35
+                    expressionPart = Expression.Lambda(expressionPart, newExpressions.ToArray());
+#else
+                    expressionPart = Expression.Lambda(expressionPart, lambdaExpr.CanReduce, newExpressions);
+#endif
                 }
                 else
                 {
@@ -101,6 +123,11 @@ namespace qckdev.Linq.Expressions
                 {
                     expressionList.Insert(0, lambdaExpression);
                     expressionPart = lambdaExpression.Body;
+                }
+                else if (expressionPart is UnaryExpression unaryExpression)
+                {
+                    expressionList.Insert(0, unaryExpression);
+                    expressionPart = unaryExpression.Operand;
                 }
                 else
                 {

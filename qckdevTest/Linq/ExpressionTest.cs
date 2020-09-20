@@ -107,9 +107,29 @@ namespace qckdevTest.Linq
             Assert.AreEqual(expected, rdo);
         }
 
+        [TestMethod]
+        public void ReplaceParameterTest_New()
+        {
+            var expression = CreateExpression(x => new { Value = x, x.Length });
+            var expected =
+                GetDemoQuery()
+                    .Select(x => new { Value = x, x.Length });
+            var rdo =
+                GetDemoQuery()
+                    .Select(expression);
+
+            AssertExt.AreEqual(expected, rdo);
+        }
+
+        private static Expression<Func<string, TResult>> CreateExpression<TResult>(Expression<Func<string, TResult>> expression)
+        {
+            return CreateExpression<string, TResult>(expression);
+        }
+
         private static Expression<Func<T, TResult>> CreateExpression<T, TResult>(Expression<Func<T, TResult>> expression)
         {
             return (Expression<Func<T, TResult>>)expression.ReplaceParameter(
+                expression.Parameters.First(),
                 Expression.Parameter(typeof(T), "item"));
         }
 

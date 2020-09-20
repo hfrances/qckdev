@@ -1,11 +1,14 @@
 ﻿#if STANDARD12 // EXCLUDE.
 #else
 
+using qckdev.Linq.Expressions;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Security.Cryptography.X509Certificates;
 
 namespace qckdev.Linq
 {
@@ -61,15 +64,25 @@ namespace qckdev.Linq
         /// <paramref name="resultSelector"/> is null.
         /// </exception>
         [SuppressMessage("Minor Code Smell", "S2436:Types and methods should not have too many generic parameters", Justification = "All parameters are necessary.")]
-        [Obsolete("Unsupported: https://github.com/dotnet/efcore/issues/17068", true)]
-        private static IQueryable<TResult> LeftJoin<TOuter, TInner, TKey, TResult>(
+        public static IQueryable<TResult> LeftJoin<TOuter, TInner, TKey, TResult>(
             this IQueryable<TOuter> outer, IQueryable<TInner> inner,
             Expression<Func<TOuter, TKey>> outerKeySelector,
             Expression<Func<TInner, TKey>> innerKeySelector,
-            Func<TOuter, TInner, TResult> resultSelector)
+            Expression<Func<TOuter, TInner, TResult>> resultSelector)
         {
-            return LeftJoin<TOuter, TInner, TKey, TResult>(outer,
-                inner, outerKeySelector, innerKeySelector, resultSelector, null);
+            var query =
+                SelectMany(
+                    System.Linq.Queryable.GroupJoin(
+                        outer,
+                        inner,
+                        outerKeySelector,
+                        innerKeySelector,
+                        (x, y) => new { Outer = x, Details = y }
+                    ),
+                    z => System.Linq.Enumerable.DefaultIfEmpty(z.Details),
+                    resultSelector
+                );
+            return query;
         }
 
         /// <summary>
@@ -120,21 +133,47 @@ namespace qckdev.Linq
         /// <paramref name="resultSelector"/> is null.
         /// </exception>
         [SuppressMessage("Minor Code Smell", "S2436:Types and methods should not have too many generic parameters", Justification = "All parameters are necessary.")]
-        [Obsolete("Unsupported: https://github.com/dotnet/efcore/issues/17068", true)]
-        private static IQueryable<TResult> LeftJoin<TOuter, TInner, TKey, TResult>(
+        public static IQueryable<TResult> LeftJoin<TOuter, TInner, TKey, TResult>(
                 this IQueryable<TOuter> outer,
                 IQueryable<TInner> inner,
                 Expression<Func<TOuter, TKey>> outerKeySelector,
                 Expression<Func<TInner, TKey>> innerKeySelector,
-                Func<TOuter, TInner, TResult> resultSelector,
-                IEqualityComparer<TKey> comparer) {
-            return outer
-                .GroupJoin(inner,
-                    outerKeySelector,
-                    innerKeySelector,
-                    (x, y) => new { n = x, ms = y.DefaultIfEmpty() },
-                    comparer)
-                .SelectMany(z => z.ms.Select(m => resultSelector(z.n, m)));
+                Expression<Func<TOuter, TInner, TResult>> resultSelector,
+                IEqualityComparer<TKey> comparer)
+        {
+
+            var query =
+                SelectMany(
+                    System.Linq.Queryable.GroupJoin(
+                        outer,
+                        inner,
+                        outerKeySelector,
+                        innerKeySelector,
+                        (x, y) => new { Outer = x, Details = y },
+                        comparer
+                    ),
+                    z => System.Linq.Enumerable.DefaultIfEmpty(z.Details),
+                    resultSelector
+                );
+            return query;
+        }
+
+        [SuppressMessage("Minor Code Smell", "S2436:Types and methods should not have too many generic parameters", Justification = "All parameters are necessary.")]
+        private static IQueryable<TResult> SelectMany<TSource, TCollection, TInner, TOuter, TResult>(
+            IQueryable<TSource> source,
+            Expression<Func<TSource, IEnumerable<TCollection>>> collectionSelector,
+            Expression<Func<TOuter, TInner, TResult>> resultSelector)
+        {
+            var group = Expression.Parameter(typeof(TSource), "group");
+            var outer = Expression.Property(group, "Outer");
+            var inner = Expression.Parameter(typeof(TCollection), "inner");
+            var body = resultSelector.Body
+                .ReplaceParameter(resultSelector.Parameters[0], outer)
+                .ReplaceParameter(resultSelector.Parameters[1], inner);
+
+            var lambda = Expression.Lambda<Func<TSource, TCollection, TResult>>(body, group, inner);
+            return System.Linq.Queryable.SelectMany(
+                source, collectionSelector, lambda);
         }
     }
 

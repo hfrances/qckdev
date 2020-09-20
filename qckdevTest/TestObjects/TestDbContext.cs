@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using System.Security.Cryptography.X509Certificates;
+using System.Runtime.CompilerServices;
 
 namespace qckdevTest.TestObjects
 {
@@ -45,11 +45,11 @@ namespace qckdevTest.TestObjects
             });
         }
 
-        public static TestDbContext CreateInstance()
+        public static TestDbContext CreateInstance([CallerMemberName] string databaseName = null)
         {
             var optionsBuilder = new DbContextOptionsBuilder<TestDbContext>();
 
-            optionsBuilder.UseInMemoryDatabase("TestDb");
+            optionsBuilder.UseInMemoryDatabase(databaseName);
             return new TestDbContext(optionsBuilder.Options);
         }
 
