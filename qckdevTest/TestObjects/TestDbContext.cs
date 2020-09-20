@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography.X509Certificates;
 
 namespace qckdevTest.TestObjects
 {
@@ -8,8 +9,10 @@ namespace qckdevTest.TestObjects
         public TestDbContext(DbContextOptions<TestDbContext> options) : base(options)
         { }
 
+
         public DbSet<Entities.Parent> Parents { get; set; }
         public DbSet<Entities.Child> Childs { get; set; }
+        public DbSet<Entities.Orphan> Orphans { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -31,6 +34,14 @@ namespace qckdevTest.TestObjects
             {
                 builder.HasKey(x => new { x.Id, x.Line });
                 builder.Property(x => x.Description).IsRequired();
+                builder
+                    .HasOne(x => x.Parent)
+                    .WithMany(x => x.Childs);
+            });
+
+            modelBuilder.Entity<Entities.Orphan>(builder =>
+            {
+                builder.HasKey(x => new { x.Id, x.Line });
             });
         }
 

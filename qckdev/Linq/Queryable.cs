@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 
@@ -59,7 +60,9 @@ namespace qckdev.Linq
         /// <paramref name="innerKeySelector"/> or 
         /// <paramref name="resultSelector"/> is null.
         /// </exception>
-        public static IQueryable<TResult> LeftJoin<TOuter, TInner, TKey, TResult>(
+        [SuppressMessage("Minor Code Smell", "S2436:Types and methods should not have too many generic parameters", Justification = "All parameters are necessary.")]
+        [Obsolete("Unsupported: https://github.com/dotnet/efcore/issues/17068", true)]
+        private static IQueryable<TResult> LeftJoin<TOuter, TInner, TKey, TResult>(
             this IQueryable<TOuter> outer, IQueryable<TInner> inner,
             Expression<Func<TOuter, TKey>> outerKeySelector,
             Expression<Func<TInner, TKey>> innerKeySelector,
@@ -116,23 +119,25 @@ namespace qckdev.Linq
         /// <paramref name="innerKeySelector"/> or 
         /// <paramref name="resultSelector"/> is null.
         /// </exception>
-        public static IQueryable<TResult> LeftJoin<TOuter, TInner, TKey, TResult>(
-            this IQueryable<TOuter> outer,
-            IQueryable<TInner> inner,
-            Expression<Func<TOuter, TKey>> outerKeySelector,
-            Expression<Func<TInner, TKey>> innerKeySelector,
-            Func<TOuter, TInner, TResult> resultSelector,
-            IEqualityComparer<TKey> comparer) => outer
+        [SuppressMessage("Minor Code Smell", "S2436:Types and methods should not have too many generic parameters", Justification = "All parameters are necessary.")]
+        [Obsolete("Unsupported: https://github.com/dotnet/efcore/issues/17068", true)]
+        private static IQueryable<TResult> LeftJoin<TOuter, TInner, TKey, TResult>(
+                this IQueryable<TOuter> outer,
+                IQueryable<TInner> inner,
+                Expression<Func<TOuter, TKey>> outerKeySelector,
+                Expression<Func<TInner, TKey>> innerKeySelector,
+                Func<TOuter, TInner, TResult> resultSelector,
+                IEqualityComparer<TKey> comparer) {
+            return outer
                 .GroupJoin(inner,
                     outerKeySelector,
                     innerKeySelector,
-                    (x, y) => new { x, y },
+                    (x, y) => new { n = x, ms = y.DefaultIfEmpty() },
                     comparer)
-                .SelectMany(
-                    m => m.y.DefaultIfEmpty(),
-                    (m, y) => resultSelector(m.x, y));
-
+                .SelectMany(z => z.ms.Select(m => resultSelector(z.n, m)));
+        }
     }
+
 }
 
 #endif
