@@ -4,43 +4,6 @@
         <name>qckdev</name>
     </assembly>
     <members>
-        <member name="T:qckdev.AppDomainWrapper">
-            <summary>
-            Wraps <see cref="T:System.AppDomain"/> object for <see cref="T:System.IDisposable"/> implementation.
-            </summary>
-        </member>
-        <member name="M:qckdev.AppDomainWrapper.#ctor(System.AppDomain)">
-            <summary>
-            Initializes a new instance of the <see cref="T:qckdev.AppDomainWrapper"/> class.
-            </summary>
-            <param name="appDomain">The application domain wrapped in this <see cref="T:qckdev.AppDomainWrapper"/>.</param>
-        </member>
-        <member name="P:qckdev.AppDomainWrapper.IsDisposed">
-            <summary>
-            Gets a value indicating whether the <see cref="P:qckdev.AppDomainWrapper.AppDomain"/> has been unloaded.
-            </summary>
-        </member>
-        <member name="P:qckdev.AppDomainWrapper.AppDomain">
-            <summary>
-            Gets the application domain wrapped in this <see cref="T:qckdev.AppDomainWrapper"/>.
-            </summary>
-        </member>
-        <member name="M:qckdev.AppDomainWrapper.Dispose(System.Boolean)">
-            <summary>
-            Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-            </summary>
-            <param name="disposing">Dispose managed state (managed objects).</param>
-        </member>
-        <member name="M:qckdev.AppDomainWrapper.Finalize">
-            <summary>
-            Releases all resources used by the <see cref="T:qckdev.AppDomainWrapper"/>.
-            </summary>
-        </member>
-        <member name="M:qckdev.AppDomainWrapper.Dispose">
-            <summary>
-            Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-            </summary>
-        </member>
         <member name="T:qckdev.CommandArgsDictionary">
             <summary>
             Provides a dictionary with all command arguments.
@@ -67,165 +30,6 @@
             <param name="args">Command arguments.</param>
             <returns>A <see cref="T:qckdev.CommandArgsDictionary"/> with the information splitted.</returns>
             <exception cref="T:System.ArgumentNullException"><paramref name="args"/> is null.</exception>
-        </member>
-        <member name="M:qckdev.ComponentModel.PropertyDescriptorCache.Cache(System.Type)">
-            <summary>
-            Returns the collection of properties for a specified type of component.
-            </summary>
-            <param name="type">A <see cref="T:System.Type"/> that represents the component to get properties for.</param>
-            <returns>
-            A <see cref="T:System.ComponentModel.PropertyDescriptorCollection"/> with the properties for a specified type of component.
-            </returns>
-        </member>
-        <member name="T:qckdev.ComponentModel.TypeDescriptorHelper">
-            <summary>
-            Provides information about the characteristics for a component, such as its attributes, properties, and events. 
-            This class cannot be inherited.
-            </summary>
-        </member>
-        <member name="M:qckdev.ComponentModel.TypeDescriptorHelper.GetCachedPropertyDescriptors(System.Type)">
-            <summary>
-            Returns the collection of properties for a specified type of component.
-            </summary>
-            <param name="type">A <see cref="T:System.Type"/> that represents the component to get properties for.</param>
-            <returns>
-            A <see cref="T:System.ComponentModel.PropertyDescriptorCollection"/> with the properties for a specified type of component.
-            </returns>
-        </member>
-        <member name="M:qckdev.ComponentModel.TypeDescriptorHelper.GetPropertiesFull(System.Type)">
-            <summary>
-            Returns the collection of properties for a specified type of component.
-            Includes all levels for interfaces.
-            </summary>
-            <param name="componentType">A <see cref="T:System.Type"/> that represents the component to get properties for.</param>
-            <returns>A <see cref="T:System.ComponentModel.PropertyDescriptorCollection"/> with the properties for a specified type of component.</returns>
-        </member>
-        <member name="F:qckdev.Data.CommandHelper.TypeMap">
-            <remarks>
-            <seealso href="https://stackoverflow.com/questions/7952142/how-to-resolve-system-type-to-system-data-dbtype"/>
-            </remarks>
-        </member>
-        <member name="M:qckdev.Data.CommandHelper.GetDbType(System.Type)">
-            <summary>
-            Converts a <see cref="T:System.Type"/> to an equivalent <see cref="T:System.Data.DbType"/> value.
-            </summary>
-            <param name="type">The <see cref="T:System.Type"/> to convert.</param>
-            <returns>
-            A <see cref="T:System.Data.DbType"/> value that is equivalent to the specified <paramref name="type"/> 
-            or <see cref="F:System.Data.DbType.Object"/> if no equivalent is found.
-            </returns>
-            <remarks>
-            <seealso href="https://stackoverflow.com/questions/7952142/how-to-resolve-system-type-to-system-data-dbtype"/>
-            </remarks>
-        </member>
-        <member name="T:qckdev.Data.DataExtensions">
-            <summary>
-            Defines the extension methods to the <see cref="N:System.Data"/> namespace.
-            </summary>
-        </member>
-        <member name="M:qckdev.Data.DataExtensions.Clone``1(``0)">
-            <summary>
-            Creates a new connection that is a copy of the current instance.
-            </summary>
-            <param name="connection">The connection to clone.</param>
-            <returns>A new connection that is a copy of this instance.</returns>
-        </member>
-        <member name="M:qckdev.Data.DataExtensions.ExecuteNonQueryAuto(System.Data.IDbCommand)">
-            <summary>
-            Executes an SQL statement against the Connection object of a .NET Framework data provider, and returns the number of rows affected.
-            If the connection is closed, it is automatically opened and closed. Otherwise the connection status does not change.
-            </summary>
-            <param name="command">The command to execute.</param>
-            <returns>The number of rows affected.</returns>
-            <exception cref="T:System.InvalidOperationException">The connection does not exist. -or- The connection is not open.</exception>
-        </member>
-        <member name="M:qckdev.Data.DataExtensions.ExecuteScalar``1(System.Data.IDbCommand)">
-            <summary>
-            Executes the query, and returns the first column of the first row in the resultset returned by the query. Extra columns or rows are ignored.
-            </summary>
-            <typeparam name="T">The returned value type.</typeparam>
-            <param name="command">The command to execute.</param>
-            <returns>
-            The first column of the first row in the resultset converted to <typeparamref name="T"/> type. 
-            When the result is <see cref="F:System.DBNull.Value"/>, it is converted to null.
-            </returns>
-        </member>
-        <member name="M:qckdev.Data.DataExtensions.ExecuteScalarAuto(System.Data.IDbCommand)">
-            <summary>
-            Executes the query, and returns the first column of the first row in the resultset returned by the query. Extra columns or rows are ignored.
-            If the connection is closed, it is automatically opened and closed. Otherwise the connection status does not change.
-            </summary>
-            <param name="command">The command to execute.</param>
-            <returns>The first column of the first row in the resultset.</returns>
-        </member>
-        <member name="M:qckdev.Data.DataExtensions.ExecuteScalarAuto``1(System.Data.IDbCommand)">
-            <summary>
-            Executes the query, and returns the first column of the first row in the resultset returned by the query. Extra columns or rows are ignored.
-            If the connection is closed, it is automatically opened and closed. Otherwise the connection status does not change.
-            </summary>
-            <typeparam name="T">The returned value type.</typeparam>
-            <param name="command">The command to execute.</param>
-            <returns>
-            The first column of the first row in the resultset converted to <typeparamref name="T"/> type. 
-            When the result is <see cref="F:System.DBNull.Value"/>, it is converted to null.
-            </returns>
-        </member>
-        <member name="M:qckdev.Data.DataExtensions.ExecuteReaderAuto(System.Data.IDbCommand)">
-            <summary>
-            Executes the <see cref="P:System.Data.IDbCommand.CommandText"/> against the <see cref="P:System.Data.IDbCommand.Connection"/> 
-            and builds an <see cref="T:System.Data.IDataReader"/>.
-            If the connection is closed, it is automatically opened and closed. Otherwise the connection status does not change.
-            </summary>
-            <param name="command">The command to execute.</param>
-            <returns>An <see cref="T:System.Data.IDataReader"/> object.</returns>
-        </member>
-        <member name="M:qckdev.Data.DataExtensions.ExecuteReaderAuto(System.Data.IDbCommand,System.Data.CommandBehavior)">
-            <summary>
-            Executes the <see cref="P:System.Data.IDbCommand.CommandText"/> against the <see cref="P:System.Data.IDbCommand.Connection"/>, 
-            and builds an <see cref="T:System.Data.IDataReader"/> using one of the <see cref="T:System.Data.CommandBehavior"/> values.
-            If the connection is closed, it is automatically opened and closed. Otherwise the connection status does not change.
-            </summary>
-            <param name="command">The command to execute.</param>
-            <param name="behavior">One of the System.Data.CommandBehavior values.</param>
-            <returns>An <see cref="T:System.Data.IDataReader"/> object.</returns>
-        </member>
-        <member name="M:qckdev.Data.DataExtensions.ExecuteDataTableAuto(System.Data.IDbCommand)">
-            <summary>
-            Returns a <see cref="T:System.Data.DataTable"/> with values from a data source using the supplied <see cref="T:System.Data.IDbCommand"/>. 
-            </summary>
-            <param name="command">The <see cref="T:System.Data.IDbCommand"/> to execute.</param>
-        </member>
-        <member name="M:qckdev.Data.DataExtensions.ExecuteDataTableAuto(System.Data.IDbCommand,System.Data.DataTable,System.Data.LoadOption)">
-            <summary>
-            Fills a <see cref="T:System.Data.DataTable"/> with values from a data source using the supplied <see cref="T:System.Data.IDbCommand"/>. 
-            If the <see cref="T:System.Data.DataTable"/> already contains rows, the incoming data from the data source is merged with the existing rows according to the value of the <paramref name="loadOption"/> parameter.
-            </summary>
-            <param name="command">The <see cref="T:System.Data.IDbCommand"/> to execute.</param>
-            <param name="table">The <see cref="T:System.Data.DataTable"/> to fill.</param>
-            <param name="loadOption">
-            A value from the System.Data.LoadOption enumeration that indicates how rows already in the <see cref="T:System.Data.DataTable"/> are combined with incoming rows that share the same primary key.
-            </param>
-        </member>
-        <member name="M:qckdev.Data.DataExtensions.CreateParameterWithValue``1(System.Data.IDbCommand,System.String,``0)">
-            <summary>
-            Creates a new instance of an <see cref="T:System.Data.IDbDataParameter"/> object.
-            </summary>
-            <typeparam name="TValue">Value type of the parameter.</typeparam>
-            <param name="command"></param>
-            <param name="parameterName">The name of the parameter.</param>
-            <param name="value">The value to be added. If the value is null, it sends a <see cref="F:System.DBNull.Value"/>.</param>
-            <returns>A <see cref="T:System.Data.IDbDataParameter"/> object.</returns>
-        </member>
-        <member name="M:qckdev.Data.DataExtensions.CreateParameterWithValue``1(System.Data.IDbCommand,System.String,``0,System.Data.ParameterDirection)">
-            <summary>
-            Creates a new instance of an <see cref="T:System.Data.IDbDataParameter"/> object.
-            </summary>
-            <typeparam name="TValue">Value type of the parameter.</typeparam>
-            <param name="command"></param>
-            <param name="parameterName">The name of the parameter.</param>
-            <param name="value">The value to be added. If the value is null, it sends a <see cref="F:System.DBNull.Value"/>.</param>
-            <param name="direction">One of the <see cref="T:System.Data.ParameterDirection"/> values.</param>
-            <returns>A <see cref="T:System.Data.IDbDataParameter"/> object.</returns>
         </member>
         <member name="T:qckdev.Extensions">
             <summary>
@@ -1227,6 +1031,212 @@
             </returns>
         </member>
         <member name="M:qckdev.Linq.Expressions.ExpressionTree.Equals(qckdev.Linq.Expressions.ExpressionTree)">
+            <summary>
+            Determines whether the specified <see cref="T:qckdev.Linq.Expressions.ExpressionTree"/> is equal to the current <see cref="T:qckdev.Linq.Expressions.ExpressionTree"/>
+            </summary>
+            <param name="other">The <see cref="T:qckdev.Linq.Expressions.ExpressionTree"/> to compare with the current <see cref="T:qckdev.Linq.Expressions.ExpressionTree"/>.</param>
+            <returns>
+            true if the specified <see cref="T:qckdev.Linq.Expressions.ExpressionTree"/> is equal to the current <see cref="T:qckdev.Linq.Expressions.ExpressionTree"/>; otherwise, false.
+            </returns>
+        </member>
+        <member name="M:qckdev.Linq.Expressions.ExpressionTree.Equals(System.Object)">
+            <summary>
+            Determines whether the specified <see cref="T:System.Object"/> is equal to the current <see cref="T:qckdev.Linq.Expressions.ExpressionTree"/>
+            </summary>
+            <param name="obj">The <see cref="T:System.Object"/> to compare with the current <see cref="T:qckdev.Linq.Expressions.ExpressionTree"/>.</param>
+            <returns>
+            true if the specified <see cref="T:System.Object"/> is equal to the current <see cref="T:qckdev.Linq.Expressions.ExpressionTree"/>; otherwise, false.
+            </returns>
+        </member>
+        <member name="T:qckdev.Linq.List">
+            <summary>
+            Provides a set of static methods for querying objects that implement <see cref="T:System.Collections.IList"/>.
+            </summary>
+        </member>
+        <member name="M:qckdev.Linq.List.AddRange(System.Collections.IList,System.Collections.ICollection)">
+            <summary>
+            Adds the elements of an <see cref="T:System.Collections.ICollection"/> to the end of the <paramref name="list"/>.
+            </summary>
+            <param name="list"></param>
+            <param name="c">
+            The ICollection whose elements should be added to the end of the <paramref name="list"/>. 
+            The collection itself cannot be null, but it can contain elements that are null.
+            </param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="c"/> is null.</exception>
+            <exception cref="T:System.NotSupportedException">
+            The <paramref name="list"/> is read-only 
+            -or- 
+            The <paramref name="list"/> has a fixed size.</exception>
+        </member>
+        <member name="M:qckdev.Linq.List.AddRange(System.Collections.IList,System.Collections.IList)">
+            <summary>
+            Adds the elements of an <see cref="T:System.Collections.IList"/> to the end of the <paramref name="list"/>.
+            </summary>
+            <param name="list"></param>
+            <param name="l">
+            The ICollection whose elements should be added to the end of the <paramref name="list"/>. 
+            The collection itself cannot be null, but it can contain elements that are null.
+            </param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="l"/> is null.</exception>
+            <exception cref="T:System.NotSupportedException">
+            The <paramref name="list"/> is read-only 
+            -or- 
+            The <paramref name="list"/> has a fixed size.</exception>
+        </member>
+        <member name="M:qckdev.Linq.List.TryReplace``1(System.Collections.Generic.IList{``0},``0,``0)">
+            <summary>
+            Replaces the first occurrence of a specific object from the <see cref="T:System.Collections.Generic.ICollection`1"/> for new one.
+            </summary>
+            <param name="list"></param>
+            <param name="oldValue">The object to replace from the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param>
+            <param name="newValue">The new object.</param>
+        </member>
+        <member name="M:qckdev.Linq.List.TryRemove``1(System.Collections.Generic.IList{``0},``0)">
+            <summary>
+            Removes the first occurrence of a specific object from the <see cref="T:System.Collections.Generic.ICollection`1"/>.
+            </summary>
+            <param name="list"></param>
+            <param name="item">The object to remove from the <see cref="T:System.Collections.Generic.IList`1"/>.</param>
+            <returns>
+            true if item was successfully removed from the <see cref="T:System.Collections.Generic.IList`1"/>;
+            otherwise, false. This method also returns false if item is not found in the
+            original <see cref="T:System.Collections.Generic.ICollection`1"/>.
+            </returns>
+            <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.IList`1"/> is read-only </exception>
+        </member>
+        <member name="M:qckdev.Reflection.PropertyInfoCache.Cache(System.Type)">
+            <summary>
+            When overridden in a derived class, searches for the properties of the current <see cref="T:System.Type"/>, using the specified binding constraints. Includes all levels for interfaces.
+            </summary>
+            <param name="type">A <see cref="T:System.Type"/> that represents the component to get properties for.</param>
+            <returns>
+            An <see cref="T:System.Collections.Generic.Dictionary`2"/> of <see cref="T:System.Reflection.PropertyInfo"/> objects representing all properties
+            of the current <see cref="T:System.Type"/> that match the specified binding constraints.-or-
+            An empty array of type <see cref="T:System.Reflection.PropertyInfo"/>, if the current <see cref="T:System.Type"/>
+            does not have properties, or if none of the properties match the binding constraints.
+            </returns>
+        </member>
+        <member name="T:qckdev.Reflection.ReflectionExtensions">
+            <summary>
+            Defines the extension methods to the <see cref="N:System.Reflection"/> namespace.
+            </summary>
+        </member>
+        <member name="M:qckdev.Reflection.ReflectionExtensions.GetPropertiesFull(System.Type)">
+            <summary>
+            When overridden in a derived class, searches for the properties of the current <see cref="T:System.Type"/>, using the specified binding constraints. 
+            Includes all levels for interfaces.
+            </summary>
+            <returns>
+            An array of <see cref="T:System.Reflection.PropertyInfo"/> objects representing all properties
+            of the current <see cref="T:System.Type"/> that match the specified binding constraints.-or-
+            An empty array of type <see cref="T:System.Reflection.PropertyInfo"/>, if the current <see cref="T:System.Type"/>
+            does not have properties, or if none of the properties match the binding constraints.
+            </returns>
+        </member>
+        <member name="M:qckdev.Reflection.ReflectionExtensions.GetCachedProperties(System.Type)">
+            <summary>
+            When overridden in a derived class, searches for the properties of the current <see cref="T:System.Type"/>, using the specified binding constraints. Includes all levels for interfaces.
+            </summary>
+            <param name="type">A <see cref="T:System.Type"/> that represents the component to get properties for.</param>
+            <returns>
+            An <see cref="T:System.Collections.Generic.Dictionary`2"/> of <see cref="T:System.Reflection.PropertyInfo"/> objects representing all properties
+            of the current <see cref="T:System.Type"/> that match the specified binding constraints.-or-
+            An empty array of type <see cref="T:System.Reflection.PropertyInfo"/>, if the current <see cref="T:System.Type"/>
+            does not have properties, or if none of the properties match the binding constraints.
+            </returns>
+        </member>
+        <member name="T:qckdev.Reflection.ReflectionHelper">
+            <summary>
+            Provides helpful methods for reflection. This class cannot be inherited.
+            </summary>
+        </member>
+        <member name="M:qckdev.Reflection.ReflectionHelper.GetHashCode(System.Object[])">
+            <summary>
+            Serves as a hash function for a object list.
+            </summary>
+            <param name="values">List of elements for HashCode creation.</param>
+            <returns>A hash code for the object list.</returns>
+        </member>
+        <member name="M:qckdev.Reflection.ReflectionHelper.GetHashCode(System.Collections.Generic.IEnumerable{System.Object})">
+            <summary>
+            Serves as a hash function for a object list.
+            </summary>
+            <param name="values">List of elements for HashCode creation.</param>
+            <returns>A hash code for the object list.</returns>
+        </member>
+        <member name="T:qckdev.Shared">
+            <summary>
+            Provides a set of miscelaneous static (Shared in Visual Basic) methods.
+            </summary>
+        </member>
+        <member name="T:System.SerializableAttribute">
+            <summary>
+            Indicates that a class can be serialized. This attribute is a mock for Portable libraries (it has not any utility).
+            This class cannot be inherited.
+            </summary>
+        </member>
+        <member name="T:System.Xml.Serialization.XmlElementAttribute">
+            <summary>
+            Indicates that a public field or property represents an XML element when the
+            System.Xml.Serialization.XmlSerializer serializes or deserializes the object
+            that contains it.
+            </summary>
+        </member>
+        <member name="M:System.Xml.Serialization.XmlElementAttribute.#ctor">
+            <summary>
+            Initializes a new instance of the System.Xml.Serialization.XmlElementAttribute
+            class.
+            </summary>
+        </member>
+        <member name="M:System.Xml.Serialization.XmlElementAttribute.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the System.Xml.Serialization.XmlElementAttribute
+            class and specifies the name of the XML element.
+            </summary>
+            <param name="elementName">The XML element name of the serialized member.</param>
+        </member>
+        <member name="M:System.Xml.Serialization.XmlElementAttribute.#ctor(System.Type)">
+            <summary>
+            Initializes a new instance of the System.Xml.Serialization.XmlElementAttribute
+            class and specifies a type for the member to which the System.Xml.Serialization.XmlElementAttribute
+            is applied. This type is used by the System.Xml.Serialization.XmlSerializer when
+            serializing or deserializing object that contains it.
+            </summary>
+            <param name="type">The System.Type of an object derived from the member's type.</param>
+        </member>
+        <member name="M:System.Xml.Serialization.XmlElementAttribute.#ctor(System.String,System.Type)">
+            <summary>
+            Initializes a new instance of the System.Xml.Serialization.XmlElementAttribute
+            and specifies the name of the XML element and a derived type for the member to
+            which the System.Xml.Serialization.XmlElementAttribute is applied. This member
+            type is used when the System.Xml.Serialization.XmlSerializer serializes the object
+            that contains it.
+            </summary>
+            <param name="elementName">The XML element name of the serialized member.</param>
+            <param name="type">The System.Type of an object derived from the member's type.</param>
+        </member>
+        <member name="P:System.Xml.Serialization.XmlElementAttribute.IsNullable">
+            <summary>
+            Gets or sets a value that indicates whether the System.Xml.Serialization.XmlSerializer
+            must serialize a member that is set to null as an empty tag with the xsi:nil
+            attribute set to true.
+            </summary>
+            <value>
+            true if the System.Xml.Serialization.XmlSerializer generates the xsi:nil attribute;
+            otherwise, false.
+            </value>
+        </member>
+        <member name="P:System.Xml.Serialization.XmlElementAttribute.ElementName">
+            <summary>
+            Gets or sets the name of the generated XML element.
+            </summary>
+            <value>
+            Gets or sets the name of the generated XML element.
+            </value>
+        </member>
+    </members>
+</doc>
+ions.ExpressionTree.Equals(qckdev.Linq.Expressions.ExpressionTree)">
             <summary>
             Determines whether the specified <see cref="T:qckdev.Linq.Expressions.ExpressionTree"/> is equal to the current <see cref="T:qckdev.Linq.Expressions.ExpressionTree"/>
             </summary>
