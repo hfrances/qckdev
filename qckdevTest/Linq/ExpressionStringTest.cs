@@ -1,14 +1,11 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using qckdev.Linq;
+using System.Diagnostics.CodeAnalysis;
 
 namespace qckdevTest.Linq
 {
 
+    [SuppressMessage("Critical Code Smell", "S2699:Tests should include assertions", Justification = "Assertion is in sub-methods.")]
     [TestClass]
     public class ExpressionStringTest
     {
@@ -143,13 +140,22 @@ namespace qckdevTest.Linq
         //[DataRow("'Texto' == 'texto'", true)] // TODO: implementar case insensitive, comprobar rendimiento.
         public void ExpressionStringTest0007a_Comparison_String_Simple(string predicate, bool expected)
         {
-            SimpleArithmeticTestCore(predicate, expected);
+            try
+            {
+                SimpleArithmeticTestCore(predicate, expected);
+            }
+            catch (NotImplementedException ex)
+            {
+                Assert.Inconclusive($"{ex.GetType().Name}: {ex.Message}");
+            }
         }
 
         // TODO: implementar LIKE, comprobar rendimiento.
         [TestMethod]
         [DataRow("'Texto' = 'Tex*'", true)]
         [DataRow("'Texto' LIKE 'Tex*'", true)]
+        [DataRow("'Texto' = 'Texto'", true)]
+        [DataRow("'Texto falso' = 'Texto'", false)]
         public void ExpressionStringTest0007b_Comparison_String_Like(string predicate, bool expected)
         {
             try
@@ -162,7 +168,7 @@ namespace qckdevTest.Linq
             }
         }
 
-        // TODO: implementar.
+        // TODO: implementar IN.
         [TestMethod]
         [DataRow("[Value2] IN (1, 2, 3, 0)", true)]
         [DataRow("[Value1] == 1 AND [Value2] IN (1, 2, 3, 0)", true)]

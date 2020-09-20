@@ -1244,6 +1244,33 @@
             true if the specified <see cref="T:System.Object"/> is equal to the current <see cref="T:qckdev.Linq.Expressions.ExpressionTree"/>; otherwise, false.
             </returns>
         </member>
+        <member name="T:qckdev.Linq.Expressions.Extensions">
+            <summary>
+            Defines the extension methods to the <see cref="N:System.Linq.Expressions"/> namespace.
+            </summary>
+        </member>
+        <member name="M:qckdev.Linq.Expressions.Extensions.ReplaceParameter(System.Linq.Expressions.Expression,System.Linq.Expressions.ParameterExpression)">
+            <summary>
+            Creates a new <see cref="T:System.Linq.Expressions.Expression"/> replacing the current <see cref="T:System.Linq.Expressions.ParameterExpression"/> for a new one.
+            </summary>
+            <param name="expression">Original <see cref="T:System.Linq.Expressions.Expression"/>.</param>
+            <param name="newParameterExpression">The replacing <see cref="T:System.Linq.Expressions.ParameterExpression"/>.</param>
+            <returns>
+            Returns a new <see cref="T:System.Linq.Expressions.Expression"/> using the new <see cref="T:System.Linq.Expressions.ParameterExpression"/>.
+            </returns>
+            <exception cref="T:System.NotSupportedException">
+            When the <see cref="T:System.Linq.Expressions.Expression"/> is not one of the compatible types (
+            <see cref="T:System.Linq.Expressions.MemberExpression"/>, <see cref="T:System.Linq.Expressions.MethodCallExpression"/>,
+            <see cref="T:System.Linq.Expressions.ParameterExpression"/>, <see cref="T:System.Linq.Expressions.LambdaExpression"/>,
+            <see cref="T:System.Linq.Expressions.BinaryExpression"/>, <see cref="T:System.Linq.Expressions.ConstantExpression"/>).
+            </exception>
+        </member>
+        <member name="M:qckdev.Linq.Expressions.Extensions.GetExpressionPath(System.Linq.Expressions.Expression)">
+            <summary>
+            Returns a <see cref="T:System.Collections.Generic.IEnumerable`1"/> with the <see cref="T:System.Linq.Expressions.Expression"/> parts of the <paramref name="expression"/> parameter.
+            </summary>
+            <param name="expression">Source <see cref="T:System.Linq.Expressions.Expression"/></param>
+        </member>
         <member name="T:qckdev.Linq.List">
             <summary>
             Provides a set of static methods for querying objects that implement <see cref="T:System.Collections.IList"/>.
