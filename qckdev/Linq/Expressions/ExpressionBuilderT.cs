@@ -149,7 +149,7 @@ namespace qckdev.Linq.Expressions
         public static Expression<Func<T, TResult>> Create(string expression)
         {
             var eb = new ExpressionBuilder<T, TResult>();
-            var root = ExpressionString.BuildTree(expression).Root;
+            var root = ExpressionStringBuilder.BuildTree(expression).Root;
 
             return (root == null ? null : eb.Lambda(eb.BuildExpression(root)));
         }

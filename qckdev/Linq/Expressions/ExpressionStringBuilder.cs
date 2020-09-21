@@ -10,7 +10,7 @@ namespace qckdev.Linq.Expressions
     /// <summary>
     /// Provide methods to convert a <see cref="String"/> expression to <see cref="ExpressionTree"/>.
     /// </summary>
-    public sealed partial class ExpressionString
+    public sealed partial class ExpressionStringBuilder
     {
 
         #region dictionaires
@@ -83,7 +83,7 @@ namespace qckdev.Linq.Expressions
 
         #region ctor
 
-        private ExpressionString()
+        private ExpressionStringBuilder()
         { }
 
         #endregion
@@ -545,7 +545,7 @@ namespace qckdev.Linq.Expressions
         {
             ExpressionTree tree;
 
-            var fsp = new ExpressionString();
+            var fsp = new ExpressionStringBuilder();
             tree = fsp.ParseExpressionString(value);
             return tree;
         }
