@@ -5,7 +5,7 @@
     <!-- portable-net451+win81+wpa81 -->
     <TargetFrameworks>netstandard2.0;netstandard1.2;net461;net40;net35</TargetFrameworks>
     <VersionSuffix>$(VersionSuffix)</VersionSuffix>
-    <Version>0.3.0-beta</Version>
+    <Version>0.4.0-beta</Version>
     <Version Condition=" '$(VersionSuffix)' != '' ">$(Version)-$(VersionSuffix)</Version>
     <Company>TrCode</Company>
     <Authors>hfrances</Authors>
@@ -33,7 +33,11 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework)'=='net35'">
-    <DefineConstants>$(DefineConstants);NET35</DefineConstants>
+    <DefineConstants>$(DefineConstants);NET35;OLD</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)'=='net40'">
+    <DefineConstants>$(DefineConstants);NET35;OLD</DefineConstants>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|netstandard2.0|AnyCPU'">

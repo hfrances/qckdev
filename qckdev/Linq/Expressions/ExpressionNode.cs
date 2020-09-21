@@ -33,7 +33,7 @@ namespace qckdev.Linq.Expressions
 
         #region properties
 
-        internal ExpressionTree ExpressionTree { get; set; }
+        internal ExpressionTree ExpressionTree { get; set;  }
 
         internal ExpressionNodeCollection ParentCollection { private get; set; }
         internal ExpressionNode ParentNode => this.ParentCollection?.Owner;

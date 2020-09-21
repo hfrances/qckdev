@@ -137,7 +137,7 @@ namespace qckdevTest.Linq
         [DataRow("'Texto' != 'Texta'", true)]
         [DataRow("'Texto' <> 'Texta'", true)]
         [DataRow("'Texto' == 'Tex*'", false)]
-        //[DataRow("'Texto' == 'texto'", true)] // TODO: implementar case insensitive, comprobar rendimiento.
+        [DataRow("'Texto' == 'texto'", true)]
         public void ExpressionStringTest0007a_Comparison_String_Simple(string predicate, bool expected)
         {
             try
@@ -146,15 +146,14 @@ namespace qckdevTest.Linq
             }
             catch (NotImplementedException ex)
             {
-                Assert.Inconclusive($"{ex.GetType().Name}: {ex.Message}");
+                Assert.Fail($"{ex.GetType().Name}: {ex.Message}");
             }
         }
 
-        // TODO: implementar LIKE, comprobar rendimiento.
         [TestMethod]
         [DataRow("'Texto' = 'Tex*'", true)]
         [DataRow("'Texto' LIKE 'Tex*'", true)]
-        [DataRow("'Texto' = 'Texto'", true)]
+        [DataRow("'Texto' = 'texto'", true)]
         [DataRow("'Texto falso' = 'Texto'", false)]
         public void ExpressionStringTest0007b_Comparison_String_Like(string predicate, bool expected)
         {
@@ -164,15 +163,14 @@ namespace qckdevTest.Linq
             }
             catch (NotImplementedException ex)
             {
-                Assert.Inconclusive($"{ex.GetType().Name}: {ex.Message}");
+                Assert.Fail($"{ex.GetType().Name}: {ex.Message}");
             }
         }
 
-        // TODO: implementar IN.
         [TestMethod]
-        [DataRow("[Value2] IN (1, 2, 3, 0)", true)]
-        [DataRow("[Value1] == 1 AND [Value2] IN (1, 2, 3, 0)", true)]
-        [DataRow("[Value1]==1 AND [Value2] IN (1, 2, 3, 0) OR [Value3]==false", true)]
+        [DataRow("[Value2] IN (1, 2, 3, 11, 0)", true)]
+        [DataRow("[Value1] == 1 AND [Value2] IN (1 , 2 ,3 , 11, 0)", true)]
+        [DataRow("[Value1]==1 AND [Value2] IN (1,2,3,11,0) OR [Value3]==false", true)]
         public void ExpressionStringTest0008_Comparison_Int_InClause(string predicate, bool expected)
         {
             var item = new { Value1 = 1, Value2 = 0, Value3 = true };
@@ -183,7 +181,24 @@ namespace qckdevTest.Linq
             }
             catch (NotImplementedException ex)
             {
-                Assert.Inconclusive($"{ex.GetType().Name}: {ex.Message}");
+                Assert.Fail($"{ex.GetType().Name}: {ex.Message}");
+            }
+        }
+
+        [TestMethod]
+        [DataRow("1 IN ([Value1], [Value2])", true)]
+        //[DataRow("[Value3] IN ([Value1], [Value2])", true)]
+        public void ExpressionStringTest0008_Comparison_Int_InClause_Reverse(string predicate, bool expected)
+        {
+            var item = new { Value1 = 1, Value2 = 0, Value3 = 1 };
+
+            try
+            {
+                SimpleArithmeticTestCore(predicate, item, expected);
+            }
+            catch (NotImplementedException ex)
+            {
+                Assert.Fail($"{ex.GetType().Name}: {ex.Message}");
             }
         }
 

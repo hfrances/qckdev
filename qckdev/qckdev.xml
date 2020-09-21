@@ -262,6 +262,21 @@
             <param name="values">List of values to compare.</param>
             <returns>Returns true if one of list values matches with the specified value.</returns>
         </member>
+        <member name="M:qckdev.Extensions.Like(System.String,System.String)">
+            <remarks>
+            Based on answer in https://stackoverflow.com/questions/5417070/c-sharp-version-of-sql-like
+            </remarks>
+        </member>
+        <member name="M:qckdev.Extensions.Like(System.String,System.String,System.Boolean)">
+            <remarks>
+            Based on answer in https://stackoverflow.com/questions/5417070/c-sharp-version-of-sql-like
+            </remarks>
+        </member>
+        <member name="M:qckdev.Extensions.Like(System.String,System.String,qckdev.StringLikeOptions)">
+            <remarks>
+            Based on answer in https://stackoverflow.com/questions/5417070/c-sharp-version-of-sql-like
+            </remarks>
+        </member>
         <member name="M:qckdev.Extensions.Clear(System.Text.StringBuilder)">
             <summary>
             Clears string builder content.
@@ -269,6 +284,16 @@
             <param name="value">
             The <see cref="T:System.Text.StringBuilder"/> to clear.
             </param>
+        </member>
+        <member name="T:qckdev.Helper">
+            <summary>
+            Provides a set of miscelaneous static (Shared in Visual Basic) methods.
+            </summary>
+        </member>
+        <member name="M:qckdev.Helper.Like(System.String,System.String,qckdev.StringLikeOptions)">
+            <remarks>
+            Based on answer in https://stackoverflow.com/questions/5417070/c-sharp-version-of-sql-like
+            </remarks>
         </member>
         <member name="T:qckdev.Key">
             <summary>
@@ -1015,11 +1040,12 @@
             <param name="value">Cadena de texto.</param>
             <returns>El <see cref="T:qckdev.Linq.Expressions.ExpressionTree"/> con los elementos de la cadena.</returns>
         </member>
-        <member name="M:qckdev.Linq.Expressions.ExpressionString.ProcessSubstring(qckdev.Linq.Expressions.ExpressionNode,System.Int32,System.Nullable{System.Int32},System.Boolean)">
+        <member name="M:qckdev.Linq.Expressions.ExpressionString.ProcessSubstring(System.Text.StringBuilder,qckdev.Linq.Expressions.ExpressionNode,System.Int32,System.Nullable{System.Int32},System.Boolean)">
             <summary>
             Procesa el rango específico de la cadena contenida en <see cref="P:qckdev.Linq.Expressions.ExpressionTree.Value"/> 
             (accesible desde <seealso cref="P:qckdev.Linq.Expressions.ExpressionNode.ExpressionTree"/>).
             </summary>
+            <param name="buffer">Almacenamiento temporal de la parte de la cadena que todavía no se ha interpretado como expressión.</param>
             <param name="node">Nodo de trabajo.</param>
             <param name="startIndex">Índice del primer caracter a leer en <see cref="P:qckdev.Linq.Expressions.ExpressionTree.Value"/></param>
             <param name="endIndex">Índice del último caracter a leer en <see cref="P:qckdev.Linq.Expressions.ExpressionTree.Value"/> o null para leer hasta el final.</param>
@@ -1028,10 +1054,13 @@
             para no lanzar error de formato si encuentra un carácter de cierre.
             </param>
         </member>
-        <member name="M:qckdev.Linq.Expressions.ExpressionString.ProcessChar(qckdev.Linq.Expressions.ExpressionNode,qckdev.Linq.Expressions.CharType@,System.Int32@,System.Boolean)">
+        <member name="M:qckdev.Linq.Expressions.ExpressionString.ProcessChar(System.Text.StringBuilder,qckdev.Linq.Expressions.ExpressionNode,qckdev.Linq.Expressions.CharType@,System.Int32@,System.Boolean)">
             <summary>
-            Analiza el caracter en una cadena y lo procesa, pudiendo crear nodos hijos, asignarles un operador o rellenar en <see cref="P:qckdev.Linq.Expressions.ExpressionString.StringBuffer"/>.
+            Analiza el caracter en una cadena y lo procesa, pudiendo crear nodos hijos, asignarles un operador o rellenar en <paramref name="buffer"/>.
             </summary>
+            <param name="buffer">
+            Almacenamiento temporal de la parte de la cadena que todavía no se ha interpretado como expressión.
+            </param>
             <param name="node">
             Nodo que se está procesando en estos momentos.
             </param>
@@ -1051,37 +1080,42 @@
             </param>
             <exception cref="T:System.FormatException">La cadena a procesar es incorrecta.</exception>
         </member>
-        <member name="M:qckdev.Linq.Expressions.ExpressionString.AddChildNodeFromOpenCharacter(qckdev.Linq.Expressions.ExpressionNode,System.Int32@)">
+        <member name="M:qckdev.Linq.Expressions.ExpressionString.AddChildNodeFromOpenCharacter(System.Text.StringBuilder,qckdev.Linq.Expressions.ExpressionNode,System.Int32@)">
             <summary>
             Crea un sub elemento a partir de un caracter de apertura.
             </summary>
-            <param name="parentNode">Nodo actual de procesamiento.</param>
+            <param name="buffer">Almacenamiento temporal de la parte de la cadena que todavía no se ha interpretado como expressión.</param>
+            <param name="node">Nodo actual de procesamiento.</param>
             <param name="charIndex">
-            Índice del caracter que se está analizando dentro de <paramref name="parentNode"/>
+            Índice del caracter que se está analizando dentro de <paramref name="node"/>
             (<seealso cref="P:qckdev.Linq.Expressions.ExpressionNode.ExpressionTree"/>, <seealso cref="P:qckdev.Linq.Expressions.ExpressionTree.Value"/>).
             Si es conveniente, este valor puede ser reemplazado por otro (por ejemplo, al encontrar una apertura de paréntesis, 
             se moverá hasta el paréntesis de cierre.
             </param>
             <exception cref="T:System.FormatException">La cadena a procesar es incorrecta.</exception>
         </member>
-        <member name="M:qckdev.Linq.Expressions.ExpressionString.CloseNodeFromOpenCharacter(qckdev.Linq.Expressions.ExpressionNode,System.Int32@,System.Func{System.Char,System.Boolean},System.Boolean)">
+        <member name="M:qckdev.Linq.Expressions.ExpressionString.CloseNodeFromOpenCharacter(System.Text.StringBuilder,qckdev.Linq.Expressions.ExpressionNode,System.Int32@,System.Func{System.Char,System.Boolean},System.Boolean)">
             <summary>
             Recorre el texto en busca hasta que se encuenta el caracter de cierre.
             </summary>
+            <param name="buffer">Almacenamiento temporal de la parte de la cadena que todavía no se ha interpretado como expressión.</param>
             <param name="node">Nodo actual de procesamiento.</param>
             <param name="charIndex"></param>
             <param name="closeCriteria"></param>
             <param name="recursive"></param>
         </member>
-        <member name="M:qckdev.Linq.Expressions.ExpressionString.ProcessBuffer(qckdev.Linq.Expressions.ExpressionNode,System.Int32,System.Boolean)">
+        <member name="M:qckdev.Linq.Expressions.ExpressionString.ProcessBuffer(System.Text.StringBuilder,qckdev.Linq.Expressions.ExpressionNode,System.Int32,System.Boolean)">
             <summary>
             Procesa el texto pendiente en el buffer.
             </summary>
-            <param name="parentNode">
-            Nodo de procesamiento (sólo lo utilizará si no existe ningún valor en <see cref="P:qckdev.Linq.Expressions.ExpressionString.CurrentNode"/>.
+            <param name="buffer">
+            Almacenamiento temporal de la parte de la cadena que todavía no se ha interpretado como expressión.
+            </param>
+            <param name="node">
+            Nodo de procesamiento (sólo lo utilizará si no existe ningún valor en <see cref="P:qckdev.Linq.Expressions.ExpressionString.LastCreatedNode"/>.
             </param>
             <param name="charIndex">
-            Índice del caracter que se está analizando dentro de <paramref name="parentNode"/>
+            Índice del caracter que se está analizando dentro de <paramref name="node"/>
             </param>
             <param name="formattedText">
             Establece si el valor pendiente del buffer debe almacenarse en <see cref="P:qckdev.Linq.Expressions.ExpressionNode.FormattedText"/>.
@@ -1691,11 +1725,6 @@
         <member name="M:qckdev.Reflection.ReflectionHelper.GetCallingMethod">
             <summary>
             Returns a <see cref="T:System.Reflection.MethodBase"/> object representing the method that called to the executing method.
-            </summary>
-        </member>
-        <member name="T:qckdev.Shared">
-            <summary>
-            Provides a set of miscelaneous static (Shared in Visual Basic) methods.
             </summary>
         </member>
     </members>

@@ -71,6 +71,30 @@ namespace qckdev
             return found;
         }
 
+        /// <remarks>
+        /// Based on answer in https://stackoverflow.com/questions/5417070/c-sharp-version-of-sql-like
+        /// </remarks>
+        public static bool Like(this string text, string pattern)
+        {
+            return Like(text, pattern, new StringLikeOptions());
+        }
+
+        /// <remarks>
+        /// Based on answer in https://stackoverflow.com/questions/5417070/c-sharp-version-of-sql-like
+        /// </remarks>
+        public static bool Like(this string text, string pattern, bool ignoreCase)
+        {
+            return Like(text, pattern, new StringLikeOptions() { IgnoreCase = ignoreCase });
+        }
+
+        /// <remarks>
+        /// Based on answer in https://stackoverflow.com/questions/5417070/c-sharp-version-of-sql-like
+        /// </remarks>
+        public static bool Like(this string text, string pattern, StringLikeOptions options)
+        {
+            return Helper.Like(text, pattern, options);
+        }
+
         /// <summary>
         /// Clears string builder content.
         /// </summary>

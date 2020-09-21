@@ -17,6 +17,27 @@ namespace qckdev.Linq.Expressions
     public sealed class ExpressionBuilder<T, TResult>
     {
 
+        private static MethodInfo GetMethod(Type type, string name, Type[] types)
+#if PORTABLE
+            => type.GetRuntimeMethod(name, types);
+#else
+            => type.GetMethod(name, types);
+#endif
+
+        private static readonly MethodInfo inMethod =
+            GetMethod(typeof(qckdev.Extensions), nameof(qckdev.Extensions.In),
+                new Type[] { typeof(string), typeof(Type[]) });
+        private static readonly MethodInfo stringInMethod =
+            GetMethod(typeof(qckdev.Extensions), nameof(qckdev.Extensions.In),
+                new Type[] { typeof(string), typeof(bool), typeof(Type[]) });
+        private static readonly MethodInfo stringEqualsMethod =
+            GetMethod(typeof(System.String), nameof(System.String.Equals),
+                new Type[] { typeof(string), typeof(string), typeof(StringComparison) });
+        private static readonly MethodInfo stringLikeMethod =
+            GetMethod(typeof(qckdev.Helper), nameof(qckdev.Helper.Like),
+                new Type[] { typeof(string), typeof(string), typeof(StringLikeOptions) });
+
+
         private readonly Dictionary<ExpressionNodeType, Func<ExpressionNode, Expression>> expressionAction; // Templates.
 
 
@@ -160,6 +181,9 @@ namespace qckdev.Linq.Expressions
             {
                 if (expression.Operator == ExpressionOperatorType.In)
                 {
+                    var val1 = BuildExpression(expression.Nodes[0]);
+                    //var val2 = BuildExpression(expression.Nodes[1]);
+
                     throw new NotImplementedException(expression.Operator.ToString());
                 }
                 else if (expression.Nodes.Count == 2)
@@ -344,11 +368,15 @@ namespace qckdev.Linq.Expressions
                 else
                     expr2 = Expression.Convert(slaveExpr, masterExpr.Type);
             }
-            
+
             switch (@operator)
             {
                 case ExpressionOperatorType.Equals:
-                    rdo = Expression.Equal(expr1, expr2);
+                    if (expr1.Type == typeof(string) && expr2.Type == typeof(string))
+                        rdo = Expression.Call(stringEqualsMethod,
+                            expr1, expr2, Expression.Constant(StringComparison.CurrentCultureIgnoreCase));
+                    else
+                        rdo = Expression.Equal(expr1, expr2);
                     break;
                 case ExpressionOperatorType.NotEqual:
                     rdo = Expression.NotEqual(expr1, expr2);
@@ -366,7 +394,10 @@ namespace qckdev.Linq.Expressions
                     rdo = Expression.LessThanOrEqual(expr1, expr2);
                     break;
                 case ExpressionOperatorType.Like:
-                    throw new NotImplementedException(@operator.ToString());
+                    rdo = Expression.Call(stringLikeMethod,
+                        expr1, expr2,
+                        Expression.New(typeof(StringLikeOptions)));
+                    break;
                 default:
                     throw new InvalidOperationException(@operator.ToString()); // TODO: Mejorar error.
             }
