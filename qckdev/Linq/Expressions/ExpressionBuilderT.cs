@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Globalization;
 using qckdev.Reflection;
+using System.ComponentModel;
 
 namespace qckdev.Linq.Expressions
 {
@@ -60,7 +61,8 @@ namespace qckdev.Linq.Expressions
                 { ExpressionNodeType.PropertyType, BuildValueExpression },
                 { ExpressionNodeType.StringType, BuildValueExpression },
                 { ExpressionNodeType.DateType, BuildValueExpression },
-                { ExpressionNodeType.UnknownType, BuildValueExpression }
+                { ExpressionNodeType.UnknownType, BuildValueExpression },
+                { ExpressionNodeType.ListType, BuildArrayExpression },
             };
         }
 
@@ -179,14 +181,7 @@ namespace qckdev.Linq.Expressions
 
             if (expression.Type == ExpressionNodeType.RelationalOperator)
             {
-                if (expression.Operator == ExpressionOperatorType.In)
-                {
-                    var val1 = BuildExpression(expression.Nodes[0]);
-                    //var val2 = BuildExpression(expression.Nodes[1]);
-
-                    throw new NotImplementedException(expression.Operator.ToString());
-                }
-                else if (expression.Nodes.Count == 2)
+                if (expression.Nodes.Count == 2)
                 {
                     var val1 = BuildExpression(expression.Nodes[0]);
                     var val2 = BuildExpression(expression.Nodes[1]);
@@ -354,54 +349,114 @@ namespace qckdev.Linq.Expressions
             return rdo;
         }
 
+        private Expression BuildArrayExpression(ExpressionNode expression)
+        {
+            var values = expression.Nodes
+                .Select(BuildValueExpression)
+                .ToArray();
+            var types = values
+                .Select(x => x.Type)
+                .Distinct();
+            var type = types.Count() == 1 ? types.First() : typeof(object);
+
+            return Expression.NewArrayInit(type, values
+                .Select(x => x.Type == type ? x : Expression.Convert(x, type))
+                .ToArray());
+        }
+
         private static Expression RelationalExpression(Expression expr1, ExpressionOperatorType @operator, Expression expr2)
         {
             Expression rdo;
-            var masterExpr = GetMasterOrSlaveExpression(expr1, expr2, master: true);
-            var slaveExpr = GetMasterOrSlaveExpression(expr1, expr2, master: false);
+            var primaryExpr = GetPrimaryOrSecondaryExpression(expr1, expr2, primary: true);
+            var secondaryExpr = GetPrimaryOrSecondaryExpression(expr1, expr2, primary: false);
 
-            // Obtener la parte de la expressión que debería adaptar su tipo a la principal.
-            if (masterExpr.Type != slaveExpr.Type)
+            if (@operator == ExpressionOperatorType.In)
             {
-                if (expr1 == slaveExpr)
-                    expr1 = Expression.Convert(slaveExpr, masterExpr.Type);
-                else
-                    expr2 = Expression.Convert(slaveExpr, masterExpr.Type);
+                rdo = RelationalExpressionIn(primaryExpr, secondaryExpr);
             }
-
-            switch (@operator)
+            else
             {
-                case ExpressionOperatorType.Equals:
-                    if (expr1.Type == typeof(string) && expr2.Type == typeof(string))
-                        rdo = Expression.Call(stringEqualsMethod,
-                            expr1, expr2, Expression.Constant(StringComparison.CurrentCultureIgnoreCase));
+                // Obtener la parte de la expressión que debería adaptar su tipo a la principal.
+                if (primaryExpr.Type != secondaryExpr.Type)
+                {
+                    if (expr1 == secondaryExpr)
+                        expr1 = Expression.Convert(secondaryExpr, primaryExpr.Type);
                     else
-                        rdo = Expression.Equal(expr1, expr2);
-                    break;
-                case ExpressionOperatorType.NotEqual:
-                    rdo = Expression.NotEqual(expr1, expr2);
-                    break;
-                case ExpressionOperatorType.GreaterThan:
-                    rdo = Expression.GreaterThan(expr1, expr2);
-                    break;
-                case ExpressionOperatorType.GreaterThanOrEqual:
-                    rdo = Expression.GreaterThanOrEqual(expr1, expr2);
-                    break;
-                case ExpressionOperatorType.LessThan:
-                    rdo = Expression.LessThan(expr1, expr2);
-                    break;
-                case ExpressionOperatorType.LessThanOrEqual:
-                    rdo = Expression.LessThanOrEqual(expr1, expr2);
-                    break;
-                case ExpressionOperatorType.Like:
-                    rdo = Expression.Call(stringLikeMethod,
-                        expr1, expr2,
-                        Expression.New(typeof(StringLikeOptions)));
-                    break;
-                default:
-                    throw new InvalidOperationException(@operator.ToString()); // TODO: Mejorar error.
+                        expr2 = Expression.Convert(secondaryExpr, primaryExpr.Type);
+                }
+
+                switch (@operator)
+                {
+                    case ExpressionOperatorType.Equals:
+                        if (expr1.Type == typeof(string) && expr2.Type == typeof(string))
+                            rdo = Expression.Call(stringEqualsMethod,
+                                expr1, expr2, Expression.Constant(StringComparison.CurrentCultureIgnoreCase));
+                        else
+                            rdo = Expression.Equal(expr1, expr2);
+                        break;
+                    case ExpressionOperatorType.NotEqual:
+                        rdo = Expression.NotEqual(expr1, expr2);
+                        break;
+                    case ExpressionOperatorType.GreaterThan:
+                        rdo = Expression.GreaterThan(expr1, expr2);
+                        break;
+                    case ExpressionOperatorType.GreaterThanOrEqual:
+                        rdo = Expression.GreaterThanOrEqual(expr1, expr2);
+                        break;
+                    case ExpressionOperatorType.LessThan:
+                        rdo = Expression.LessThan(expr1, expr2);
+                        break;
+                    case ExpressionOperatorType.LessThanOrEqual:
+                        rdo = Expression.LessThanOrEqual(expr1, expr2);
+                        break;
+                    case ExpressionOperatorType.Like:
+                        rdo = Expression.Call(stringLikeMethod,
+                            expr1, expr2,
+                            Expression.New(typeof(StringLikeOptions)));
+                        break;
+                    default:
+                        throw new InvalidOperationException(@operator.ToString()); // TODO: Mejorar error.
+                }
             }
             return rdo;
+        }
+
+        private static Expression RelationalExpressionIn(Expression primaryExpr, Expression secondaryExpr)
+        {
+            Expression expr1, expr2;
+
+#if PORTABLE
+            throw new NotSupportedException($"nameof(RelationalExpressionIn) not available for this framework version.");
+#else
+            // Obtener la parte de la expressión que debería adaptar su tipo a la principal.
+            if (primaryExpr.Type.BaseType == typeof(System.Array))
+            {
+                var primaryType = primaryExpr.Type.GetElementType();
+
+                expr1 = (primaryType == secondaryExpr.Type ? secondaryExpr :
+                    Expression.Convert(secondaryExpr, primaryType));
+                expr2 = primaryExpr;
+            }
+            else if (secondaryExpr.Type.BaseType == typeof(System.Array))
+            {
+                var secondaryType = secondaryExpr.Type.GetElementType();
+
+                expr1 = (secondaryType == primaryExpr.Type ? primaryExpr :
+                    Expression.Convert(primaryExpr, secondaryType));
+                expr2 = secondaryExpr;
+            }
+            else
+            {
+                throw new InvalidOperationException(nameof(RelationalExpressionIn)); // TODO: Mejorar error.
+            }
+
+            // TODO: cómo hacer compatible con IQueriable?
+            MethodInfo containsMethod =
+                typeof(System.Linq.Enumerable)
+                    .GetMethodExt(nameof(System.Linq.Enumerable.Contains),
+                        new Type[] { expr1.Type, typeof(IEnumerable<>).MakeGenericType(expr1.Type), expr1.Type });
+            return Expression.Call(containsMethod, expr2, expr1);
+#endif
         }
 
         private static Expression ArithmeticExpression(Expression expr1, ExpressionOperatorType @operator, Expression expr2)
@@ -435,21 +490,21 @@ namespace qckdev.Linq.Expressions
         }
 
         /// <summary>
-        /// Returns which of expressions contains the master or slave data <see cref="Type"/>, according to <paramref name="master"/> parameter.
+        /// Returns which of expressions contains the primary data <see cref="Type"/>, according to <paramref name="primary"/> parameter.
         /// </summary>
         /// <param name="expr1">First expression.</param>
         /// <param name="expr2">Second expression.</param>
-        /// <param name="master">True to returns the expression that contains the master <see cref="Type"/>. False to returns the expression that contains the slave <see cref="Type"/>.</param>
-        /// <returns>The expressions contains the master or slave data <see cref="Type"/>, according to <paramref name="master"/> parameter.</returns>
+        /// <param name="primary">True to returns the expression that contains the primary <see cref="Type"/>. False to returns the expression that contains the secondary <see cref="Type"/>.</param>
+        /// <returns>The expressions contains the primary data <see cref="Type"/>, according to <paramref name="primary"/> parameter.</returns>
         /// <remarks>
-        /// Master data type is every expression whose type is not <see cref="ExpressionType.Constant"/>.
-        /// If both expressions are <see cref="ConstantExpression"/>, the funcion returns different one for each <paramref name="master"/> value.
+        /// Primary data type is every expression whose type is not <see cref="ExpressionType.Constant"/>.
+        /// If both expressions are <see cref="ConstantExpression"/>, the funcion returns different one for each <paramref name="primary"/> value.
         /// </remarks>
-        private static Expression GetMasterOrSlaveExpression(Expression expr1, Expression expr2, bool master)
+        private static Expression GetPrimaryOrSecondaryExpression(Expression expr1, Expression expr2, bool primary)
         {
             Expression rdo = null;
 
-            if (master)
+            if (primary)
             {
                 rdo = (expr1.NodeType == ExpressionType.Constant ? expr2 : expr1);
             }

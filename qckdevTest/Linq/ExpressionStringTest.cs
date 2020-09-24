@@ -140,14 +140,7 @@ namespace qckdevTest.Linq
         [DataRow("'Texto' == 'texto'", true)]
         public void ExpressionStringTest0007a_Comparison_String_Simple(string predicate, bool expected)
         {
-            try
-            {
-                SimpleArithmeticTestCore(predicate, expected);
-            }
-            catch (NotImplementedException ex)
-            {
-                Assert.Fail($"{ex.GetType().Name}: {ex.Message}");
-            }
+            SimpleArithmeticTestCore(predicate, expected);
         }
 
         [TestMethod]
@@ -157,14 +150,7 @@ namespace qckdevTest.Linq
         [DataRow("'Texto falso' = 'Texto'", false)]
         public void ExpressionStringTest0007b_Comparison_String_Like(string predicate, bool expected)
         {
-            try
-            {
-                SimpleArithmeticTestCore(predicate, expected);
-            }
-            catch (NotImplementedException ex)
-            {
-                Assert.Fail($"{ex.GetType().Name}: {ex.Message}");
-            }
+            SimpleArithmeticTestCore(predicate, expected);
         }
 
         [TestMethod]
@@ -175,14 +161,7 @@ namespace qckdevTest.Linq
         {
             var item = new { Value1 = 1, Value2 = 0, Value3 = true };
 
-            try
-            {
-                SimpleArithmeticTestCore(predicate, item, expected);
-            }
-            catch (NotImplementedException ex)
-            {
-                Assert.Fail($"{ex.GetType().Name}: {ex.Message}");
-            }
+            SimpleArithmeticTestCore(predicate, item, expected);
         }
 
         [TestMethod]
@@ -192,14 +171,7 @@ namespace qckdevTest.Linq
         {
             var item = new { Value1 = 1, Value2 = 0, Value3 = 1 };
 
-            try
-            {
-                SimpleArithmeticTestCore(predicate, item, expected);
-            }
-            catch (NotImplementedException ex)
-            {
-                Assert.Fail($"{ex.GetType().Name}: {ex.Message}");
-            }
+            SimpleArithmeticTestCore(predicate, item, expected);
         }
 
         [TestMethod]

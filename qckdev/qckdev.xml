@@ -822,17 +822,17 @@
             when the <see cref="T:qckdev.Linq.Expressions.ExpressionOperatorType"/> is a value expression.
             </summary>
         </member>
-        <member name="M:qckdev.Linq.Expressions.ExpressionBuilder`2.GetMasterOrSlaveExpression(System.Linq.Expressions.Expression,System.Linq.Expressions.Expression,System.Boolean)">
+        <member name="M:qckdev.Linq.Expressions.ExpressionBuilder`2.GetPrimaryOrSecondaryExpression(System.Linq.Expressions.Expression,System.Linq.Expressions.Expression,System.Boolean)">
             <summary>
-            Returns which of expressions contains the master or slave data <see cref="T:System.Type"/>, according to <paramref name="master"/> parameter.
+            Returns which of expressions contains the primary data <see cref="T:System.Type"/>, according to <paramref name="primary"/> parameter.
             </summary>
             <param name="expr1">First expression.</param>
             <param name="expr2">Second expression.</param>
-            <param name="master">True to returns the expression that contains the master <see cref="T:System.Type"/>. False to returns the expression that contains the slave <see cref="T:System.Type"/>.</param>
-            <returns>The expressions contains the master or slave data <see cref="T:System.Type"/>, according to <paramref name="master"/> parameter.</returns>
+            <param name="primary">True to returns the expression that contains the primary <see cref="T:System.Type"/>. False to returns the expression that contains the secondary <see cref="T:System.Type"/>.</param>
+            <returns>The expressions contains the primary data <see cref="T:System.Type"/>, according to <paramref name="primary"/> parameter.</returns>
             <remarks>
-            Master data type is every expression whose type is not <see cref="F:System.Linq.Expressions.ExpressionType.Constant"/>.
-            If both expressions are <see cref="T:System.Linq.Expressions.ConstantExpression"/>, the funcion returns different one for each <paramref name="master"/> value.
+            Primary data type is every expression whose type is not <see cref="F:System.Linq.Expressions.ExpressionType.Constant"/>.
+            If both expressions are <see cref="T:System.Linq.Expressions.ConstantExpression"/>, the funcion returns different one for each <paramref name="primary"/> value.
             </remarks>
         </member>
         <member name="T:qckdev.Linq.Expressions.ExpressionHelper">
@@ -1222,7 +1222,7 @@
             </summary>
             <param name="node">Nodo desde el que limpiar.</param>
         </member>
-        <member name="M:qckdev.Linq.Expressions.ExpressionStringBuilder.UploadEndIndexAllLevels(qckdev.Linq.Expressions.ExpressionNode)">
+        <member name="M:qckdev.Linq.Expressions.ExpressionStringBuilder.UpdateEndIndexAllLevels(qckdev.Linq.Expressions.ExpressionNode)">
             <summary>
             Calcula el <see cref="P:qckdev.Linq.Expressions.ExpressionNode.EndIndex"/> del elemento y de todos sus elementos hijos que todavía tengan este valor vacío.
             </summary>

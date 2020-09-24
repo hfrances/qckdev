@@ -113,7 +113,7 @@ namespace qckdev.Linq.Expressions
             ProcessSubstring(buffer, root, 0, null, delimiterOpened: false);
 
             // Finalizar.
-            UploadEndIndexAllLevels(root);
+            UpdateEndIndexAllLevels(root);
             CollapseTree(ref root);
             tree.Root = root;
             return tree;
@@ -419,11 +419,14 @@ namespace qckdev.Linq.Expressions
                 }
                 else
                 {
+                    var startIndex = charIndex - (textBuffer.Length - 1);
+                    ExpressionNode tmp;
+
                     // Crear un nodo con el contenido del buffer. 
                     // Este nodo parasá a ser el actual, es decir, sobre el que se seguirán colgando nodos.
-                    int startIndex = charIndex - (textBuffer.Length - 1);
-                    nearestNode = CreateNode(node, startIndex, charIndex, ExpressionNodeType.UnknownType,
+                    tmp = CreateNode(node, startIndex, charIndex, ExpressionNodeType.UnknownType,
                         formattedText: (formattedText ? textBuffer : null));
+                    nearestNode = (node.Type == ExpressionNodeType.ListType ? null : tmp);
                 }
                 buffer.Clear();
             }
@@ -912,12 +915,12 @@ namespace qckdev.Linq.Expressions
         /// Se utiliza para todos aquellos tipos de elementos que no se sabe el valor de <see cref="ExpressionNode.EndIndex"/> 
         /// hasta tenerse todos los nodos hijos.
         /// </remarks>
-        private static void UploadEndIndexAllLevels(ExpressionNode node)
+        private static void UpdateEndIndexAllLevels(ExpressionNode node)
         {
 
             foreach (var child in node.Nodes)
             {
-                UploadEndIndexAllLevels(child);
+                UpdateEndIndexAllLevels(child);
             }
             if (node.EndIndex == null)
             {
