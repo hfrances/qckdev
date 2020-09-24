@@ -41,32 +41,32 @@ namespace qckdevTest.Linq
         /// https://www.calculatorsoup.com/calculators/math/math-equation-solver.php
         /// </remarks>
         [TestMethod]
-        [DataRow("4 * 2", 8)]
-        [DataRow("4 * 2 + 3", 11)]
-        [DataRow("(4 * 2) + 3", 11)]
-        [DataRow("4 * (2 + 3)", 20)]
-        [DataRow("4^1*(2+3)", 20)]
-        [DataRow("(4)^1*(2+3)", 20)]
-        [DataRow("(2+2)^1*(2+3)", 20)]
-        [DataRow("6/2", 3)]
-        [DataRow("(3+3)/2", 3)]
-        [DataRow("3 + 2 * 4", 11)]
-        [DataRow("3 + 2 * 4 * 2", 19)]
-        [DataRow("3 + 2 * 4 * 2 + 3", 22)]
-        [DataRow("2^16", 65536)]
-        [DataRow("2^16 + 3", 65539)]
-        [DataRow("3^2*5", 45)]
-        [DataRow("3 + 2^16 + 3", 65542)]
-        [DataRow("3 + 2 * 4 * 2^16 + 3", 524294)]
-        [DataRow("3 + 2 * 4 * 2^16 + 3^2", 524300)]
-        [DataRow("3 + 2 * 4 * 2^16 + 3^2*5", 524336)]
-        [DataRow("3 + (2 * 4 * 2^16) + ((3^2)*5)", 524336)]
-        [DataRow("(4^4)+4", 260)]
-        [DataRow("(3+2)^2*(5^3)", 3125)]
+        //[DataRow("4 * 2", 8)]
+        //[DataRow("4 * 2 + 3", 11)]
+        //[DataRow("(4 * 2) + 3", 11)]
+        //[DataRow("4 * (2 + 3)", 20)]
+        //[DataRow("4^1*(2+3)", 20)]
+        //[DataRow("(4)^1*(2+3)", 20)]
+        //[DataRow("(2+2)^1*(2+3)", 20)]
+        //[DataRow("6/2", 3)]
+        //[DataRow("(3+3)/2", 3)]
+        //[DataRow("3 + 2 * 4", 11)]
+        //[DataRow("3 + 2 * 4 * 2", 19)]
+        //[DataRow("3 + 2 * 4 * 2 + 3", 22)]
+        //[DataRow("2^16", 65536)]
+        //[DataRow("2^16 + 3", 65539)]
+        //[DataRow("3^2*5", 45)]
+        //[DataRow("3 + 2^16 + 3", 65542)]
+        //[DataRow("3 + 2 * 4 * 2^16 + 3", 524294)]
+        //[DataRow("3 + 2 * 4 * 2^16 + 3^2", 524300)]
+        //[DataRow("3 + 2 * 4 * 2^16 + 3^2*5", 524336)]
+        //[DataRow("3 + (2 * 4 * 2^16) + ((3^2)*5)", 524336)]
+        //[DataRow("(4^4)+4", 260)]
+        //[DataRow("(3+2)^2*(5^3)", 3125)]
         [DataRow("(3+2)^2*(5^3)^2", 390625)]
-        [DataRow("(3+2)^2*(5^3)^2*(5^0)*(5^4)", 244140625)]
-        [DataRow("(10+5^2)*((5*2)+9+3^3)/2", 805)]
-        [DataRow("(10+5^2)*((5*2)+9-3^3)/2", -140)]
+        //[DataRow("(3+2)^2*(5^3)^2*(5^0)*(5^4)", 244140625)]
+        //[DataRow("(10+5^2)*((5*2)+9+3^3)/2", 805)]
+        //[DataRow("(10+5^2)*((5*2)+9-3^3)/2", -140)]
         public void ExpressionStringTest0002_Arithmetic_Advanced(string predicate, int expected)
         {
             SimpleArithmeticTestCore(predicate, expected);
@@ -80,12 +80,12 @@ namespace qckdevTest.Linq
         }
 
         [TestMethod]
-        [DataRow("(42)", 42)]
-        [DataRow("(4+2)", 6)]
-        [DataRow("((4+2))", 6)]
-        [DataRow("3+(4*2)", 11)]
-        [DataRow("2*3+3^1", 9)]
-        [DataRow("2*(6+7)-8^2", -38)]
+        //[DataRow("(42)", 42)]
+        //[DataRow("(4+2)", 6)]
+        //[DataRow("((4+2))", 6)]
+        //[DataRow("3+(4*2)", 11)]
+        //[DataRow("2*3+3^1", 9)]
+        //[DataRow("2*(6+7)-8^2", -38)]
         [DataRow("(10+5^2)*((5*-2)+9-3^3)/2", -490)]
         public void ExpressionStringTest0004_Arithmetic_Special(string predicate, int expected)
         {
@@ -187,7 +187,7 @@ namespace qckdevTest.Linq
 
         [TestMethod]
         [DataRow("1 IN ([Value1], [Value2])", true)]
-        //[DataRow("[Value3] IN ([Value1], [Value2])", true)]
+        [DataRow("[Value3] IN ([Value1], [Value2])", true)]
         public void ExpressionStringTest0008_Comparison_Int_InClause_Reverse(string predicate, bool expected)
         {
             var item = new { Value1 = 1, Value2 = 0, Value3 = 1 };
@@ -261,9 +261,21 @@ namespace qckdevTest.Linq
             SimpleArithmeticTestCore(predicate, expected);
         }
 
+        [SuppressMessage("Critical Code Smell", "S1764:Identical expressions should not be used on both sides of a binary operator")]
+        [DataRow("1==1 || 1==0 && 1==1", 1 == 1 || 1 == 0 && 1 == 1)]
+        [DataRow("1==0 || 1==1 && 1==1", 1 == 0 || 1 == 1 && 1 == 1)]
+        [DataRow("1==1 && 1==1 || 1==0", 1 == 1 && 1 == 1 || 1 == 0)]
+        [DataRow("1==0 && 1==1 || 1==0", 1 == 0 && 1 == 1 || 1 == 0)]
+        [DataRow("1==0 && 1==1 || 1==1", 1 == 0 && 1 == 1 || 1 == 1)]
+        [DataRow("1==0 && 1==1 || 1==1", 1 == 0 && 1 == 1 || 1 == 1)]
+        public void ExpressionStringTest0012b_Logical_Priorized(string predicate, bool expected)
+        {
+            SimpleArithmeticTestCore(predicate, expected);
+        }
+
         [TestMethod]
         [DataRow("(-1*-5)-1 == 4 AND -1==-1", true)]
-        public void ExpressionStringTest0012b_Logical_Advanced(string predicate, bool expected)
+        public void ExpressionStringTest0012c_Logical_Advanced(string predicate, bool expected)
         {
             SimpleArithmeticTestCore(predicate, expected);
         }

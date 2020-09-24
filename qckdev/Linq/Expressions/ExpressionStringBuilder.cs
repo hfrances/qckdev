@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics;
 
 namespace qckdev.Linq.Expressions
 {
@@ -83,6 +84,8 @@ namespace qckdev.Linq.Expressions
 
         #region ctor
 
+        private int _lastNodeId = 0;
+
         private ExpressionStringBuilder()
         { }
 
@@ -90,9 +93,6 @@ namespace qckdev.Linq.Expressions
 
 
         #region properties
-
-        ExpressionNode LastCreatedNode { get; set; }
-
         #endregion
 
 
@@ -135,13 +135,17 @@ namespace qckdev.Linq.Expressions
         {
             var value = node.ExpressionTree.Value;
             var lastCharType = CharType.None;
+            ExpressionNode nearestNode = null;
             int i;
 
             for (i = startIndex; i <= (endIndex ?? value.Length - 1); i++)
             {
-                ProcessChar(buffer, node, ref lastCharType, ref i, delimiterOpened);
+                ExpressionNode tmp;
+
+                tmp = ProcessChar(buffer, nearestNode ?? node, ref lastCharType, ref i, delimiterOpened);
+                nearestNode = tmp ?? nearestNode;
             }
-            ProcessBuffer(buffer, node, i - 1, formattedText: false);
+            ProcessBuffer(buffer, nearestNode ?? node, i - 1, formattedText: false);
         }
 
         /// <summary>
@@ -170,18 +174,21 @@ namespace qckdev.Linq.Expressions
         /// <exception cref="FormatException">La cadena a procesar es incorrecta.</exception>
         private ExpressionNode ProcessChar(StringBuilder buffer, ExpressionNode node, ref CharType lastCharType, ref int charIndex, bool delimiterOpened)
         {
-            var currentNode = node;
-            var value = currentNode.ExpressionTree.Value;
+            var value = node.ExpressionTree.Value;
             var c = value[charIndex];
             var negativeSymbol = false;
+            ExpressionNode nearestNode = null;
 
             if (DelimiterChars.ContainsKey(c))
             {
+                ExpressionNode tmp;
+
                 // Se ha detectado un carácter de apertura (un paréntesis, una comilla, un corchete...). 
                 // Procesa su contenido hasta encontrar el carácter de cierre.
                 // Mueve el contador hasta el último carácter leído.
-                currentNode = ProcessBuffer(buffer, currentNode, charIndex - 1, formattedText: false);
-                currentNode = AddChildNodeFromOpenCharacter(buffer, currentNode, ref charIndex);
+                tmp = ProcessBuffer(buffer, node, charIndex - 1, formattedText: false);
+                tmp = AddChildNodeFromOpenCharacter(buffer, tmp ?? node, ref charIndex);
+                nearestNode = tmp ?? nearestNode;
             }
             else if (!delimiterOpened && DelimiterChars.ContainsValue(c))
             {
@@ -189,33 +196,37 @@ namespace qckdev.Linq.Expressions
             }
             else if (BreakerChars.Contains(c))
             {
+                ExpressionNode tmp;
 
                 // Se ha detectado un caracter de rotura (una coma, un espacio...). 
                 // Procesar el contenido.
                 // Mueve el contador hasta el último carácter leído.
-                currentNode = ProcessBuffer(buffer, currentNode, charIndex - 1, formattedText: false);
+                tmp = ProcessBuffer(buffer, node, charIndex - 1, formattedText: false);
+                nearestNode = tmp ?? nearestNode;
             }
             else
             {
-                currentNode = this.LastCreatedNode ?? node;
-
                 if (c == '-' && (
                         // El nodo actual un nodo-valor y el elemento que hay en el buffer es un operador.
                         // Procesar el buffer para crear el nodo-operador y empezar a rellenar el nodo-valor.
-                        (lastCharType == CharType.Operator && IsValueNode(currentNode.Type)) ||
+                        (lastCharType == CharType.Operator && IsValueNode(node.Type)) ||
                         // El nodo actual es un nodo-operador, por lo que ya estamos en la fase de rellenar el nodo-valor.
-                        (buffer.Length == 0 && IsOperatorNode(currentNode.Type)) ||
+                        (buffer.Length == 0 && IsOperatorNode(node.Type)) ||
                         // No hay ninguna operación aritmética en proceso. Es un nodo-valor.
                         (buffer.Length == 0 && !IsArithmeticBranch(node))
                     ))
                 {
                     // Es símbolo negativo.
-                    currentNode = ProcessBuffer(buffer, node, charIndex - 1, formattedText: false);
+                    nearestNode =
+                        ProcessBuffer(buffer, node, charIndex - 1, formattedText: false)
+                            ?? nearestNode;
                     negativeSymbol = true;
                 }
                 else if (buffer.Length > 0 && lastCharType != GetCharType(c.ToString()))
                 {
-                    currentNode = ProcessBuffer(buffer, node, charIndex - 1, formattedText: false);
+                    nearestNode =
+                        ProcessBuffer(buffer, node, charIndex - 1, formattedText: false)
+                            ?? nearestNode;
                 }
 
                 buffer.Append(c);
@@ -223,7 +234,7 @@ namespace qckdev.Linq.Expressions
             lastCharType = (negativeSymbol ?
                 CharType.Other :
                     GetCharType(buffer.ToString()));
-            return currentNode;
+            return nearestNode;
         }
 
         /// <summary>
@@ -241,12 +252,11 @@ namespace qckdev.Linq.Expressions
         [SuppressMessage("Minor Code Smell", "S3241:Methods should not return values that are never used", Justification = "Return value could be necessary in the future.")]
         private ExpressionNode AddChildNodeFromOpenCharacter(StringBuilder buffer, ExpressionNode node, ref int charIndex)
         {
-            ExpressionNode childNode = null;
-            var lastNode = this.LastCreatedNode ?? node;
-            var value = lastNode.ExpressionTree.Value;
+            var value = node.ExpressionTree.Value;
             var c = value[charIndex];
             Func<char, bool> closeCriteria;
             ExpressionNodeType nodeType;
+            ExpressionNode newNode = null;
             bool isLocked;
             bool recursive;
 
@@ -255,7 +265,7 @@ namespace qckdev.Linq.Expressions
                 case '(':
                     isLocked = true; // Bloquear el nodo ya que es una expresión entre paréntesis (lo que se encuentre dentro deberá ir dentro y lo que se encuentre fuera deberá ir fuera).
                     recursive = true;
-                    if (lastNode.Operator == ExpressionOperatorType.In)
+                    if (node.Operator == ExpressionOperatorType.In)
                         nodeType = ExpressionNodeType.ListType;
                     else
                         nodeType = ExpressionNodeType.Default;
@@ -269,20 +279,19 @@ namespace qckdev.Linq.Expressions
 
             }
             closeCriteria = (x) => x == DelimiterChars[c];
-            childNode = lastNode.Nodes.AddNew();
-            childNode.Type = nodeType;
-            childNode.Locked = isLocked;
-            childNode.StartIndex = charIndex;
-            this.LastCreatedNode = childNode;
+            newNode = CreateNode(node, charIndex, nodeType: nodeType, isLocked: isLocked);
 
-            CloseNodeFromOpenCharacter(buffer, childNode, ref charIndex, closeCriteria, recursive);
-            if (childNode.EndIndex == null)
+            node = CloseNodeFromOpenCharacter(buffer, newNode, ref charIndex, closeCriteria, recursive);
+            if (newNode.EndIndex == null)
             {
                 // Si llega null, es que no se encontró caracter de cierre, por lo que el formato de texto probablemente sea erróneo.
                 throw new FormatException($"Invalid format for the following sentence:\n{value}\nClose character {closeCriteria} not found.");
             }
-            this.LastCreatedNode = childNode;
-            return lastNode;
+            else if (newNode.Locked)
+            {
+                node = newNode;
+            }
+            return node;
         }
 
         /// <summary>
@@ -296,12 +305,12 @@ namespace qckdev.Linq.Expressions
         [SuppressMessage("Critical Code Smell", "S3776:Cognitive Complexity of methods should not be too high", Justification = "Cognitive complexity could be higher if this method is split.")]
         private ExpressionNode CloseNodeFromOpenCharacter(StringBuilder buffer, ExpressionNode node, ref int charIndex, Func<char, bool> closeCriteria, bool recursive)
         {
-            var currentNode = node;
-            var value = currentNode.ExpressionTree.Value;
+            var value = node.ExpressionTree.Value;
             var lastCharType = CharType.None;
             var flag = 0; // [0] Continuar leyendo; [1] Posible fin; [2] Caracter de escape; [99] Fin de la cadena.
             var useFormattedText = false;
             int i;
+            ExpressionNode nearestNode = null;
 
             charIndex++;
             for (i = charIndex; i < value.Length && flag != 99; i++)
@@ -339,7 +348,10 @@ namespace qckdev.Linq.Expressions
                     flag = 0;
                     if (recursive)
                     {
-                        currentNode = ProcessChar(buffer, currentNode, ref lastCharType, ref i, true);
+                        ExpressionNode tmp;
+
+                        tmp = ProcessChar(buffer, nearestNode ?? node, ref lastCharType, ref i, true);
+                        nearestNode = tmp ?? nearestNode;
                     }
                     else
                     {
@@ -354,23 +366,26 @@ namespace qckdev.Linq.Expressions
                 if (recursive)
                 {
                     // Es necesario para los paréntesis ya que puede llegar a crear nodos hijos.
-                    currentNode = ProcessBuffer(buffer, currentNode, charIndex - 1, useFormattedText);
+                    nearestNode = ProcessBuffer(buffer, nearestNode ?? node, charIndex - 1, useFormattedText);
                 }
                 else
                 {
+                    ExpressionNode tmp = node;
+
                     // Se utiliza para los nodos de tipo valor. Se aplica el valor directamente al nodo.
                     if (useFormattedText)
-                        node.FormattedText = buffer.ToString();
-                    currentNode = node;
-                    this.LastCreatedNode = currentNode;
+                    {
+                        tmp.FormattedText = buffer.ToString();
+                    }
                     buffer.Clear();
+                    nearestNode = tmp;
                 }
             }
             else
             {
                 // Do nothing: el resto del proceso es robusto y saltará un "FormatException".
             }
-            return currentNode;
+            return nearestNode;
         }
 
         /// <summary>
@@ -380,7 +395,7 @@ namespace qckdev.Linq.Expressions
         /// Almacenamiento temporal de la parte de la cadena que todavía no se ha interpretado como expressión.
         /// </param>
         /// <param name="node">
-        /// Nodo de procesamiento (sólo lo utilizará si no existe ningún valor en <see cref="LastCreatedNode"/>.
+        /// Nodo de procesamiento.
         /// </param>
         /// <param name="charIndex">
         /// Índice del caracter que se está analizando dentro de <paramref name="node"/>
@@ -391,38 +406,46 @@ namespace qckdev.Linq.Expressions
         /// </param>
         private ExpressionNode ProcessBuffer(StringBuilder buffer, ExpressionNode node, int charIndex, bool formattedText)
         {
-            var currentNode = node;
+            ExpressionNode nearestNode = null;
 
             if (buffer.Length > 0)
             {
                 var textBuffer = buffer.ToString();
 
-                currentNode = this.LastCreatedNode ?? currentNode;
                 if (OperationMap.TryGetValue(textBuffer, out ExpressionOperatorType @operator))
                 {
                     // El buffer contiene un operador. Procesar el operador y reemplazar el nodo por el nuevo con operador si fuera preciso.
-                    currentNode = ProcessOperator(currentNode, @operator, charIndex);
+                    nearestNode = ProcessOperator(node, @operator, charIndex);
                 }
                 else
                 {
-                    ExpressionNode newNode;
-
                     // Crear un nodo con el contenido del buffer. 
                     // Este nodo parasá a ser el actual, es decir, sobre el que se seguirán colgando nodos.
-                    newNode = currentNode.Nodes.AddNew();
-                    newNode.StartIndex = charIndex - (textBuffer.Length - 1);
-                    newNode.Type = ExpressionNodeType.UnknownType;
-                    if (formattedText)
-                    {
-                        newNode.FormattedText = textBuffer;
-                    }
-                    newNode.EndIndex = charIndex;
-                    currentNode = newNode;
+                    int startIndex = charIndex - (textBuffer.Length - 1);
+                    nearestNode = CreateNode(node, startIndex, charIndex, ExpressionNodeType.UnknownType,
+                        formattedText: (formattedText ? textBuffer : null));
                 }
-                this.LastCreatedNode = currentNode;
                 buffer.Clear();
             }
-            return currentNode;
+            return nearestNode;
+        }
+
+        private ExpressionNode CreateNode(ExpressionNode parent, int startIndex, int? endIndex = null,
+            ExpressionNodeType nodeType = ExpressionNodeType.Default,
+            ExpressionOperatorType @operator = ExpressionOperatorType.None,
+            bool isLocked = false, string formattedText = null)
+        {
+            ExpressionNode node;
+
+            node = parent.Nodes.AddNew();
+            node.Id = ++_lastNodeId;
+            node.Type = nodeType;
+            node.Locked = isLocked;
+            node.StartIndex = startIndex;
+            node.EndIndex = endIndex;
+            node.FormattedText = formattedText;
+            node.Operator = @operator;
+            return node;
         }
 
         #endregion
@@ -488,7 +511,7 @@ namespace qckdev.Linq.Expressions
 
         private static ExpressionNode ProcessBufferLogicOperator(ExpressionNode currentNode, ExpressionOperatorType @operator)
         {
-            ExpressionNode rdo;
+            ExpressionNode rdo, tmp;
             bool isValidNode(ExpressionNodeType type)
             {
                 return type.In(
@@ -499,10 +522,11 @@ namespace qckdev.Linq.Expressions
             }
 
             // Buscar el nodo donde se puede aplicar el operador.
-            rdo = FindNodeForOperator(currentNode, @operator, isValidNode, GetLogicalOperator);
+            tmp = FindNodeForOperator(currentNode, @operator, isValidNode, GetLogicalOperator);
 
             // Las operaciones se van solapando.
-            ApplyParentNode(rdo, ExpressionNodeType.LogicalOperator, @operator);
+            ApplyParentNode(tmp, ExpressionNodeType.LogicalOperator, @operator);
+            rdo = tmp;
             return rdo;
         }
 
@@ -511,6 +535,7 @@ namespace qckdev.Linq.Expressions
             ExpressionNode newNode;
 
             newNode = currentNode.Nodes.AddNew();
+            newNode.Id = currentNode.Id + 0.01F;
             newNode.StartIndex = charIndex;
             newNode.Type = ExpressionNodeType.LogicalOperator;
             newNode.Operator = ExpressionOperatorType.Not;
@@ -519,7 +544,7 @@ namespace qckdev.Linq.Expressions
 
         private static ExpressionNode ProcessBufferRelationalOperator(ExpressionNode currentNode, ExpressionOperatorType @operator)
         {
-            ExpressionNode rdo;
+            ExpressionNode rdo, tmp;
             bool isValidNode(ExpressionNodeType type)
             {
                 return type.In(
@@ -529,10 +554,11 @@ namespace qckdev.Linq.Expressions
             }
 
             // Buscar el nodo donde se puede aplicar el operador.
-            rdo = FindNodeForOperator(currentNode, @operator, isValidNode, GetRelationalOperator);
+            tmp = FindNodeForOperator(currentNode, @operator, isValidNode, GetRelationalOperator);
 
             // Las operaciones se van solapando.
-            ApplyParentNode(rdo, ExpressionNodeType.RelationalOperator, @operator);
+            ApplyParentNode(tmp, ExpressionNodeType.RelationalOperator, @operator);
+            rdo = tmp;
             return rdo;
         }
 
@@ -556,12 +582,16 @@ namespace qckdev.Linq.Expressions
         /// <param name="node">Nodo a modificar.</param>
         /// <param name="parentType">Nuevo tipo</param>
         /// <param name="parentOperator">Nuevo operador.</param>
-        private static void ApplyParentNode(ExpressionNode node, ExpressionNodeType parentType, ExpressionOperatorType parentOperator)
+        /// <returns>
+        /// Devuelve el nodo creado bajo <paramref name="node"/> con las propiedades que éste tenía antes.
+        /// </returns>
+        private static ExpressionNode ApplyParentNode(ExpressionNode node, ExpressionNodeType parentType, ExpressionOperatorType parentOperator)
         {
             // Mover la expresión debajo del operador:
             // Crea una expresión, copia sus valores y sus nodos hijos.
             var rdo = new ExpressionNode(node.ExpressionTree)
             {
+                Id = node.Id,
                 Type = node.Type,
                 Operator = node.Operator,
                 StartIndex = node.StartIndex,
@@ -574,16 +604,17 @@ namespace qckdev.Linq.Expressions
             {
                 node.Nodes.Remove(child);
                 rdo.Nodes.Add(child);
-                child.ParentCollection = rdo.Nodes;
             }
 
             // Añade la expressión creada a la actual y aplica los nuevos valores.
             node.Nodes.Add(rdo);
+            node.Id += 0.01F;
             node.Type = parentType;
             node.Operator = parentOperator;
             node.EndIndex = null;
             node.FormattedText = null;
             node.Locked = false;
+            return rdo;
         }
 
         /// <summary>

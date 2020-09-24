@@ -1003,44 +1003,44 @@
             <param name="index">The zero-based index at which item should be inserted.</param>
             <param name="item">The object to insert. The value can be null for reference types.</param>
         </member>
-        <member name="T:qckdev.Linq.Expressions.ExpressionString">
+        <member name="T:qckdev.Linq.Expressions.ExpressionStringBuilder">
             <summary>
             Provide methods to convert a <see cref="T:System.String"/> expression to <see cref="T:qckdev.Linq.Expressions.ExpressionTree"/>.
             </summary>
         </member>
-        <member name="F:qckdev.Linq.Expressions.ExpressionString.OperationMap">
+        <member name="F:qckdev.Linq.Expressions.ExpressionStringBuilder.OperationMap">
             <summary>
             Relación entre los operadores en formato texto y los operadores en formato objeto.
             </summary>
         </member>
-        <member name="F:qckdev.Linq.Expressions.ExpressionString.BreakerChars">
+        <member name="F:qckdev.Linq.Expressions.ExpressionStringBuilder.BreakerChars">
             <summary>
             Lista de caracteres que indican que se cambia de elemento durante la lectura.
             </summary>
         </member>
-        <member name="F:qckdev.Linq.Expressions.ExpressionString.ScapeChars">
+        <member name="F:qckdev.Linq.Expressions.ExpressionStringBuilder.ScapeChars">
             <summary>
             Lista de caracteres que tienen funcionamiento especial pero, que si vienen dos veces seguidas, se refiere al carácter en sí.
             </summary>
         </member>
-        <member name="F:qckdev.Linq.Expressions.ExpressionString.DelimiterChars">
+        <member name="F:qckdev.Linq.Expressions.ExpressionStringBuilder.DelimiterChars">
             <summary>
             Relación entre el caracter de apertura y el de cierre.
             </summary>
         </member>
-        <member name="F:qckdev.Linq.Expressions.ExpressionString.DelimiterTypes">
+        <member name="F:qckdev.Linq.Expressions.ExpressionStringBuilder.DelimiterTypes">
             <summary>
             Relación entre el caracter de apertura y el tipo de dato.
             </summary>
         </member>
-        <member name="M:qckdev.Linq.Expressions.ExpressionString.ParseExpressionString(System.String)">
+        <member name="M:qckdev.Linq.Expressions.ExpressionStringBuilder.ParseExpressionString(System.String)">
             <summary>
             Recorre todos los caracteres de la cadena y los procesa.
             </summary>
             <param name="value">Cadena de texto.</param>
             <returns>El <see cref="T:qckdev.Linq.Expressions.ExpressionTree"/> con los elementos de la cadena.</returns>
         </member>
-        <member name="M:qckdev.Linq.Expressions.ExpressionString.ProcessSubstring(System.Text.StringBuilder,qckdev.Linq.Expressions.ExpressionNode,System.Int32,System.Nullable{System.Int32},System.Boolean)">
+        <member name="M:qckdev.Linq.Expressions.ExpressionStringBuilder.ProcessSubstring(System.Text.StringBuilder,qckdev.Linq.Expressions.ExpressionNode,System.Int32,System.Nullable{System.Int32},System.Boolean)">
             <summary>
             Procesa el rango específico de la cadena contenida en <see cref="P:qckdev.Linq.Expressions.ExpressionTree.Value"/> 
             (accesible desde <seealso cref="P:qckdev.Linq.Expressions.ExpressionNode.ExpressionTree"/>).
@@ -1050,11 +1050,11 @@
             <param name="startIndex">Índice del primer caracter a leer en <see cref="P:qckdev.Linq.Expressions.ExpressionTree.Value"/></param>
             <param name="endIndex">Índice del último caracter a leer en <see cref="P:qckdev.Linq.Expressions.ExpressionTree.Value"/> o null para leer hasta el final.</param>
             <param name="delimiterOpened">
-            Indica si se está buscando dentro de una zona incluida en <see cref="F:qckdev.Linq.Expressions.ExpressionString.DelimiterChars"/>, 
+            Indica si se está buscando dentro de una zona incluida en <see cref="F:qckdev.Linq.Expressions.ExpressionStringBuilder.DelimiterChars"/>, 
             para no lanzar error de formato si encuentra un carácter de cierre.
             </param>
         </member>
-        <member name="M:qckdev.Linq.Expressions.ExpressionString.ProcessChar(System.Text.StringBuilder,qckdev.Linq.Expressions.ExpressionNode,qckdev.Linq.Expressions.CharType@,System.Int32@,System.Boolean)">
+        <member name="M:qckdev.Linq.Expressions.ExpressionStringBuilder.ProcessChar(System.Text.StringBuilder,qckdev.Linq.Expressions.ExpressionNode,qckdev.Linq.Expressions.CharType@,System.Int32@,System.Boolean)">
             <summary>
             Analiza el caracter en una cadena y lo procesa, pudiendo crear nodos hijos, asignarles un operador o rellenar en <paramref name="buffer"/>.
             </summary>
@@ -1075,12 +1075,12 @@
             se moverá hasta el paréntesis de cierre.
             </param>
             <param name="delimiterOpened">
-            Indica si se está buscando dentro de una zona incluida en <see cref="F:qckdev.Linq.Expressions.ExpressionString.DelimiterChars"/>, 
+            Indica si se está buscando dentro de una zona incluida en <see cref="F:qckdev.Linq.Expressions.ExpressionStringBuilder.DelimiterChars"/>, 
             para no lanzar error de formato si encuentra un carácter de cierre.
             </param>
             <exception cref="T:System.FormatException">La cadena a procesar es incorrecta.</exception>
         </member>
-        <member name="M:qckdev.Linq.Expressions.ExpressionString.AddChildNodeFromOpenCharacter(System.Text.StringBuilder,qckdev.Linq.Expressions.ExpressionNode,System.Int32@)">
+        <member name="M:qckdev.Linq.Expressions.ExpressionStringBuilder.AddChildNodeFromOpenCharacter(System.Text.StringBuilder,qckdev.Linq.Expressions.ExpressionNode,System.Int32@)">
             <summary>
             Crea un sub elemento a partir de un caracter de apertura.
             </summary>
@@ -1094,7 +1094,7 @@
             </param>
             <exception cref="T:System.FormatException">La cadena a procesar es incorrecta.</exception>
         </member>
-        <member name="M:qckdev.Linq.Expressions.ExpressionString.CloseNodeFromOpenCharacter(System.Text.StringBuilder,qckdev.Linq.Expressions.ExpressionNode,System.Int32@,System.Func{System.Char,System.Boolean},System.Boolean)">
+        <member name="M:qckdev.Linq.Expressions.ExpressionStringBuilder.CloseNodeFromOpenCharacter(System.Text.StringBuilder,qckdev.Linq.Expressions.ExpressionNode,System.Int32@,System.Func{System.Char,System.Boolean},System.Boolean)">
             <summary>
             Recorre el texto en busca hasta que se encuenta el caracter de cierre.
             </summary>
@@ -1104,7 +1104,7 @@
             <param name="closeCriteria"></param>
             <param name="recursive"></param>
         </member>
-        <member name="M:qckdev.Linq.Expressions.ExpressionString.ProcessBuffer(System.Text.StringBuilder,qckdev.Linq.Expressions.ExpressionNode,System.Int32,System.Boolean)">
+        <member name="M:qckdev.Linq.Expressions.ExpressionStringBuilder.ProcessBuffer(System.Text.StringBuilder,qckdev.Linq.Expressions.ExpressionNode,System.Int32,System.Boolean)">
             <summary>
             Procesa el texto pendiente en el buffer.
             </summary>
@@ -1112,7 +1112,7 @@
             Almacenamiento temporal de la parte de la cadena que todavía no se ha interpretado como expressión.
             </param>
             <param name="node">
-            Nodo de procesamiento (sólo lo utilizará si no existe ningún valor en <see cref="P:qckdev.Linq.Expressions.ExpressionString.LastCreatedNode"/>.
+            Nodo de procesamiento.
             </param>
             <param name="charIndex">
             Índice del caracter que se está analizando dentro de <paramref name="node"/>
@@ -1122,22 +1122,25 @@
             Este valor sustituirá al de la propiedad <see cref="P:qckdev.Linq.Expressions.ExpressionNode.Text"/> durante el procesamiento.
             </param>
         </member>
-        <member name="M:qckdev.Linq.Expressions.ExpressionString.BuildTree(System.String)">
+        <member name="M:qckdev.Linq.Expressions.ExpressionStringBuilder.BuildTree(System.String)">
             <summary>
             Converts a <see cref="T:System.String"/> expression to <see cref="T:qckdev.Linq.Expressions.ExpressionTree"/>.
             </summary>
             <param name="value">The <see cref="T:System.String"/> expression to parse.</param>
             <returns>The <see cref="T:qckdev.Linq.Expressions.ExpressionTree"/> parsed.</returns>
         </member>
-        <member name="M:qckdev.Linq.Expressions.ExpressionString.ApplyParentNode(qckdev.Linq.Expressions.ExpressionNode,qckdev.Linq.Expressions.ExpressionNodeType,qckdev.Linq.Expressions.ExpressionOperatorType)">
+        <member name="M:qckdev.Linq.Expressions.ExpressionStringBuilder.ApplyParentNode(qckdev.Linq.Expressions.ExpressionNode,qckdev.Linq.Expressions.ExpressionNodeType,qckdev.Linq.Expressions.ExpressionOperatorType)">
             <summary>
             Modifica la expresión del parámetro <paramref name="node"/> añadiendo primero los datos actuales a un nodo inferior.
             </summary>
             <param name="node">Nodo a modificar.</param>
             <param name="parentType">Nuevo tipo</param>
             <param name="parentOperator">Nuevo operador.</param>
+            <returns>
+            Devuelve el nodo creado bajo <paramref name="node"/> con las propiedades que éste tenía antes.
+            </returns>
         </member>
-        <member name="M:qckdev.Linq.Expressions.ExpressionString.GetCharType(System.String)">
+        <member name="M:qckdev.Linq.Expressions.ExpressionStringBuilder.GetCharType(System.String)">
             <summary>
             Devuelve el tipo de elemento almacenado en la cadena <paramref name="value"/>.
             </summary>
@@ -1146,21 +1149,21 @@
             Se utiliza para detectar cuándo pasa de valor a operador, o paréntesis u otra cosa.
             </remarks>
         </member>
-        <member name="M:qckdev.Linq.Expressions.ExpressionString.IsValueNode(qckdev.Linq.Expressions.ExpressionNodeType)">
+        <member name="M:qckdev.Linq.Expressions.ExpressionStringBuilder.IsValueNode(qckdev.Linq.Expressions.ExpressionNodeType)">
             <summary>
             Devuelve si el tipo de nodo puede contener un valor.
             </summary>
             <param name="nodeType">Tipo de nodo a validar.</param>
             <returns>True si el tipo puede contener un valor, false en caso contrario.</returns>
         </member>
-        <member name="M:qckdev.Linq.Expressions.ExpressionString.IsOperatorNode(qckdev.Linq.Expressions.ExpressionNodeType)">
+        <member name="M:qckdev.Linq.Expressions.ExpressionStringBuilder.IsOperatorNode(qckdev.Linq.Expressions.ExpressionNodeType)">
             <summary>
             Devuelve si el tipo de nodo es un operador.
             </summary>
             <param name="nodeType">Tipo de nodo a validar.</param>
             <returns>True si el tipo es un operador, false en caso contrario.</returns>
         </member>
-        <member name="M:qckdev.Linq.Expressions.ExpressionString.GetOperatorPriority(qckdev.Linq.Expressions.ExpressionOperatorType)">
+        <member name="M:qckdev.Linq.Expressions.ExpressionStringBuilder.GetOperatorPriority(qckdev.Linq.Expressions.ExpressionOperatorType)">
             <summary>
             Devuelve la prioridad de cálculo del operador de menor a mayor. 
             Esto permite hacer las multiplicaciones antes que las sumas, las potencias antes que las multiplicaciones, los AND antes que los OR, etc.
@@ -1172,28 +1175,28 @@
             <seealso href="https://docs.microsoft.com/en-us/sql/t-sql/language-elements/operator-precedence-transact-sql?view=sql-server-2017"/>
             </remarks>
         </member>
-        <member name="M:qckdev.Linq.Expressions.ExpressionString.GetArithmeticOperator(qckdev.Linq.Expressions.ExpressionNode)">
+        <member name="M:qckdev.Linq.Expressions.ExpressionStringBuilder.GetArithmeticOperator(qckdev.Linq.Expressions.ExpressionNode)">
             <summary>
             Devuelve el operador adjunto a un nodo específico.
             </summary>
             <param name="node">Nodo de búsqueda.</param>
             <returns>El operador adjunto al nodo especificado.</returns>
         </member>
-        <member name="M:qckdev.Linq.Expressions.ExpressionString.GetLogicalOperator(qckdev.Linq.Expressions.ExpressionNode)">
+        <member name="M:qckdev.Linq.Expressions.ExpressionStringBuilder.GetLogicalOperator(qckdev.Linq.Expressions.ExpressionNode)">
             <summary>
             Devuelve el operador adjunto a un nodo específico.
             </summary>
             <param name="node">Nodo de búsqueda.</param>
             <returns>El operador adjunto al nodo especificado.</returns>
         </member>
-        <member name="M:qckdev.Linq.Expressions.ExpressionString.GetRelationalOperator(qckdev.Linq.Expressions.ExpressionNode)">
+        <member name="M:qckdev.Linq.Expressions.ExpressionStringBuilder.GetRelationalOperator(qckdev.Linq.Expressions.ExpressionNode)">
             <summary>
             Devuelve el operador adjunto a un nodo específico.
             </summary>
             <param name="node">Nodo de búsqueda.</param>
             <returns>El operador adjunto al nodo especificado.</returns>
         </member>
-        <member name="M:qckdev.Linq.Expressions.ExpressionString.IsArithmeticBranch(qckdev.Linq.Expressions.ExpressionNode)">
+        <member name="M:qckdev.Linq.Expressions.ExpressionStringBuilder.IsArithmeticBranch(qckdev.Linq.Expressions.ExpressionNode)">
             <summary>
             Devuelve un valor que indica si la rama en la que se encuentra el nodo es una rama aritmética.
             </summary>
@@ -1203,7 +1206,7 @@
             Se utiliza para poder diferenciar si el símbolo "-" es porque va a ser un número negativo o una resta.
             </remarks>
         </member>
-        <member name="M:qckdev.Linq.Expressions.ExpressionString.FindNodeForOperator(qckdev.Linq.Expressions.ExpressionNode,qckdev.Linq.Expressions.ExpressionOperatorType,System.Func{qckdev.Linq.Expressions.ExpressionNodeType,System.Boolean},System.Func{qckdev.Linq.Expressions.ExpressionNode,qckdev.Linq.Expressions.ExpressionOperatorType})">
+        <member name="M:qckdev.Linq.Expressions.ExpressionStringBuilder.FindNodeForOperator(qckdev.Linq.Expressions.ExpressionNode,qckdev.Linq.Expressions.ExpressionOperatorType,System.Func{qckdev.Linq.Expressions.ExpressionNodeType,System.Boolean},System.Func{qckdev.Linq.Expressions.ExpressionNode,qckdev.Linq.Expressions.ExpressionOperatorType})">
             <summary>
             Devuelve el nodo más próximo a <paramref name="currentNode"/> al que se le pueda asignar la operación especificada.
             </summary>
@@ -1213,13 +1216,13 @@
             <param name="getOperatorFunc">Función que devuelve el tipo de operador del nodo durante las búsquedas.</param>
             <returns>El nodo más próximo al que se le pueda asignar la operación especificada.</returns>
         </member>
-        <member name="M:qckdev.Linq.Expressions.ExpressionString.CollapseTree(qckdev.Linq.Expressions.ExpressionNode@)">
+        <member name="M:qckdev.Linq.Expressions.ExpressionStringBuilder.CollapseTree(qckdev.Linq.Expressions.ExpressionNode@)">
             <summary>
             Elimina todos los nodos que están vacíos (<see cref="F:qckdev.Linq.Expressions.ExpressionNodeType.Default"/>) para dejar el arbol lo más limpio posible.
             </summary>
             <param name="node">Nodo desde el que limpiar.</param>
         </member>
-        <member name="M:qckdev.Linq.Expressions.ExpressionString.UploadEndIndexAllLevels(qckdev.Linq.Expressions.ExpressionNode)">
+        <member name="M:qckdev.Linq.Expressions.ExpressionStringBuilder.UploadEndIndexAllLevels(qckdev.Linq.Expressions.ExpressionNode)">
             <summary>
             Calcula el <see cref="P:qckdev.Linq.Expressions.ExpressionNode.EndIndex"/> del elemento y de todos sus elementos hijos que todavía tengan este valor vacío.
             </summary>

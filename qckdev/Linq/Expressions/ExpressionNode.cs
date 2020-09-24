@@ -33,10 +33,11 @@ namespace qckdev.Linq.Expressions
 
         #region properties
 
-        internal ExpressionTree ExpressionTree { get; set;  }
+        internal ExpressionTree ExpressionTree { get; set; }
 
         internal ExpressionNodeCollection ParentCollection { private get; set; }
         internal ExpressionNode ParentNode => this.ParentCollection?.Owner;
+        internal float Id { get; set; }
 
         /// <summary>
         /// Gets or sets if this nodo cannot be altered during the <see cref="ExpressionTree"/> build (for example parentheses).
@@ -128,7 +129,15 @@ namespace qckdev.Linq.Expressions
         public override string ToString()
         {
             var @operator = (this.Operator == ExpressionOperatorType.None ? (ExpressionOperatorType?)null : this.Operator);
-            return string.Format("Expr {0} {1}:    {2}", this.Type, @operator, this.FormattedText ?? this.Text);
+            string value;
+
+            if (this.StartIndex == null)
+                value = null;
+            else if (this.EndIndex == null)
+                value = $" ... partial ... {this.ExpressionTree.Value.Substring(this.StartIndex.Value)}";
+            else
+                value = this.Text;
+            return $"[{this.Id}] Expr {this.Type} { @operator}:   {this.FormattedText ?? value}";
         }
 
         #endregion
