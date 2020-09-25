@@ -10,7 +10,7 @@ namespace qckdev.Linq.Expressions
     /// <summary>
     /// Provide methods to convert a <see cref="String"/> expression to <see cref="ExpressionTree"/>.
     /// </summary>
-    public sealed partial class ExpressionStringBuilder
+    internal sealed partial class ExpressionStringBuilder
     {
 
         #region dictionaires
@@ -587,7 +587,7 @@ namespace qckdev.Linq.Expressions
         /// <returns>
         /// Devuelve el nodo creado bajo <paramref name="node"/> con las propiedades que éste tenía antes.
         /// </returns>
-        private static ExpressionNode ApplyParentNode(ExpressionNode node, ExpressionNodeType parentType, ExpressionOperatorType parentOperator)
+        private static void ApplyParentNode(ExpressionNode node, ExpressionNodeType parentType, ExpressionOperatorType parentOperator)
         {
             // Mover la expresión debajo del operador:
             // Crea una expresión, copia sus valores y sus nodos hijos.
@@ -616,7 +616,6 @@ namespace qckdev.Linq.Expressions
             node.EndIndex = null;
             node.FormattedText = null;
             node.Locked = false;
-            return rdo;
         }
 
         /// <summary>

@@ -32,7 +32,7 @@ namespace qckdev
                 isCharWildCardOn = false,
                 isCharSetOn = false,
                 isNotCharSetOn = false,
-                endOfPattern = false;
+                endOfPattern;
             int lastWildCard = -1;
             int patternIndex = 0;
             var set = new System.Collections.Generic.List<char>();

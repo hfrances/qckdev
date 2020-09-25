@@ -27,9 +27,7 @@ namespace qckdev.Linq
         /// The <paramref name="list"/> has a fixed size.</exception>
         public static void AddRange(this IList list, ICollection c)
         {
-            var l = c as IList;
-
-            if (l == null)
+            if (!(c is IList l))
             {
                 var count = c.Count;
                 var array = new object[count];

@@ -128,10 +128,9 @@ namespace qckdev.Linq.Expressions
         /// <exception cref="KeyNotFoundException">When the <see cref="ExpressionNodeType"/> is not implemented.</exception>
         public static Expression<Func<T, TResult>> Create(string expression)
         {
-            var eb = new ExpressionBuilder<T, TResult>();
-            var root = ExpressionStringBuilder.BuildTree(expression).Root;
+            var expressionTree = ExpressionStringBuilder.BuildTree(expression);
 
-            return (root == null ? null : eb.Lambda(eb.BuildExpression(root)));
+            return Create(expressionTree);
         }
 
         #endregion
@@ -313,7 +312,7 @@ namespace qckdev.Linq.Expressions
                     else if (Boolean.TryParse(content, out bln))
                         rdo = Expression.Constant(bln);
 
-                    else if (Properties.TryGetValue(content, out pi))
+                    else if (Properties.ContainsKey(content))
                         rdo = BuildValueExpression(expression, ExpressionNodeType.PropertyType);
 
                     else

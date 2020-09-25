@@ -142,8 +142,8 @@ namespace qckdev
         {
             bool rdo;
 
-            if (item1 is string && item2 is string)
-                rdo = (string.Compare((string)item1, (string)item2, (IgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal)) == 0);
+            if (item1 is string string1 && item2 is string string2)
+                rdo = (string.Compare(string1, string2, (IgnoreCase ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal)) == 0);
             else
                 rdo = object.Equals(item1, item2);
             return rdo;
@@ -211,8 +211,8 @@ namespace qckdev
                 }
                 else
                 {
-                    if (ignoreCase && item is string)
-                        myhashcode = ((string)item).ToUpper().GetHashCode();
+                    if (ignoreCase && item is string value)
+                        myhashcode = value.ToUpper().GetHashCode();
                     else
                         myhashcode = item.GetHashCode();
 

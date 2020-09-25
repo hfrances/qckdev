@@ -27,9 +27,8 @@ namespace qckdev.Reflection
         /// </returns>
         public Dictionary<string, PropertyInfo> Cache(Type type)
         {
-            Dictionary<string, PropertyInfo> properties;
 
-            if (!InnerList.TryGetValue(type, out properties))
+            if (!InnerList.TryGetValue(type, out Dictionary<string, PropertyInfo> properties))
             {
                 properties = type.GetPropertiesFull()
                     .ToDictionary(x => x.Name, y => y);

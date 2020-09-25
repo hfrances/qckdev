@@ -31,7 +31,8 @@ namespace qckdevTest
         {
 
             int expectedIndex = 0, actualIndex = 0;
-            bool expectedNext = false, actualNext = false;
+            bool expectedNext;
+            bool actualNext = false;
             var expectedEtor = expected.GetEnumerator();
             var actualEtor = actual.GetEnumerator();
 

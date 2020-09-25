@@ -273,8 +273,7 @@ namespace qckdevTest.Linq
 
         private void SimpleArithmeticTestCore<T, TResult>(string predicate, T parameter, TResult expected)
         {
-            var expressionTree = qckdev.Linq.Expressions.ExpressionStringBuilder.BuildTree(predicate);
-            var expression = qckdev.Linq.Expressions.ExpressionBuilder<T, TResult>.Create(expressionTree);
+            var expression = qckdev.Linq.Expressions.ExpressionBuilder<T, TResult>.Create(predicate);
             var lambda = expression.Compile();
             var actual = lambda.Invoke(parameter);
 

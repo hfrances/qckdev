@@ -3,9 +3,12 @@ using System;
 using System.Linq;
 using qckdev.Data;
 using System.Data;
+using System.Diagnostics.CodeAnalysis;
 
 namespace qckdevTest.Data
 {
+
+    [SuppressMessage("Critical Code Smell", "S2699:Tests should include assertions", Justification = "Assertion is in sub-methods.")]
     [TestClass]
     public class DataHelperTest
     {

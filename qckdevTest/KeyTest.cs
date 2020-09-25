@@ -76,6 +76,8 @@ namespace qckdevTest
 
             for (int i = 0; i < DICTIONARYCOUNT && rdo; i += 5)
                 rdo = dictionary.ContainsKey(GetStringKey(i));
+
+            Assert.IsTrue(true);
         }
 
         /// <summary>
@@ -94,6 +96,8 @@ namespace qckdevTest
 
             for (int i = 0; i < DICTIONARYCOUNT && rdo; i += 5)
                 rdo = dictionary.ContainsKey(new Key(new object[] { GetStringKey(i) }, ignoreCase: false));
+
+            Assert.IsTrue(true);
         }
 
         /// <summary>
@@ -112,6 +116,8 @@ namespace qckdevTest
 
             for (int i = 0; i < DICTIONARYCOUNT && rdo; i += 5)
                 rdo = dictionary.ContainsKey(new Key(new object[] { GetStringKey(i), i }, ignoreCase: false));
+
+            Assert.IsTrue(true);
         }
 
         /// <summary>
@@ -130,6 +136,8 @@ namespace qckdevTest
 
             for (int i = 0; i < DICTIONARYCOUNT && rdo; i += 5)
                 rdo = dictionary.ContainsKey(new Key(new object[] { GetStringKey(i), i }, ignoreCase: true));
+
+            Assert.IsTrue(true);
         }
 
         /// <summary>

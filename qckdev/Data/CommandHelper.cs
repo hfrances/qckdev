@@ -61,7 +61,7 @@ namespace qckdev.Data
             val = command.ExecuteScalar();
             if (val == DBNull.Value)
             {
-                rdo = default(T);
+                rdo = default;
             }
             else
             {
@@ -113,12 +113,11 @@ namespace qckdev.Data
         public static IDataReader ExecuteReaderAuto(IDbCommand command, CommandBehavior behavior)
         {
             IDataReader rdo;
-            ConnectionState connectionState;
 
-            ConnectionHelper.OpenWithCheck(command.Connection, out connectionState);
+            ConnectionHelper.OpenWithCheck(command.Connection, out ConnectionState connectionState);
             if (connectionState == ConnectionState.Closed && (behavior & CommandBehavior.CloseConnection) != CommandBehavior.CloseConnection)
             {
-                behavior = behavior | CommandBehavior.CloseConnection; // Si la conexión estaba originalmente cerrada, cerrarla otra vez tras terminar el DataReader.
+                behavior |= CommandBehavior.CloseConnection; // Si la conexión estaba originalmente cerrada, cerrarla otra vez tras terminar el DataReader.
             }
             rdo = command.ExecuteReader(behavior);
             return rdo;
