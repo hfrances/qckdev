@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
+using System.Reflection;
 
 namespace qckdev.Linq.Expressions
 {
@@ -9,6 +10,20 @@ namespace qckdev.Linq.Expressions
     /// </summary>
     public static class ExpressionBuilder
     {
+        private static MethodInfo GetMethod(Type type, string name, Type[] types)
+#if PORTABLE
+            => type.GetRuntimeMethod(name, types);
+#else
+            => type.GetMethod(name, types);
+#endif
+
+        internal static readonly MethodInfo StringEqualsMethod =
+            GetMethod(typeof(System.String), nameof(System.String.Equals),
+                new Type[] { typeof(string), typeof(string), typeof(StringComparison) });
+        internal static readonly MethodInfo StringLikeMethod =
+            GetMethod(typeof(qckdev.Helper), nameof(qckdev.Helper.Like),
+                new Type[] { typeof(string), typeof(string), typeof(StringLikeOptions) });
+
 
         /// <summary>
         /// Creates a <see cref="Expression"/> that represents an equality comparison between a <see cref="System.Reflection.PropertyInfo"/> and a constant.

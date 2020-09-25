@@ -5,7 +5,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Globalization;
 using qckdev.Reflection;
-using System.ComponentModel;
 
 namespace qckdev.Linq.Expressions
 {
@@ -17,27 +16,6 @@ namespace qckdev.Linq.Expressions
     /// <typeparam name="TResult">The <see cref="Type"/> returned for the <see cref="Expression"/>.</typeparam>
     public sealed class ExpressionBuilder<T, TResult>
     {
-
-        private static MethodInfo GetMethod(Type type, string name, Type[] types)
-#if PORTABLE
-            => type.GetRuntimeMethod(name, types);
-#else
-            => type.GetMethod(name, types);
-#endif
-
-        private static readonly MethodInfo inMethod =
-            GetMethod(typeof(qckdev.Extensions), nameof(qckdev.Extensions.In),
-                new Type[] { typeof(string), typeof(Type[]) });
-        private static readonly MethodInfo stringInMethod =
-            GetMethod(typeof(qckdev.Extensions), nameof(qckdev.Extensions.In),
-                new Type[] { typeof(string), typeof(bool), typeof(Type[]) });
-        private static readonly MethodInfo stringEqualsMethod =
-            GetMethod(typeof(System.String), nameof(System.String.Equals),
-                new Type[] { typeof(string), typeof(string), typeof(StringComparison) });
-        private static readonly MethodInfo stringLikeMethod =
-            GetMethod(typeof(qckdev.Helper), nameof(qckdev.Helper.Like),
-                new Type[] { typeof(string), typeof(string), typeof(StringLikeOptions) });
-
 
         private readonly Dictionary<ExpressionNodeType, Func<ExpressionNode, Expression>> expressionAction; // Templates.
 
@@ -389,7 +367,7 @@ namespace qckdev.Linq.Expressions
                 {
                     case ExpressionOperatorType.Equals:
                         if (expr1.Type == typeof(string) && expr2.Type == typeof(string))
-                            rdo = Expression.Call(stringEqualsMethod,
+                            rdo = Expression.Call(ExpressionBuilder.StringEqualsMethod,
                                 expr1, expr2, Expression.Constant(StringComparison.CurrentCultureIgnoreCase));
                         else
                             rdo = Expression.Equal(expr1, expr2);
@@ -410,7 +388,7 @@ namespace qckdev.Linq.Expressions
                         rdo = Expression.LessThanOrEqual(expr1, expr2);
                         break;
                     case ExpressionOperatorType.Like:
-                        rdo = Expression.Call(stringLikeMethod,
+                        rdo = Expression.Call(ExpressionBuilder.StringLikeMethod,
                             expr1, expr2,
                             Expression.New(typeof(StringLikeOptions)));
                         break;
@@ -423,11 +401,12 @@ namespace qckdev.Linq.Expressions
 
         private static Expression RelationalExpressionIn(Expression primaryExpr, Expression secondaryExpr)
         {
-            Expression expr1, expr2;
 
 #if PORTABLE
             throw new NotSupportedException($"nameof(RelationalExpressionIn) not available for this framework version.");
 #else
+            Expression expr1, expr2;
+
             // Obtener la parte de la expressión que debería adaptar su tipo a la principal.
             if (primaryExpr.Type.BaseType == typeof(System.Array))
             {
@@ -502,7 +481,7 @@ namespace qckdev.Linq.Expressions
         /// </remarks>
         private static Expression GetPrimaryOrSecondaryExpression(Expression expr1, Expression expr2, bool primary)
         {
-            Expression rdo = null;
+            Expression rdo;
 
             if (primary)
             {

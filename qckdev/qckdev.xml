@@ -1730,5 +1730,25 @@
             Returns a <see cref="T:System.Reflection.MethodBase"/> object representing the method that called to the executing method.
             </summary>
         </member>
+        <member name="T:qckdev.StringLikeOptions">
+            <summary>
+            Provides options for LIKE operation.
+            </summary>
+        </member>
+        <member name="P:qckdev.StringLikeOptions.WildCard">
+            <summary>
+            Gets or sets a character used to substitute zero or more characters in a <see cref="T:System.String"/>.
+            </summary>
+        </member>
+        <member name="P:qckdev.StringLikeOptions.CharWildCard">
+            <summary>
+            Gets or sets a character used to substitute a single character in a <see cref="T:System.String"/>.
+            </summary>
+        </member>
+        <member name="P:qckdev.StringLikeOptions.IgnoreCase">
+            <summary>
+            Gets or sets true to ignore case during the comparison; otherwise, false.
+            </summary>
+        </member>
     </members>
 </doc>
