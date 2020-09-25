@@ -302,15 +302,16 @@ namespace qckdev.Linq.Expressions
                     break;
 
                 case ExpressionNodeType.UnknownType:
-                    Double dbl;
-                    bool bln;
 
                     // Adivinar tipo. Probar número, boolean, propiedad... Al final, si no se identifica, dejar como object.
-                    if (Double.TryParse(content, NumberStyles.Number, CultureInfo.InvariantCulture, out dbl))
+                    if (double.TryParse(content, NumberStyles.Number, CultureInfo.InvariantCulture, out double dbl))
                         rdo = Expression.Constant(dbl);
 
-                    else if (Boolean.TryParse(content, out bln))
+                    else if (bool.TryParse(content, out bool bln))
                         rdo = Expression.Constant(bln);
+
+                    else if (DateTime.TryParse(content, out DateTime dateTime))
+                        rdo = Expression.Constant(dateTime);
 
                     else if (Properties.ContainsKey(content))
                         rdo = BuildValueExpression(expression, ExpressionNodeType.PropertyType);

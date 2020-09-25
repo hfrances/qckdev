@@ -1,6 +1,8 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 
 namespace qckdevTest.Linq
 {
@@ -269,6 +271,27 @@ namespace qckdevTest.Linq
             SimpleArithmeticTestCore(predicate, item, expected);
         }
 
+        [TestMethod]
+        [DataRow("[date1]>=#2020/09/25#", 3)]
+        [DataRow("[date1]>=#09/25/2020#", 3)]
+        [DataRow("[date1]<=#2020/09/25#", 1)]
+        [DataRow("[date1]<=#09/25/2020#", 1)]
+        [DataRow("[date1]==#2020/09/25#", 1)]
+        [DataRow("[date1]==#09/25/2020#", 1)]
+        //TODO: [DataRow("[date1]='26/09/2020'", 1)]
+        //TODO: [DataRow("[date1]='26/09/2020*'", 2)]
+        public void ExpressionStringTest0014_DateTime(string predicate, int expected)
+        {
+            var collection = new[]
+            {
+                new { date1 = new DateTime(2020, 09, 25), date2 = DateTime.Now },
+                new { date1 = new DateTime(2020, 09, 26), date2 = DateTime.Now },
+                new { date1 = new DateTime(2020, 09, 26, 12, 45, 01), date2 = DateTime.Now },
+            };
+
+            CollectionArithmeticTestCore(predicate, collection, expected);
+        }
+
         #region common
 
         private void SimpleArithmeticTestCore<T, TResult>(string predicate, T parameter, TResult expected)
@@ -283,6 +306,14 @@ namespace qckdevTest.Linq
         private void SimpleArithmeticTestCore<TResult>(string predicate, TResult expected)
         {
             SimpleArithmeticTestCore<object, TResult>(predicate, null, expected);
+        }
+
+        private void CollectionArithmeticTestCore<T>(string predicate, IEnumerable<T> collection, int expected)
+        {
+            var expression = qckdev.Linq.Expressions.ExpressionBuilder<T, bool>.Create(predicate);
+            var lambda = expression.Compile();
+
+            Assert.AreEqual(expected, collection.Count(lambda), $"\n{expression}");
         }
 
         #endregion
