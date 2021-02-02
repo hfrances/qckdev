@@ -44,7 +44,43 @@ namespace qckdevTest.Linq
             }
         }
 
-        [TestMethod, ExpectedException(typeof(InvalidOperationException), "Exception expected.")]
+        [TestMethod]
+        public void LeftJoinTest_WithoutForeignKeys()
+        {
+
+            using (var context = TestObjects.TestDbContext.CreateInstance())
+            {
+                InitializeData(context);
+
+                var expected = new[]
+                {
+                    new { Number = 1, Line = (int?)1 },
+                    new { Number = 1, Line = (int?)2 },
+                    new { Number = 2, Line = (int?)1 },
+                    new { Number = 3, Line = (int?)null },
+                };
+
+                var actual =
+                    context.Parents
+                        .LeftJoin(context.Orphans,
+                            x => x.Id,
+                            y => y.Id,
+                            (x, y) => new
+                            {
+                                x.Number,
+                                Line = (int?)y.Line,
+                            })
+                        .OrderBy(x => x.Number)
+                            .ThenBy(x => x.Line)
+                        .ToArray();
+
+                AssertExt.AreEqual(expected, actual);
+            }
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException), 
+            "Exception expected. Cannot use any converter in LINQ to Entity expressions.")] 
         public void LeftJoinTest_StringComparer()
         {
 

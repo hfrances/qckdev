@@ -63,13 +63,13 @@ namespace qckdev.Linq
         /// </exception>
         [SuppressMessage("Minor Code Smell", "S2436:Types and methods should not have too many generic parameters", Justification = "All parameters are necessary.")]
         public static IQueryable<TResult> LeftJoin<TOuter, TInner, TKey, TResult>(
-            this IQueryable<TOuter> outer, IQueryable<TInner> inner,
-            Expression<Func<TOuter, TKey>> outerKeySelector,
-            Expression<Func<TInner, TKey>> innerKeySelector,
-            Expression<Func<TOuter, TInner, TResult>> resultSelector)
-        {
-            var query =
-                SelectMany(
+                this IQueryable<TOuter> outer, IQueryable<TInner> inner,
+                Expression<Func<TOuter, TKey>> outerKeySelector,
+                Expression<Func<TInner, TKey>> innerKeySelector,
+                Expression<Func<TOuter, TInner, TResult>> resultSelector) =>
+
+            Select(
+                System.Linq.Queryable.SelectMany(
                     System.Linq.Queryable.GroupJoin(
                         outer,
                         inner,
@@ -77,11 +77,13 @@ namespace qckdev.Linq
                         innerKeySelector,
                         (x, y) => new { Outer = x, Details = y }
                     ),
-                    z => System.Linq.Enumerable.DefaultIfEmpty(z.Details),
-                    resultSelector
-                );
-            return query;
-        }
+                    (group) => System.Linq.Enumerable.DefaultIfEmpty(group.Details),
+                    (group, value) => new { Outer = group.Outer, Inner = value }
+                ),
+                x => x.Outer,
+                y => y.Inner,
+                resultSelector
+            );
 
         /// <summary>
         /// Correlates the elements of two sequences based on matching keys. 
@@ -137,11 +139,10 @@ namespace qckdev.Linq
                 Expression<Func<TOuter, TKey>> outerKeySelector,
                 Expression<Func<TInner, TKey>> innerKeySelector,
                 Expression<Func<TOuter, TInner, TResult>> resultSelector,
-                IEqualityComparer<TKey> comparer)
-        {
+                IEqualityComparer<TKey> comparer) =>
 
-            var query =
-                SelectMany(
+            Select(
+                System.Linq.Queryable.SelectMany(
                     System.Linq.Queryable.GroupJoin(
                         outer,
                         inner,
@@ -150,29 +151,43 @@ namespace qckdev.Linq
                         (x, y) => new { Outer = x, Details = y },
                         comparer
                     ),
-                    z => System.Linq.Enumerable.DefaultIfEmpty(z.Details),
-                    resultSelector
-                );
-            return query;
-        }
+                    (group) => System.Linq.Enumerable.DefaultIfEmpty(group.Details),
+                    (group, value) => new { Outer = group.Outer, Inner = value }
+                ),
+                x => x.Outer,
+                y => y.Inner,
+                resultSelector
+            );
 
         [SuppressMessage("Minor Code Smell", "S2436:Types and methods should not have too many generic parameters", Justification = "All parameters are necessary.")]
-        private static IQueryable<TResult> SelectMany<TSource, TCollection, TInner, TOuter, TResult>(
+        private static IQueryable<TResult> Select<TSource, TInner, TOuter, TResult>(
             IQueryable<TSource> source,
-            Expression<Func<TSource, IEnumerable<TCollection>>> collectionSelector,
+            Expression<Func<TSource, TOuter>> outerKeySelector,
+            Expression<Func<TSource, TInner>> innerKeySelector,
             Expression<Func<TOuter, TInner, TResult>> resultSelector)
         {
-            var group = Expression.Parameter(typeof(TSource), "group");
-            var outer = Expression.Property(group, "Outer");
-            var inner = Expression.Parameter(typeof(TCollection), "inner");
-            var body = resultSelector.Body
-                .ReplaceParameter(resultSelector.Parameters[0], outer)
-                .ReplaceParameter(resultSelector.Parameters[1], inner);
-
-            var lambda = Expression.Lambda<Func<TSource, TCollection, TResult>>(body, group, inner);
-            return System.Linq.Queryable.SelectMany(
-                source, collectionSelector, lambda);
+            return System.Linq.Queryable.Select(source, CastSelector(source, outerKeySelector, innerKeySelector, resultSelector));
         }
+
+
+        [SuppressMessage("Minor Code Smell", "S2436:Types and methods should not have too many generic parameters", Justification = "All parameters are necessary.")]
+        private static Expression<Func<TSource, TResult>> CastSelector<TSource, TInner, TOuter, TResult>(
+            IQueryable<TSource> source,
+            Expression<Func<TSource, TOuter>> outerKeySelector,
+            Expression<Func<TSource, TInner>> innerKeySelector,
+            Expression<Func<TOuter, TInner, TResult>> resultSelector
+        )
+        {
+            var value = Expression.Parameter(typeof(TSource), "value");
+            var outer = Expression.Property(value, "Outer");
+            var inner = Expression.Property(value, "Inner");
+            
+            return Expression.Lambda<Func<TSource, TResult>>(
+                Expression.Invoke(resultSelector, outer, inner),
+                value
+            );
+        }
+
     }
 
 }
