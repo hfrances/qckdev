@@ -44,12 +44,7 @@
     <CodeAnalysisRuleSet>qckdev.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='netstandard1.2'">
-    <PackageReference Include="CoreCompat.Newtonsoft.Json">
-      <Version>9.0.2-beta001</Version>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-  </ItemGroup>
+  
 
   <ItemGroup>
     <AdditionalFiles Include="..\.sonarlint\qckdev\CSharp\SonarLint.xml" Link="SonarLint.xml" />
