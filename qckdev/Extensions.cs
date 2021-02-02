@@ -11,27 +11,6 @@ namespace qckdev
     {
 
         /// <summary>
-        /// Retrieves a substring from this instance. The substring starts at a specified character and end at other specified character.
-        /// </summary>
-        /// <param name="value">The string to test.</param>
-        /// <param name="start">The starting character.</param>
-        /// <param name="end">The ending character.</param>
-        /// <returns>
-        /// A <see cref="String"/> equivalent to the substring that begins and ends at a specified characters.
-        /// or the original <paramref name="value"/> if it does not contains starts and ends characters.
-        /// </returns>
-        [Obsolete("This method is obsolete and will disappear in coming versions.")]
-        public static string Substring(this string value, string start, string end)
-        {
-            string rdo = value;
-
-            if (!string.IsNullOrEmpty(value) && value.Length >= 2 && value.StartsWith(start) && value.EndsWith(end))
-                    rdo = value.Substring(1, value.Length - 2);
-
-            return rdo;
-        }
-
-        /// <summary>
         /// Determines whether a specified value matches any value in a a list.
         /// </summary>
         /// <typeparam name="T">The type of elements to validate.</typeparam>
