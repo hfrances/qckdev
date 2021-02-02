@@ -7,7 +7,7 @@ namespace qckdevTest.Linq
 {
 
     [TestClass]
-    public class QueriableTest
+    public class QueryableTest
     {
 
         [TestMethod]
