@@ -68,6 +68,18 @@
             <returns>A <see cref="T:qckdev.CommandArgsDictionary"/> with the information splitted.</returns>
             <exception cref="T:System.ArgumentNullException"><paramref name="args"/> is null.</exception>
         </member>
+        <member name="M:qckdev.CommandArgsDictionary.Substring(System.String,System.String,System.String)">
+            <summary>
+            Retrieves a substring from this instance. The substring starts at a specified character and end at other specified character.
+            </summary>
+            <param name="value">The string to test.</param>
+            <param name="start">The starting character.</param>
+            <param name="end">The ending character.</param>
+            <returns>
+            A <see cref="T:System.String"/> equivalent to the substring that begins and ends at a specified characters.
+            or the original <paramref name="value"/> if it does not contains starts and ends characters.
+            </returns>
+        </member>
         <member name="M:qckdev.ComponentModel.PropertyDescriptorCache.Cache(System.Type)">
             <summary>
             Returns the collection of properties for a specified type of component.
@@ -231,18 +243,6 @@
             <summary>
             Provides a set of static (Shared in Visual Basic) methods.
             </summary>
-        </member>
-        <member name="M:qckdev.Extensions.Substring(System.String,System.String,System.String)">
-            <summary>
-            Retrieves a substring from this instance. The substring starts at a specified character and end at other specified character.
-            </summary>
-            <param name="value">The string to test.</param>
-            <param name="start">The starting character.</param>
-            <param name="end">The ending character.</param>
-            <returns>
-            A <see cref="T:System.String"/> equivalent to the substring that begins and ends at a specified characters.
-            or the original <paramref name="value"/> if it does not contains starts and ends characters.
-            </returns>
         </member>
         <member name="M:qckdev.Extensions.In``1(``0,``0[])">
             <summary>
