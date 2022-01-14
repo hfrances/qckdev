@@ -41,6 +41,133 @@
             Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
             </summary>
         </member>
+        <member name="T:qckdev.Collections.CacheDictionary`2">
+            <summary>
+            Represents a collection of keys and values where its items are alive during the time set in <see cref="P:qckdev.Collections.CacheDictionary`2.CacheTimeout"/> property.
+            </summary>
+            <typeparam name="TKey">The type of the keys in the dictionary.</typeparam>
+            <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
+        </member>
+        <member name="M:qckdev.Collections.CacheDictionary`2.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:qckdev.Collections.CacheDictionary`2"/> class
+            that is empty, has the default initial capacity, and uses the default equality
+            comparer for the key type.
+            </summary>
+        </member>
+        <member name="M:qckdev.Collections.CacheDictionary`2.#ctor(System.Collections.Generic.IEqualityComparer{`0})">
+            <summary>
+            Initializes a new instance of the <see cref="T:qckdev.Collections.CacheDictionary`2"/> class
+            that is empty, has the default initial capacity, and uses the specified <see cref="T:System.Collections.Generic.IEqualityComparer`1"/>.
+            </summary>
+            <param name="comparer">
+            The <see cref="T:System.Collections.Generic.IEqualityComparer`1"/> implementation to use when
+            comparing keys, or null to use the default <see cref="T:System.Collections.Generic.IEqualityComparer`1"/>
+            for the type of the key.
+            </param>
+        </member>
+        <member name="P:qckdev.Collections.CacheDictionary`2.Keys">
+            <summary>
+            Gets a collection containing the keys in the <see cref="T:qckdev.Collections.CacheDictionary`2"/>.
+            </summary>
+        </member>
+        <member name="P:qckdev.Collections.CacheDictionary`2.Values">
+            <summary>
+            Gets a collection containing the values in the <see cref="T:qckdev.Collections.CacheDictionary`2"/>.
+            </summary>
+        </member>
+        <member name="P:qckdev.Collections.CacheDictionary`2.Count">
+            <summary>
+            Gets the number of key/value pairs contained in the <see cref="T:qckdev.Collections.CacheDictionary`2"/>.
+            </summary>
+        </member>
+        <member name="P:qckdev.Collections.CacheDictionary`2.Item(`0)">
+            <summary>
+            Gets or sets the value associated with the specified key.
+            </summary>
+            <param name="key">The key of the value to get or set.</param>
+            <returns>
+            The value associated with the specified key. If the specified key is not found,
+            a get operation throws a System.Collections.Generic.KeyNotFoundException, and
+            a set operation creates a new element with the specified key.
+            </returns>
+            <exception cref="T:System.ArgumentNullException">
+            <paramref name="key"/> is null.
+            </exception>
+            <exception cref="T:System.Collections.Generic.KeyNotFoundException">
+            The property is retrieved and key does not exist in the collection.
+            </exception>
+        </member>
+        <member name="M:qckdev.Collections.CacheDictionary`2.Add(`0,`1)">
+            <summary>
+            Adds the specified key and value to the dictionary.
+            </summary>
+            <param name="key">The key of the element to add.</param>
+            <param name="value">The value of the element to add. The value can be null for reference types.</param>
+            <exception cref="T:System.ArgumentNullException">
+            <paramref name="key"/> is null.
+            </exception>
+            <exception cref="T:System.ArgumentException">
+            An element with the same key already exists in the <see cref="T:qckdev.Collections.CacheDictionary`2"/>.
+            </exception>
+        </member>
+        <member name="M:qckdev.Collections.CacheDictionary`2.TryGetValue(`0,`1@)">
+            <summary>
+            Gets the value associated with the specified key.
+            </summary>
+            <param name="key">The key of the value to get.</param>
+            <param name="value">
+            When this method returns, contains the value associated with the specified key,
+            if the key is found; otherwise, the default value for the type of the value parameter.
+            This parameter is passed uninitialized.
+            </param>
+            <returns>
+            true if the <see cref="T:qckdev.Collections.CacheDictionary`2"/> contains an element with
+            the specified key; otherwise, false.
+            </returns>
+            <see cref="T:System.ArgumentNullException">
+            <paramref name="key"/> is null.
+            </see>
+        </member>
+        <member name="M:qckdev.Collections.CacheDictionary`2.ContainsKey(`0)">
+            <summary>
+            Determines whether the <see cref="T:qckdev.Collections.CacheDictionary`2"/> contains the specified key.
+            </summary>
+            <param name="key">The key to locate in the <see cref="T:qckdev.Collections.CacheDictionary`2"/>.</param>
+            <returns>
+            true if the <see cref="T:qckdev.Collections.CacheDictionary`2"/> contains an element with
+            the specified key; otherwise, false.
+            </returns>
+            <see cref="T:System.ArgumentNullException">
+            <paramref name="key"/> is null.
+            </see>
+        </member>
+        <member name="M:qckdev.Collections.CacheDictionary`2.Remove(`0)">
+            <summary>
+            Removes the value with the specified key from the <see cref="T:qckdev.Collections.CacheDictionary`2"/>.
+            </summary>
+            <param name="key">The key of the element to remove.</param>
+            <returns>
+            true if the element is successfully found and removed; otherwise, false. This
+            method returns false if key is not found in the <see cref="T:qckdev.Collections.CacheDictionary`2"/>.
+            </returns>
+            <see cref="T:System.ArgumentNullException">
+            <paramref name="key"/> is null.
+            </see>
+        </member>
+        <member name="M:qckdev.Collections.CacheDictionary`2.GetEnumerator">
+            <summary>
+            Returns an enumerator that iterates through the <see cref="T:qckdev.Collections.CacheDictionary`2"/>.
+            </summary>
+            <returns>
+            A <see cref="T:System.Collections.Generic.IEnumerator`1"/> structure for the <see cref="T:qckdev.Collections.CacheDictionary`2"/>.
+            </returns>
+        </member>
+        <member name="M:qckdev.Collections.CacheDictionary`2.Clear">
+            <summary>
+            Removes all keys and values from the <see cref="T:qckdev.Collections.CacheDictionary`2"/>.
+            </summary>
+        </member>
         <member name="T:qckdev.CommandArgsDictionary">
             <summary>
             Provides a dictionary with all command arguments.
@@ -67,6 +194,18 @@
             <param name="args">Command arguments.</param>
             <returns>A <see cref="T:qckdev.CommandArgsDictionary"/> with the information splitted.</returns>
             <exception cref="T:System.ArgumentNullException"><paramref name="args"/> is null.</exception>
+        </member>
+        <member name="M:qckdev.CommandArgsDictionary.Substring(System.String,System.String,System.String)">
+            <summary>
+            Retrieves a substring from this instance. The substring starts at a specified character and end at other specified character.
+            </summary>
+            <param name="value">The string to test.</param>
+            <param name="start">The starting character.</param>
+            <param name="end">The ending character.</param>
+            <returns>
+            A <see cref="T:System.String"/> equivalent to the substring that begins and ends at a specified characters.
+            or the original <paramref name="value"/> if it does not contains starts and ends characters.
+            </returns>
         </member>
         <member name="M:qckdev.ComponentModel.PropertyDescriptorCache.Cache(System.Type)">
             <summary>
@@ -231,18 +370,6 @@
             <summary>
             Provides a set of static (Shared in Visual Basic) methods.
             </summary>
-        </member>
-        <member name="M:qckdev.Extensions.Substring(System.String,System.String,System.String)">
-            <summary>
-            Retrieves a substring from this instance. The substring starts at a specified character and end at other specified character.
-            </summary>
-            <param name="value">The string to test.</param>
-            <param name="start">The starting character.</param>
-            <param name="end">The ending character.</param>
-            <returns>
-            A <see cref="T:System.String"/> equivalent to the substring that begins and ends at a specified characters.
-            or the original <paramref name="value"/> if it does not contains starts and ends characters.
-            </returns>
         </member>
         <member name="M:qckdev.Extensions.In``1(``0,``0[])">
             <summary>
