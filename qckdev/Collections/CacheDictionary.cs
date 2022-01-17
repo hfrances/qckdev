@@ -49,6 +49,9 @@ namespace qckdev.Collections
         }
 
 
+        /// <summary>
+        /// Gets or sets how long <typeparamref name="TKey"/> is stored in the dictionary.
+        /// </summary>
         public TimeSpan CacheTimeout { get; set; } = TimeSpan.FromMinutes(10);
 
         /// <summary>

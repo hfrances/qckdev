@@ -68,6 +68,36 @@ namespace qckdevTest.Collections
         }
 
         [TestMethod]
+        public void Add_TooManyItems()
+        {
+            const int count = 1000;
+            var dic = new qckdev.Collections.CacheDictionary<int, string>()
+            {
+                CacheTimeout = TimeSpan.FromMilliseconds(200)
+            };
+
+            for (int i = 0; i < count; i++)
+            {
+                dic.Add(i, $"Item {i}");
+            }
+            Assert.AreEqual(count, dic.Count);
+        }
+
+        [TestMethod]
+        public void Count()
+        {
+            var dic = new qckdev.Collections.CacheDictionary<int, string>()
+            {
+                CacheTimeout = TimeSpan.FromMilliseconds(200)
+            };
+
+            dic.Add(1, "a");
+            dic.Add(2, "b");
+            dic.Add(3, "c");
+            Assert.AreEqual(3, dic.Count);
+        }
+
+        [TestMethod]
         public void Count_WithDelay()
         {
             var dic = new qckdev.Collections.CacheDictionary<int, string>()
@@ -131,7 +161,9 @@ namespace qckdevTest.Collections
         }
 
         [TestMethod]
-        public void ContainsKey_WithDelay()
+        [DataRow(1, false)]
+        [DataRow(2, true)]
+        public void ContainsKey_WithDelay(int key, bool expected)
         {
             var dic = new qckdev.Collections.CacheDictionary<int, string>()
             {
@@ -143,8 +175,9 @@ namespace qckdevTest.Collections
             dic.Add(2, "b");
             dic.Add(3, "c");
 
-            Assert.IsFalse(dic.ContainsKey(1));
+            Assert.AreEqual(expected, dic.ContainsKey(key));
         }
+
 
         [TestMethod]
         public void Remove()
@@ -291,6 +324,100 @@ namespace qckdevTest.Collections
             dic[1] = "x";
 
             Assert.AreEqual("x", dic[1]);
+        }
+
+        [TestMethod]
+        public void This_Get()
+        {
+            var dic = new qckdev.Collections.CacheDictionary<int, string>()
+            {
+                CacheTimeout = TimeSpan.FromMilliseconds(200)
+            };
+
+            dic[1] = "a";
+            dic[2] = "b";
+            dic[3] = "c";
+
+            Assert.AreEqual("a", dic[1]);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(KeyNotFoundException))]
+        public void This_Get_NotFound_WithDelay()
+        {
+            var dic = new qckdev.Collections.CacheDictionary<int, string>()
+            {
+                CacheTimeout = TimeSpan.FromMilliseconds(200)
+            };
+
+            dic[1] = "a";
+            System.Threading.Thread.Sleep(210);
+            dic[2] = "b";
+            dic[3] = "c";
+
+            Assert.AreEqual("a", dic[1]);
+        }
+
+        [TestMethod]
+        public void Keys()
+        {
+            var dic = new qckdev.Collections.CacheDictionary<int, string>()
+            {
+                CacheTimeout = TimeSpan.FromMilliseconds(200)
+            };
+
+            dic[1] = "a";
+            dic[2] = "b";
+            dic[3] = "c";
+
+            Assert.AreEqual(3, dic.Keys.Count);
+        }
+
+        [TestMethod]
+        public void Keys_WithDelay()
+        {
+            var dic = new qckdev.Collections.CacheDictionary<int, string>()
+            {
+                CacheTimeout = TimeSpan.FromMilliseconds(200)
+            };
+
+            dic[1] = "a";
+            System.Threading.Thread.Sleep(210);
+            dic[2] = "b";
+            dic[3] = "c";
+
+            Assert.AreEqual(2, dic.Keys.Count);
+        }
+
+        [TestMethod]
+        public void Values()
+        {
+            var dic = new qckdev.Collections.CacheDictionary<int, string>()
+            {
+                CacheTimeout = TimeSpan.FromMilliseconds(200)
+            };
+
+            dic[1] = "a";
+            dic[2] = "b";
+            dic[3] = "c";
+
+            Assert.AreEqual(3, dic.Values.Count);
+        }
+
+        [TestMethod]
+        public void Values_WithDelay()
+        {
+            var dic = new qckdev.Collections.CacheDictionary<int, string>()
+            {
+                CacheTimeout = TimeSpan.FromMilliseconds(200)
+            };
+
+            dic[1] = "a";
+            System.Threading.Thread.Sleep(210);
+            dic[2] = "b";
+            dic[3] = "c";
+
+            Assert.AreEqual(2, dic.Values.Count);
         }
 
     }
