@@ -17,10 +17,11 @@ parameters:
   - name: Deploy
     type: string
     values:
+      - disabled
       - auto
       - true
       - false
-    default: auto
+    default: disabled
   - name: Analyze
     type: string
     values:
