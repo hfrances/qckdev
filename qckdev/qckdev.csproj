@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <!-- portable-net451+win81+wpa81 -->
-    <TargetFrameworks>net5.0;netstandard2.0;netstandard1.2;net461;net40;$(net35)</TargetFrameworks>
+    <TargetFrameworks>net6.0;net5.0;netstandard2.0;netstandard1.2;net461;net40;$(net35)</TargetFrameworks>
     <VersionSuffix>$(VersionSuffix)</VersionSuffix>
     <Version>0.4.0</Version>
     <Version Condition=" '$(VersionSuffix)' != '' ">$(Version)-$(VersionSuffix)</Version>
