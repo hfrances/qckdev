@@ -78,7 +78,7 @@ namespace qckdev.Linq
             var array = new T[count];
 
             collection.CopyTo(array, 0);
-            for (int i = 0; i < count && rdo == 1; i++)
+            for (int i = 0; i < count && rdo == -1; i++)
                 if (predicate(array[i]))
                     rdo = i;
             return rdo;

@@ -14,7 +14,7 @@ namespace qckdev
             for (int i = 0; i < others.Length && rdo; i++)
             {
                 var o = (int)Enum.ToObject(typeof(T), others[i]);
-                rdo = (v & o) > 0;
+                rdo = (v & o) == o;
             }
             return rdo;
         }

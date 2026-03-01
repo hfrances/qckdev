@@ -39,6 +39,15 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssertCommon.cs" />
+    <Compile Include="EnumHelperTest.cs" />
+    <Compile Include="SharedTest.cs" />
+    <Compile Include="LinqDictionaryTest.cs" />
+    <Compile Include="LinqListTest.cs" />
+    <Compile Include="LinqCollectionTest.cs" />
+    <Compile Include="ReflectionHelperTest.cs" />
+    <Compile Include="ReflectionExtensionsTest.cs" />
+    <Compile Include="LinqEnumerableExtensionsTest.cs" />
     <Compile Include="..\qckdevTest\CommandArgsDictionaryTest.cs">
       <Link>CommandArgsDictionaryTest.cs</Link>
     </Compile>
@@ -48,6 +57,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\qckdevTest.Common\qckdevTest.Common.csproj" />
     <ProjectReference Include="..\qckdev\qckdev.csproj">
       <Project>{CA91C1A7-7BBD-4105-BF4E-50F74C013D51}</Project>
       <Name>qckdev</Name>
