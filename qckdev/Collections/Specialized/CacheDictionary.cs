@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace qckdev.Collections
+namespace qckdev.Collections.Specialized
 {
 
     /// <summary>

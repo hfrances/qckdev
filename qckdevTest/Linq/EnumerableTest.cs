@@ -22,8 +22,8 @@ namespace qckdevTest.Linq
                 new {Id = 1, Linea = 2},
                 new {Id = 3, Linea = 1}
             };
-            var qry = parent
-                .LeftJoin(child, x => x.Id, y => y.Id,
+            var qry = qckdev.Linq.Enumerable
+                .LeftJoin(parent, child, x => x.Id, y => y.Id,
                     (x, y) => new
                     {
                         Parent = x,
@@ -70,8 +70,8 @@ namespace qckdevTest.Linq
                 new {Id = "a", Linea = 2},
                 new {Id = "C", Linea = 1}
             };
-            var qry = parent
-                .LeftJoin(child, x => x.Id, y => y.Id,
+            var qry = qckdev.Linq.Enumerable
+                .LeftJoin(parent, child, x => x.Id, y => y.Id,
                     (x, y) => new
                     {
                         Parent = x,

@@ -15,7 +15,7 @@ namespace qckdevTest.Collections
         [TestMethod]
         public void CreateInstance_WithValues()
         {
-            var dic = new qckdev.Collections.CacheDictionary<int, string>
+            var dic = new qckdev.Collections.Specialized.CacheDictionary<int, string>
             {
                 { 1, "a" },
                 { 2, "b" },
@@ -27,7 +27,7 @@ namespace qckdevTest.Collections
         [TestMethod]
         public void Add()
         {
-            var dic = new qckdev.Collections.CacheDictionary<int, string>();
+            var dic = new qckdev.Collections.Specialized.CacheDictionary<int, string>();
 
             dic.Add(1, "a");
             dic.Add(2, "b");
@@ -39,7 +39,7 @@ namespace qckdevTest.Collections
         [ExpectedException(typeof(ArgumentException))]
         public void Add_Duplicated()
         {
-            var dic = new qckdev.Collections.CacheDictionary<int, string>()
+            var dic = new qckdev.Collections.Specialized.CacheDictionary<int, string>()
             {
                 CacheTimeout = TimeSpan.FromMilliseconds(200)
             };
@@ -54,7 +54,7 @@ namespace qckdevTest.Collections
         [TestMethod]
         public void Add_DuplicatedWithDelay()
         {
-            var dic = new qckdev.Collections.CacheDictionary<int, string>()
+            var dic = new qckdev.Collections.Specialized.CacheDictionary<int, string>()
             {
                 CacheTimeout = TimeSpan.FromMilliseconds(200)
             };
@@ -71,7 +71,7 @@ namespace qckdevTest.Collections
         public void Add_TooManyItems()
         {
             const int count = 1000;
-            var dic = new qckdev.Collections.CacheDictionary<int, string>()
+            var dic = new qckdev.Collections.Specialized.CacheDictionary<int, string>()
             {
                 CacheTimeout = TimeSpan.FromMilliseconds(200)
             };
@@ -86,7 +86,7 @@ namespace qckdevTest.Collections
         [TestMethod]
         public void Count()
         {
-            var dic = new qckdev.Collections.CacheDictionary<int, string>()
+            var dic = new qckdev.Collections.Specialized.CacheDictionary<int, string>()
             {
                 CacheTimeout = TimeSpan.FromMilliseconds(200)
             };
@@ -100,7 +100,7 @@ namespace qckdevTest.Collections
         [TestMethod]
         public void Count_WithDelay()
         {
-            var dic = new qckdev.Collections.CacheDictionary<int, string>()
+            var dic = new qckdev.Collections.Specialized.CacheDictionary<int, string>()
             {
                 CacheTimeout = TimeSpan.FromMilliseconds(200)
             };
@@ -115,7 +115,7 @@ namespace qckdevTest.Collections
         [TestMethod]
         public void TryGetValue()
         {
-            var dic = new qckdev.Collections.CacheDictionary<int, string>()
+            var dic = new qckdev.Collections.Specialized.CacheDictionary<int, string>()
             {
                 CacheTimeout = TimeSpan.FromMilliseconds(200)
             };
@@ -131,7 +131,7 @@ namespace qckdevTest.Collections
         [TestMethod]
         public void TryGetValue_WithDelay()
         {
-            var dic = new qckdev.Collections.CacheDictionary<int, string>()
+            var dic = new qckdev.Collections.Specialized.CacheDictionary<int, string>()
             {
                 CacheTimeout = TimeSpan.FromMilliseconds(200)
             };
@@ -148,7 +148,7 @@ namespace qckdevTest.Collections
         [TestMethod]
         public void ContainsKey()
         {
-            var dic = new qckdev.Collections.CacheDictionary<int, string>()
+            var dic = new qckdev.Collections.Specialized.CacheDictionary<int, string>()
             {
                 CacheTimeout = TimeSpan.FromMilliseconds(200)
             };
@@ -165,7 +165,7 @@ namespace qckdevTest.Collections
         [DataRow(2, true)]
         public void ContainsKey_WithDelay(int key, bool expected)
         {
-            var dic = new qckdev.Collections.CacheDictionary<int, string>()
+            var dic = new qckdev.Collections.Specialized.CacheDictionary<int, string>()
             {
                 CacheTimeout = TimeSpan.FromMilliseconds(200)
             };
@@ -182,7 +182,7 @@ namespace qckdevTest.Collections
         [TestMethod]
         public void Remove()
         {
-            var dic = new qckdev.Collections.CacheDictionary<int, string>()
+            var dic = new qckdev.Collections.Specialized.CacheDictionary<int, string>()
             {
                 CacheTimeout = TimeSpan.FromMilliseconds(200)
             };
@@ -198,7 +198,7 @@ namespace qckdevTest.Collections
         [TestMethod]
         public void Remove_Twice()
         {
-            var dic = new qckdev.Collections.CacheDictionary<int, string>()
+            var dic = new qckdev.Collections.Specialized.CacheDictionary<int, string>()
             {
                 CacheTimeout = TimeSpan.FromMilliseconds(200)
             };
@@ -215,7 +215,7 @@ namespace qckdevTest.Collections
         [TestMethod]
         public void Remove_WithDelay()
         {
-            var dic = new qckdev.Collections.CacheDictionary<int, string>()
+            var dic = new qckdev.Collections.Specialized.CacheDictionary<int, string>()
             {
                 CacheTimeout = TimeSpan.FromMilliseconds(200)
             };
@@ -232,7 +232,7 @@ namespace qckdevTest.Collections
         [TestMethod]
         public void Clear()
         {
-            var dic = new qckdev.Collections.CacheDictionary<int, string>()
+            var dic = new qckdev.Collections.Specialized.CacheDictionary<int, string>()
             {
                 CacheTimeout = TimeSpan.FromMilliseconds(200)
             };
@@ -248,7 +248,7 @@ namespace qckdevTest.Collections
         [TestMethod]
         public void Clear_WithDelay()
         {
-            var dic = new qckdev.Collections.CacheDictionary<int, string>()
+            var dic = new qckdev.Collections.Specialized.CacheDictionary<int, string>()
             {
                 CacheTimeout = TimeSpan.FromMilliseconds(200)
             };
@@ -265,7 +265,7 @@ namespace qckdevTest.Collections
         [TestMethod]
         public void This_Set()
         {
-            var dic = new qckdev.Collections.CacheDictionary<int, string>()
+            var dic = new qckdev.Collections.Specialized.CacheDictionary<int, string>()
             {
                 CacheTimeout = TimeSpan.FromMilliseconds(200)
             };
@@ -280,7 +280,7 @@ namespace qckdevTest.Collections
         [TestMethod]
         public void This_Set_WithDelay()
         {
-            var dic = new qckdev.Collections.CacheDictionary<int, string>()
+            var dic = new qckdev.Collections.Specialized.CacheDictionary<int, string>()
             {
                 CacheTimeout = TimeSpan.FromMilliseconds(200)
             };
@@ -296,7 +296,7 @@ namespace qckdevTest.Collections
         [TestMethod]
         public void This_Set_Existing()
         {
-            var dic = new qckdev.Collections.CacheDictionary<int, string>()
+            var dic = new qckdev.Collections.Specialized.CacheDictionary<int, string>()
             {
                 CacheTimeout = TimeSpan.FromMilliseconds(200)
             };
@@ -312,7 +312,7 @@ namespace qckdevTest.Collections
         [TestMethod]
         public void This_Set_Existing_WithDelay()
         {
-            var dic = new qckdev.Collections.CacheDictionary<int, string>()
+            var dic = new qckdev.Collections.Specialized.CacheDictionary<int, string>()
             {
                 CacheTimeout = TimeSpan.FromMilliseconds(200)
             };
@@ -329,7 +329,7 @@ namespace qckdevTest.Collections
         [TestMethod]
         public void This_Get()
         {
-            var dic = new qckdev.Collections.CacheDictionary<int, string>()
+            var dic = new qckdev.Collections.Specialized.CacheDictionary<int, string>()
             {
                 CacheTimeout = TimeSpan.FromMilliseconds(200)
             };
@@ -345,7 +345,7 @@ namespace qckdevTest.Collections
         [ExpectedException(typeof(KeyNotFoundException))]
         public void This_Get_NotFound_WithDelay()
         {
-            var dic = new qckdev.Collections.CacheDictionary<int, string>()
+            var dic = new qckdev.Collections.Specialized.CacheDictionary<int, string>()
             {
                 CacheTimeout = TimeSpan.FromMilliseconds(200)
             };
@@ -361,7 +361,7 @@ namespace qckdevTest.Collections
         [TestMethod]
         public void Keys()
         {
-            var dic = new qckdev.Collections.CacheDictionary<int, string>()
+            var dic = new qckdev.Collections.Specialized.CacheDictionary<int, string>()
             {
                 CacheTimeout = TimeSpan.FromMilliseconds(200)
             };
@@ -376,7 +376,7 @@ namespace qckdevTest.Collections
         [TestMethod]
         public void Keys_WithDelay()
         {
-            var dic = new qckdev.Collections.CacheDictionary<int, string>()
+            var dic = new qckdev.Collections.Specialized.CacheDictionary<int, string>()
             {
                 CacheTimeout = TimeSpan.FromMilliseconds(200)
             };
@@ -392,7 +392,7 @@ namespace qckdevTest.Collections
         [TestMethod]
         public void Values()
         {
-            var dic = new qckdev.Collections.CacheDictionary<int, string>()
+            var dic = new qckdev.Collections.Specialized.CacheDictionary<int, string>()
             {
                 CacheTimeout = TimeSpan.FromMilliseconds(200)
             };
@@ -407,7 +407,7 @@ namespace qckdevTest.Collections
         [TestMethod]
         public void Values_WithDelay()
         {
-            var dic = new qckdev.Collections.CacheDictionary<int, string>()
+            var dic = new qckdev.Collections.Specialized.CacheDictionary<int, string>()
             {
                 CacheTimeout = TimeSpan.FromMilliseconds(200)
             };
