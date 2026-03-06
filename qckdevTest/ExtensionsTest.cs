@@ -71,7 +71,7 @@ namespace qckdevTest
 
             builder.Append("Hola mundo.");
             Assert.AreEqual(11, builder.Length);
-            Extensions.Clear(builder);
+            QExtensions.Clear(builder);
             Assert.AreEqual(0, builder.Length);
         }
 
