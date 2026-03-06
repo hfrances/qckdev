@@ -7,7 +7,7 @@ namespace qckdev
     /// <summary>
     /// Provides a set of static (Shared in Visual Basic) methods.
     /// </summary>
-    public static class Extensions
+    public static class QExtensions
     {
 
         /// <summary>
